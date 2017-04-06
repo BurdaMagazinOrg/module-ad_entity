@@ -12,6 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   label = @Translation("Advertising entity"),
  *   handlers = {
  *     "list_builder" = "Drupal\ad_entity\AdEntityListBuilder",
+ *     "view_builder" = "Drupal\ad_entity\AdEntityViewBuilder",
  *     "form" = {
  *       "add" = "Drupal\ad_entity\Form\AdEntityForm",
  *       "edit" = "Drupal\ad_entity\Form\AdEntityForm",
