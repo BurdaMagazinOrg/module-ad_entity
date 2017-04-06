@@ -1,6 +1,6 @@
-# Ad Entity
+# Advertising Entity
 
-A Drupal module which provides a consolidated management of various types of advertising instances.
+A Drupal module which provides a consolidated management for various types of advertising instances.
 
 # Quick start
 
