@@ -1,0 +1,4 @@
+type: module
+name: Ad Entity
+description: "Provides a consolidated management of various types of advertising instances."
+core: 8.x
