@@ -1,0 +1,4 @@
+services:
+  ad_entity.type_manager:
+    class: Drupal\ad_entity\Plugin\AdTypeManager
+    parent: default_plugin_manager

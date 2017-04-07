@@ -2,11 +2,12 @@
 
 namespace Drupal\ad_entity\Form;
 
+use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Form\FormBuilder;
+use Drupal\ad_entity\Plugin\AdTypeManager;
 
 /**
  * Class GlobalSettingsForm.
@@ -16,23 +17,33 @@ use Drupal\Core\Form\FormBuilder;
 class GlobalSettingsForm extends ConfigFormBase {
 
   /**
-   * Drupal\Core\Form\FormBuilder definition.
+   * The form builder.
    *
    * @var \Drupal\Core\Form\FormBuilder
    */
   protected $formBuilder;
 
   /**
+   * The Advertising type manager.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdTypeManager
+   */
+  protected $adTypeManager;
+
+  /**
    * Constructor method.
    *
-   * @param Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param Drupal\Core\Form\FormBuilder $form_builder
+   * @param \Drupal\Core\Form\FormBuilder $form_builder
    *   The form builder.
+   * @param \Drupal\ad_entity\Plugin\AdTypeManager $ad_type_manager
+   *   The Advertising type manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, FormBuilder $form_builder) {
+  public function __construct(ConfigFactoryInterface $config_factory, FormBuilder $form_builder, AdTypeManager $ad_type_manager) {
     parent::__construct($config_factory);
     $this->formBuilder = $form_builder;
+    $this->adTypeManager = $ad_type_manager;
   }
 
   /**
@@ -41,7 +52,8 @@ class GlobalSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('form_builder')
+      $container->get('form_builder'),
+      $container->get('ad_entity.type_manager')
     );
   }
 
@@ -58,7 +70,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'ad_entity_global_settings';
+    return 'ad_entity_settings';
   }
 
   /**

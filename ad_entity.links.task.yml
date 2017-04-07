@@ -3,8 +3,8 @@ entity.ad_entity.collection:
   route_name: entity.ad_entity.collection
   base_route: entity.ad_entity.collection
   weight: 10
-ad_entity.ad_entity_global_settings:
+ad_entity.settings:
   title: 'Global settings'
-  route_name: ad_entity.ad_entity_global_settings
+  route_name: ad_entity.settings
   base_route: entity.ad_entity.collection
   weight: 20

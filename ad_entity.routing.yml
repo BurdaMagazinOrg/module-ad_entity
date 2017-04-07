@@ -1,5 +1,5 @@
 
-ad_entity.ad_entity_global_settings:
+ad_entity.settings:
   path: '/admin/structure/ad_entity/global-settings'
   defaults:
     _form: '\Drupal\ad_entity\Form\GlobalSettingsForm'
