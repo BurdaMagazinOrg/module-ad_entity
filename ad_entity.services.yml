@@ -2,3 +2,6 @@ services:
   ad_entity.type_manager:
     class: Drupal\ad_entity\Plugin\AdTypeManager
     parent: default_plugin_manager
+  ad_entity.view_manager:
+    class: Drupal\ad_entity\Plugin\AdViewManager
+    parent: default_plugin_manager

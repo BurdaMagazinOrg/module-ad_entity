@@ -9,5 +9,20 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface AdEntityInterface extends ConfigEntityInterface {
 
-  // Add get/set methods for your configuration properties here.
+  /**
+   * Get the corresponding Advertisement type plugin.
+   *
+   * @return \Drupal\ad_entity\Plugin\AdTypeInterface
+   *   An instance of the Advertisement type plugin.
+   */
+  public function getTypePlugin();
+
+  /**
+   * Get the corresponding Advertisement view handler plugin.
+   *
+   * @return \Drupal\ad_entity\Plugin\AdViewInterface
+   *   An instance of the Advertisement view plugin handler.
+   */
+  public function getViewPlugin();
+
 }

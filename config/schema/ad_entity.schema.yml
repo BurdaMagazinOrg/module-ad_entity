@@ -14,3 +14,9 @@ ad_entity.ad_entity.*:
       label: 'Label'
     uuid:
       type: string
+    type_plugin_id:
+      type: string
+      label: 'Type plugin id'
+    view_plugin_id:
+      type: string
+      label: 'View handler plugin id'

@@ -42,8 +42,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $cacheable_metadata->applyTo($build[$entity_id]);
 
       // Build the content.
-      $build[$entity_id] += []; // TODO Use plugins to build the content,
-      // use EntityWithPluginCollectionInterface on the Advertising entity.
+      $build[$entity_id] += []; // TODO Use view handler plugins to build the content.
     }
 
     return $build;

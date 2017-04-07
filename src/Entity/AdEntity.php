@@ -54,4 +54,42 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    */
   protected $label;
 
+  /**
+   * An instance of the type plugin.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdTypeInterface
+   */
+  protected $typePlugin;
+
+  /**
+   * An instance of the view handler plugin.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdViewInterface
+   */
+  protected $viewPlugin;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTypePlugin() {
+    if (!isset($this->typePlugin)) {
+      $id = $this->get('type_plugin_id');
+      $this->typePlugin = $id ?
+        \Drupal::service('ad_entity.type_manager')->createInstance($id) : NULL;
+    }
+    return $this->typePlugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getViewPlugin() {
+    if (!isset($this->viewPlugin)) {
+      $id = $this->get('view_plugin_id');
+      $this->viewPlugin = $id ?
+        \Drupal::service('ad_entity.view_manager')->createInstance($id) : NULL;
+    }
+    return $this->viewPlugin;
+  }
+
 }

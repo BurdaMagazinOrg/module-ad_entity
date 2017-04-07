@@ -37,7 +37,7 @@ class AdEntityForm extends EntityForm {
       '#disabled' => !$ad_entity->isNew(),
     ];
 
-    /* You will need additional form elements for your custom properties. */
+    // TODO Fieldset for type, fieldset for view settings (when multiple views are allowed).
 
     return $form;
   }
