@@ -1,0 +1,11 @@
+
+ad_entity.ad_entity_global_settings:
+  path: '/admin/structure/ad_entity/global-settings'
+  defaults:
+    _form: '\Drupal\ad_entity\Form\GlobalSettingsForm'
+    _title: 'Global settings for Advertising entities'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+

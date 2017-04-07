@@ -3,8 +3,8 @@
 namespace Drupal\ad_entity;
 
 use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\ad_entity\Entity\AdEntityInterface;
 
 /**
  * Provides the base view builder for Advertising entities.
@@ -19,7 +19,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  public function view(AdEntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
+  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
     $build = $this->viewMultiple([$entity], $view_mode, $langcode);
     return reset($build);
   }

@@ -1,0 +1,10 @@
+entity.ad_entity.collection:
+  title: 'Manage'
+  route_name: entity.ad_entity.collection
+  base_route: entity.ad_entity.collection
+  weight: 10
+ad_entity.ad_entity_global_settings:
+  title: 'Global settings'
+  route_name: ad_entity.ad_entity_global_settings
+  base_route: entity.ad_entity.collection
+  weight: 20
