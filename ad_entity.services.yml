@@ -5,3 +5,6 @@ services:
   ad_entity.view_manager:
     class: Drupal\ad_entity\Plugin\AdViewManager
     parent: default_plugin_manager
+  ad_entity.context_manager:
+    class: Drupal\ad_entity\Plugin\AdContextManager
+    parent: default_plugin_manager

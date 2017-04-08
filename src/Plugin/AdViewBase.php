@@ -7,6 +7,4 @@ use Drupal\Component\Plugin\PluginBase;
 /**
  * Base class for Advertising view handlers.
  */
-abstract class AdViewBase extends PluginBase implements AdViewInterface {
-
-}
+abstract class AdViewBase extends PluginBase implements AdViewInterface {}

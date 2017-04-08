@@ -23,4 +23,37 @@ interface AdTypeInterface extends PluginInspectionInterface {
    */
   public function allowedViews(array $form, FormStateInterface $form_state);
 
+  /**
+   * Returns the form elements for global settings.
+   *
+   * @param array $form
+   *   The global settings form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   *
+   * @return array
+   *   The settings as form array.
+   */
+  public function globalSettingsForm(array $form, FormStateInterface $form_state);
+
+  /**
+   * Validate the global settings form.
+   *
+   * @param array &$form
+   *   The global settings form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   */
+  public function globalSettingsValidate(array &$form, FormStateInterface $form_state);
+
+  /**
+   * Act on form submission of global settings.
+   *
+   * @param array &$form
+   *   The global settings form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   */
+  public function globalSettingsSubmit(array &$form, FormStateInterface $form_state);
+
 }
