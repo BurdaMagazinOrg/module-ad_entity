@@ -45,9 +45,7 @@ class AdEntityHtmlRouteProvider extends AdminHtmlRouteProvider {
       $route
         ->setDefaults([
           '_entity_list' => $entity_type_id,
-          // Make sure this is not a TranslatableMarkup object as the
-          // TitleResolver translates this string again.
-          '_title' => (string) $entity_type->getLabel(),
+          '_title' => 'Advertising entities',
         ])
         ->setRequirement('_permission', $entity_type->getAdminPermission())
         ->setOption('_admin_route', TRUE);

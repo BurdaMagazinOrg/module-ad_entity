@@ -2,3 +2,4 @@ type: module
 name: Advertising Entity
 description: "Provides a consolidated management for various types of advertising instances."
 core: 8.x
+configure: entity.ad_entity.collection

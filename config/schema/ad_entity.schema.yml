@@ -23,7 +23,7 @@ ad_entity.ad_entity.*:
 
 ad_entity.context:
   type: mapping
-  label: 'Advertising entity context'
+  label: 'Advertising context'
   mapping:
     plugin_id:
       type: string

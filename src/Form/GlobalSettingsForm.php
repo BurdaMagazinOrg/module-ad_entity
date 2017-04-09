@@ -2,7 +2,6 @@
 
 namespace Drupal\ad_entity\Form;
 
-use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -17,33 +16,23 @@ use Drupal\ad_entity\Plugin\AdTypeManager;
 class GlobalSettingsForm extends ConfigFormBase {
 
   /**
-   * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilder
-   */
-  protected $formBuilder;
-
-  /**
    * The Advertising type manager.
    *
    * @var \Drupal\ad_entity\Plugin\AdTypeManager
    */
-  protected $adTypeManager;
+  protected $typeManager;
 
   /**
    * Constructor method.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Form\FormBuilder $form_builder
-   *   The form builder.
    * @param \Drupal\ad_entity\Plugin\AdTypeManager $ad_type_manager
    *   The Advertising type manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, FormBuilder $form_builder, AdTypeManager $ad_type_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, AdTypeManager $ad_type_manager) {
     parent::__construct($config_factory);
-    $this->formBuilder = $form_builder;
-    $this->adTypeManager = $ad_type_manager;
+    $this->typeManager = $ad_type_manager;
   }
 
   /**
@@ -52,7 +41,6 @@ class GlobalSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('form_builder'),
       $container->get('ad_entity.type_manager')
     );
   }
@@ -61,9 +49,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [
-      'ad_entity.settings',
-    ];
+    return ['ad_entity.settings'];
   }
 
   /**
@@ -77,8 +63,34 @@ class GlobalSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $type_ids = array_keys($this->typeManager->getDefinitions());
+    if (empty($type_ids)) {
+      return [
+        '#markup' => $this->t("There's no plugin installed which offers global settings."),
+      ];
+    }
+
+    $form = parent::buildForm($form, $form_state);
     $config = $this->config('ad_entity.settings');
-    return parent::buildForm($form, $form_state);
+
+    $form['settings_tabs'] = [
+      '#type' => 'vertical_tabs',
+      '#default_tab' => 'edit-' . key($type_ids),
+    ];
+
+    foreach ($type_ids as $type_id) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      $type = $this->typeManager->createInstance($type_id);
+      $form[$type_id] = [
+        '#type' => 'details',
+        '#group' => 'settings_tabs',
+        '#attributes' => ['id' => 'edit-' . $type_id],
+        '#title' => $type->getPluginDefinition()['label'],
+        '#tree' => TRUE,
+      ] + $type->globalSettingsForm($form, $form_state, $config);
+    }
+
+    return $form;
   }
 
   /**
@@ -86,6 +98,14 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
+    $config = $this->config('ad_entity.settings');
+
+    $type_ids = array_keys($this->typeManager->getDefinitions());
+    foreach ($type_ids as $type_id) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      $type = $this->typeManager->createInstance($type_id);
+      $type->globalSettingsValidate($form, $form_state, $config);
+    }
   }
 
   /**
@@ -93,8 +113,16 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
+    $config = $this->config('ad_entity.settings');
 
-    $this->config('ad_entity.settings')->save();
+    $type_ids = array_keys($this->typeManager->getDefinitions());
+    foreach ($type_ids as $type_id) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      $type = $this->typeManager->createInstance($type_id);
+      $type->globalSettingsSubmit($form, $form_state, $config);
+    }
+
+    $config->save();
   }
 
 }
