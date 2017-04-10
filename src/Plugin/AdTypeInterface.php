@@ -60,6 +60,7 @@ interface AdTypeInterface extends PluginInspectionInterface {
    *   The corresponding form state.
    * @param \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity
    *   The Advertising entity.
+   *
    * @return array
    *   The form elements as array.
    */

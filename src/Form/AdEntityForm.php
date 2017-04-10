@@ -2,8 +2,6 @@
 
 namespace Drupal\ad_entity\Form;
 
-use Drupal\ad_entity\Entity\AdEntityInterface;
-use Drupal\ad_entity\Plugin\AdViewInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormBuilderInterface;
@@ -46,7 +44,7 @@ class AdEntityForm extends EntityForm {
    *   The form builder.
    * @param \Drupal\ad_entity\Plugin\AdTypeManager $ad_type_manager
    *   The Advertising type manager.
-   * @param \Drupal\ad_entity\Plugin\AdViewManager $ad_type_manager
+   * @param \Drupal\ad_entity\Plugin\AdViewManager $ad_view_manager
    *   The Advertising view manager.
    */
   public function __construct(FormBuilderInterface $form_builder, AdTypeManager $ad_type_manager, AdViewManager $ad_view_manager) {
@@ -106,7 +104,8 @@ class AdEntityForm extends EntityForm {
       '#disabled' => !$ad_entity->isNew(),
     ];
 
-    // TODO Fieldset for type, fieldset for view settings (when multiple views are allowed).
+    // TODO: Fieldset for type, fieldset for view settings
+    // (when multiple views are allowed).
     $type_definitions = $this->typeManager->getDefinitions();
     $options = [];
     foreach ($type_definitions as $id => $definition) {
@@ -118,7 +117,7 @@ class AdEntityForm extends EntityForm {
       '#options' => $options,
       '#required' => TRUE,
       '#default_value' => $form_state->getValue('type_plugin_id') ?
-        $form_state->getValue('type_plugin_id') : $ad_entity->get('type_plugin_id'),
+      $form_state->getValue('type_plugin_id') : $ad_entity->get('type_plugin_id'),
       '#empty_value' => '',
       '#ajax' => [
         'callback' => [$this, 'thirdPartyChange'],
@@ -140,7 +139,7 @@ class AdEntityForm extends EntityForm {
       if ($type = $this->typeManager->createInstance($type_id)) {
         // Get all allowed view handlers for this type.
         $view_definitions = array_keys($this->viewManager->getDefinitions());
-        $allowed_views  = [];
+        $allowed_views = [];
         foreach ($view_definitions as $view_id) {
           /** @var \Drupal\ad_entity\Plugin\AdViewInterface $handler */
           $handler = $this->viewManager->createInstance($view_id);
@@ -157,7 +156,7 @@ class AdEntityForm extends EntityForm {
             '#options' => $allowed_views,
             '#required' => TRUE,
             '#default_value' => $form_state->getValue('view_plugin_id') ?
-              $form_state->getValue('view_plugin_id') : $ad_entity->get('view_plugin_id'),
+            $form_state->getValue('view_plugin_id') : $ad_entity->get('view_plugin_id'),
             '#empty_value' => '',
           ];
         }

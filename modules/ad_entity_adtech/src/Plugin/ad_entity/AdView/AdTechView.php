@@ -23,7 +23,7 @@ class AdTechView extends AdViewBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function build(AdEntityInterface $entity) {
     return [];
