@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\ad_entity\Plugin\AdViewManager;
 
 /**
  * Defines the Advertising entity.
@@ -55,11 +56,11 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $label;
 
   /**
-   * An instance of the type plugin.
+   * The Advertising view manager.
    *
-   * @var \Drupal\ad_entity\Plugin\AdTypeInterface
+   * @var \Drupal\ad_entity\Plugin\AdViewManager
    */
-  protected $typePlugin;
+  protected $viewManager;
 
   /**
    * An instance of the view handler plugin.
@@ -69,15 +70,15 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $viewPlugin;
 
   /**
-   * {@inheritdoc}
+   * An instance of the type plugin.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdTypeInterface
    */
-  public function getTypePlugin() {
-    if (!isset($this->typePlugin)) {
-      $id = $this->get('type_plugin_id');
-      $this->typePlugin = $id ?
-        \Drupal::service('ad_entity.type_manager')->createInstance($id) : NULL;
-    }
-    return $this->typePlugin;
+  protected $typePlugin;
+
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+    $this->viewManager = \Drupal::service('ad_entity.view_manager');
   }
 
   /**
@@ -87,9 +88,36 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     if (!isset($this->viewPlugin)) {
       $id = $this->get('view_plugin_id');
       $this->viewPlugin = $id ?
-        \Drupal::service('ad_entity.view_manager')->createInstance($id) : NULL;
+        $this->viewManager->createInstance($id) : NULL;
     }
     return $this->viewPlugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTypePlugin() {
+    if (!isset($this->typePlugin)) {
+      $id = $this->get('type_plugin_id');
+      // Use the type manager only when it's really needed.
+      $this->typePlugin = $id ?
+        \Drupal::service('ad_entity.type_manager')->createInstance($id) : NULL;
+    }
+    return $this->typePlugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    // Make sure the provider of the view plugin is given as a dependency.
+    // The type plugin however usually provides third party settings,
+    // which implies that its provider is already added as dependency.
+    if ($view_id = $this->get('view_plugin_id')) {
+      $definition = $this->viewManager->getDefinition($view_id);
+      $this->addDependency('module', $definition['provider']);
+    }
+    return parent::calculateDependencies();
   }
 
 }

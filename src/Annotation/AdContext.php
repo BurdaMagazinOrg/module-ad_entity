@@ -20,4 +20,13 @@ class AdContext extends Plugin {
    */
   public $id;
 
+  /**
+   * The label of the Advertising context.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $label;
+
 }

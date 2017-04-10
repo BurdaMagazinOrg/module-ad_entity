@@ -14,7 +14,7 @@ use Drupal\ad_entity\Plugin\AdContextManager;
  *
  * @FieldWidget(
  *   id = "ad_entity_context",
- *   label = @Translation("Avertising context"),
+ *   label = @Translation("Advertising context"),
  *   field_types = {
  *     "ad_entity_context"
  *   }

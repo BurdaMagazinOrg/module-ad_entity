@@ -165,6 +165,8 @@ class AdEntityForm extends EntityForm {
         $definition = $type_definitions[$type_id];
         $type_form = [
           '#type' => 'fieldset',
+          '#tree' => TRUE,
+          '#parents' => ['third_party_settings', $definition['provider']],
           '#collapsible' => FALSE,
           '#collapsed' => FALSE,
           '#attributes' => ['id' => 'type-plugin-' . $type_id],
