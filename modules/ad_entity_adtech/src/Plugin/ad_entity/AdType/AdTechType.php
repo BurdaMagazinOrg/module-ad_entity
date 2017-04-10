@@ -36,7 +36,7 @@ class AdTechType extends AdTypeBase {
     $element['page_targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Default page targeting"),
-      '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the page. Format: <strong>'pos': 'top', category: ['value1', 'value2']</strong>, ..."),
+      '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the page. Format: <strong>pos: 'top', category: ['value1', 'value2']</strong>, ..."),
       '#default_value' => !empty($settings['page_targeting']) ? $settings['page_targeting'] : '',
     ];
 

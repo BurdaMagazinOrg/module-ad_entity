@@ -5,8 +5,8 @@ namespace Drupal\ad_entity\src\Plugin\ad_entity\AdContext;
 use Drupal\ad_entity\Plugin\AdContextBase;
 
 /**
- * Class HideContext.
+ * Turnoff context plugin.
  */
-class HideContext extends AdContextBase {
+class TurnoffContext extends AdContextBase {
 
 }

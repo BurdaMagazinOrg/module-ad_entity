@@ -32,10 +32,10 @@ ad_entity.context:
       type: sequence
       label: 'The Advertising entities where to apply the given context'
 
-ad_entity.context.hide:
+ad_entity.context.turnoff:
   type: mapping
-  label: 'Context for hiding Advertising entities'
+  label: 'Context for turning off the display of Advertising entities'
   mapping:
     enabled:
       type: boolean
-      label: 'Hide the given Advertising entities'
+      label: 'Whether the turn off is enabled for the given entities'
