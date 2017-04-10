@@ -1,0 +1,24 @@
+ad_entity.settings.adtech_factory:
+  type: mapping
+  label: 'Global settings for the AdTech Factory type.'
+  mapping:
+    library_source:
+      type: string
+      label: 'Library source'
+    page_targeting:
+      type: string
+      label: 'Default pairs of key-values for targeting on the page'
+
+ad_entity.ad_entity.*.third_party.adtech_factory:
+  type: mapping
+  label: 'Configuration for the AdTech Factory type'
+  mapping:
+    data_atf:
+      type: string
+      label: 'Value for the data-atf attribute on the ad tag'
+    data_atf_format:
+      type: string
+      label: 'Value for the data-atf-format attribute on the ad tag'
+    targeting:
+      type: string
+      label: 'Default pairs of key-values for targeting on the ad tag'

@@ -7,6 +7,11 @@ use Drupal\ad_entity\Plugin\AdViewBase;
 
 /**
  * Default view handler plugin for AdTech Factory advertisement.
+ *
+ * @AdView(
+ *   id = "adtech_factory_default",
+ *   label = "Default AdTech Factory tag"
+ * )
  */
 class AdTechView extends AdViewBase {
 

@@ -20,4 +20,13 @@ class AdView extends Plugin {
    */
   public $id;
 
+  /**
+   * The label of the Advertising view handler.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $label;
+
 }

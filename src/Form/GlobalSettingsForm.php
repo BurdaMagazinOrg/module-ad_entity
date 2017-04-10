@@ -117,6 +117,11 @@ class GlobalSettingsForm extends ConfigFormBase {
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {
+      $values = $form_state->getValue($type_id, []);
+      if (!empty($values)) {
+        $config->set($type_id, $values);
+      }
+
       /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
       $type = $this->typeManager->createInstance($type_id);
       $type->globalSettingsSubmit($form, $form_state, $config);

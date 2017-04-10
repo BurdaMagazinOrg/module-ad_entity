@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin;
 
+use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\Config;
@@ -49,5 +50,43 @@ interface AdTypeInterface extends PluginInspectionInterface {
    *   The configuration object.
    */
   public function globalSettingsSubmit(array &$form, FormStateInterface $form_state, Config $config);
+
+  /**
+   * Returns the elements for the Advertising entity form.
+   *
+   * @param array $form
+   *   The entity form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   * @param \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity
+   *   The Advertising entity.
+   * @return array
+   *   The form elements as array.
+   */
+  public function entityConfigForm(array $form, FormStateInterface $form_state, AdEntityInterface $ad_entity);
+
+  /**
+   * Validate the Advertising entity form.
+   *
+   * @param array &$form
+   *   The entity form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   * @param \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity
+   *   The Advertising entity.
+   */
+  public function entityConfigValidate(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity);
+
+  /**
+   * Act on submission of the Advertising entity form.
+   *
+   * @param array &$form
+   *   The entity form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The corresponding form state.
+   * @param \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity
+   *   The Advertising entity.
+   */
+  public function entityConfigSubmit(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity);
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin;
 
+use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\Config;
@@ -66,5 +67,22 @@ abstract class AdTypeBase extends PluginBase implements AdTypeInterface, Contain
    * {@inheritdoc}
    */
   public function globalSettingsSubmit(array &$form, FormStateInterface $form_state, Config $config) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityConfigForm(array $form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {
+    return ['#markup' => $this->stringTranslation->translate("This plugin doesn't offer any configurable settings.")];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityConfigValidate(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityConfigSubmit(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {}
 
 }

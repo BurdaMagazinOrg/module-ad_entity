@@ -2,6 +2,8 @@
 
 namespace Drupal\ad_entity\Form;
 
+use Drupal\ad_entity\Entity\AdEntityInterface;
+use Drupal\ad_entity\Plugin\AdViewInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormBuilderInterface;
@@ -84,6 +86,7 @@ class AdEntityForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
     $ad_entity = $this->entity;
     $form['label'] = [
       '#type' => 'textfield',
@@ -114,7 +117,63 @@ class AdEntityForm extends EntityForm {
       '#title' => $this->t("Advertising type"),
       '#options' => $options,
       '#required' => TRUE,
+      '#default_value' => $form_state->getValue('type_plugin_id') ?
+        $form_state->getValue('type_plugin_id') : $ad_entity->get('type_plugin_id'),
+      '#empty_value' => '',
+      '#ajax' => [
+        'callback' => [$this, 'thirdPartyChange'],
+        'wrapper' => 'third-party-config',
+        'effect' => 'fade',
+        'method' => 'replaceWith',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => '',
+        ],
+      ],
     ];
+    $form['third_party'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'third-party-config'],
+    ];
+    if (($type_id = $form_state->getValue('type_plugin_id')) || ($type_id = $ad_entity->get('type_plugin_id'))) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      if ($type = $this->typeManager->createInstance($type_id)) {
+        // Get all allowed view handlers for this type.
+        $view_definitions = array_keys($this->viewManager->getDefinitions());
+        $allowed_views  = [];
+        foreach ($view_definitions as $view_id) {
+          /** @var \Drupal\ad_entity\Plugin\AdViewInterface $handler */
+          $handler = $this->viewManager->createInstance($view_id);
+          if (in_array($type_id, $handler->allowedTypes())) {
+            $allowed_views[$view_id] = $handler->getPluginDefinition()['label'];
+          }
+        }
+
+        if (!empty($allowed_views)) {
+          $form['third_party']['view_plugin_id'] = [
+            '#type' => 'select',
+            '#title' => $this->t("View handler"),
+            '#tree' => FALSE,
+            '#options' => $allowed_views,
+            '#required' => TRUE,
+            '#default_value' => $form_state->getValue('view_plugin_id') ?
+              $form_state->getValue('view_plugin_id') : $ad_entity->get('view_plugin_id'),
+            '#empty_value' => '',
+          ];
+        }
+
+        // Expose the type-specific configuration.
+        $definition = $type_definitions[$type_id];
+        $type_form = [
+          '#type' => 'fieldset',
+          '#collapsible' => FALSE,
+          '#collapsed' => FALSE,
+          '#attributes' => ['id' => 'type-plugin-' . $type_id],
+          '#title' => $this->t("Configuration for the @type type", ['@type' => $definition['label']]),
+        ] + $type->entityConfigForm($form, $form_state, $ad_entity);
+        $form['third_party'][$type_id] = $type_form;
+      }
+    }
 
     return $form;
   }
@@ -139,6 +198,22 @@ class AdEntityForm extends EntityForm {
         ]));
     }
     $form_state->setRedirectUrl($ad_entity->toUrl('collection'));
+  }
+
+  /**
+   * Rebuild callback for changed third party configs.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current form state.
+   *
+   * @return array
+   *   The third party form part.
+   */
+  public function thirdPartyChange(array &$form, FormStateInterface $form_state) {
+    $form = $this->formBuilder->rebuildForm($this->getFormId(), $form_state, $form);
+    return $form['third_party'];
   }
 
 }
