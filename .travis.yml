@@ -102,7 +102,7 @@ before_install:
   - composer self-update
 
   # Code Checks
-  - bash -x -e ./scripts/travis/test-source-code.sh
+  # - bash -x -e ./scripts/travis/test-source-code.sh
 
   # fix default travis php.ini
   - echo 'always_populate_raw_post_data = -1' >> drupal.php.ini
