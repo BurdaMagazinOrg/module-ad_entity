@@ -26,7 +26,10 @@ class AdTechView extends AdViewBase {
    * {@inheritdoc}
    */
   public function build(AdEntityInterface $entity) {
-    return [];
+    return [
+      '#theme' => 'adtech_factory_default',
+      '#ad_entity' => $entity,
+    ];
   }
 
 }

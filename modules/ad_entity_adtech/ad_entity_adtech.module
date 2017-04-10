@@ -33,3 +33,15 @@ function ad_entity_adtech_library_info_build() {
 function ad_entity_adtech_preprocess_page(&$variables) {
   $variables['#attached']['library'][] = 'ad_entity_adtech/provider';
 }
+
+/**
+ * Implements hook_theme().
+ */
+function ad_entity_adtech_theme($existing, $type, $theme, $path) {
+  return [
+    'adtech_factory_default' => [
+      'variables' => ['ad_entity' => NULL],
+      'file' => 'ad_entity_adtech.theme.inc',
+    ],
+  ];
+}
