@@ -81,11 +81,12 @@ class GlobalSettingsForm extends ConfigFormBase {
     foreach ($type_ids as $type_id) {
       /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
       $type = $this->typeManager->createInstance($type_id);
+      $label = $type->getPluginDefinition()['label'];
       $form[$type_id] = [
         '#type' => 'details',
         '#group' => 'settings_tabs',
         '#attributes' => ['id' => 'edit-' . $type_id],
-        '#title' => $type->getPluginDefinition()['label'],
+        '#title' => $this->t("@type types", ['@type' => $label]),
         '#tree' => TRUE,
       ] + $type->globalSettingsForm($form, $form_state, $config);
     }

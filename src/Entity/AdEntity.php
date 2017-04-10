@@ -3,7 +3,6 @@
 namespace Drupal\ad_entity\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\ad_entity\Plugin\AdViewManager;
 
 /**
  * Defines the Advertising entity.
@@ -76,6 +75,14 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    */
   protected $typePlugin;
 
+  /**
+   * AdEntity constructor.
+   *
+   * @param array $values
+   *   The values as array.
+   * @param string $entity_type
+   *   The entity type as string.
+   */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
     $this->viewManager = \Drupal::service('ad_entity.view_manager');
