@@ -34,10 +34,10 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $plugin_id, 
-      $plugin_definition, 
-      $configuration['field_definition'], 
-      $configuration['settings'], 
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('ad_entity.context_manager')
     );
@@ -56,7 +56,7 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\ad_entity\Plugin\AdContextManager
+   * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
    *   The Advertising context manager.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextManager $context_manager) {
@@ -79,7 +79,7 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\ad_entity\Plugin\Field\FieldType\AdContextItem $item */
-    $item = $items[$delta];
+    /* $item = $items[$delta]; */
 
     return $element;
   }
@@ -106,9 +106,10 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    /* // TODO serialization.
     foreach ($values as &$value) {
-      // TODO serialization
-    }
+    }*/
+
     return $values;
   }
 

@@ -3,4 +3,3 @@ entity.ad_entity.add_form:
   title: 'Add Advertising entity'
   appears_on:
     - entity.ad_entity.collection
-

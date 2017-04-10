@@ -62,7 +62,7 @@ class AdContextFormatter extends FormatterBase implements ContainerFactoryPlugin
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\ad_entity\Plugin\AdContextManager
+   * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
    *   The Advertising context manager.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager) {
@@ -85,9 +85,9 @@ class AdContextFormatter extends FormatterBase implements ContainerFactoryPlugin
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
+    /* TODO apply contexts.
     foreach ($items as $delta => $item) {
-      // TODO apply contexts.
-    }
+    }*/
 
     return $element;
   }
