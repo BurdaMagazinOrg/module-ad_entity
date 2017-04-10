@@ -1,0 +1,7 @@
+{
+  "name": "burdamagazinorg/ad_entity",
+  "type": "drupal-module",
+  "description": "Advertising Entity", 
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev"
+}
