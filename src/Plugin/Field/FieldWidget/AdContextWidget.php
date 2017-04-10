@@ -34,10 +34,10 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $plugin_id, 
-      $plugin_definition, 
-      $configuration['field_definition'], 
-      $configuration['settings'], 
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('ad_entity.context_manager')
     );
@@ -107,7 +107,7 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
-      // TODO serialization
+      // TODO serialization.
     }
     return $values;
   }
