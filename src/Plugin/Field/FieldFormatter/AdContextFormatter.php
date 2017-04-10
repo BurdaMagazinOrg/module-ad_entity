@@ -85,9 +85,9 @@ class AdContextFormatter extends FormatterBase implements ContainerFactoryPlugin
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
+    /* TODO apply contexts.
     foreach ($items as $delta => $item) {
-      // TODO apply contexts.
-    }
+    }*/
 
     return $element;
   }

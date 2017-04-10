@@ -79,7 +79,7 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\ad_entity\Plugin\Field\FieldType\AdContextItem $item */
-    $item = $items[$delta];
+    /* $item = $items[$delta]; */
 
     return $element;
   }
@@ -106,9 +106,10 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    /* // TODO serialization.
     foreach ($values as &$value) {
-      // TODO serialization.
-    }
+    }*/
+
     return $values;
   }
 
