@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   default_formatter = "ad_entity_context"
  * )
  */
-class AdContextItem extends FieldItemBase {
+class ContextItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}

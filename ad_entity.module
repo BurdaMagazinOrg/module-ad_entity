@@ -11,7 +11,7 @@
 function ad_entity_theme($existing, $type, $theme, $path) {
   return [
     'ad_entity' => [
-      'variables' => ['ad_entity' => NULL],
+      'variables' => ['ad_entity' => NULL, 'device' => 'any'],
       'file' => 'ad_entity.theme.inc',
     ],
   ];

@@ -3,24 +3,15 @@
 namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
- * Plugin implementation of the 'ad_entity_context' formatter.
- *
- * @FieldFormatter(
- *   id = "ad_entity_context",
- *   label = @Translation("Advertising context"),
- *   field_types = {
- *     "ad_entity_context"
- *   }
- * )
+ * Base formatter class for Advertising context fields.
  */
-class AdContextFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+abstract class ContextFormatterBase extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
    * The Advertising context manager.
@@ -75,21 +66,8 @@ class AdContextFormatter extends FormatterBase implements ContainerFactoryPlugin
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t("This formatter won't show any output, but will apply the contexts when its not hidden.");
+    $summary[] = $this->t("This formatter won't show any output, but will deliver Advertising context when its not hidden.");
     return $summary;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element = [];
-
-    /* TODO apply contexts.
-    foreach ($items as $delta => $item) {
-    }*/
-
-    return $element;
   }
 
 }

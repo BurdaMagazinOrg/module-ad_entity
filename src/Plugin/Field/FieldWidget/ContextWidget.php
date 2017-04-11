@@ -20,7 +20,7 @@ use Drupal\ad_entity\Plugin\AdContextManager;
  *   }
  * )
  */
-class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
    * The Advertising context manager.
@@ -78,7 +78,7 @@ class AdContextWidget extends WidgetBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\ad_entity\Plugin\Field\FieldType\AdContextItem $item */
+    /** @var \Drupal\ad_entity\Plugin\Field\FieldType\ContextItem $item */
     /* $item = $items[$delta]; */
 
     return $element;

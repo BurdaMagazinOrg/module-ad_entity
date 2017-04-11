@@ -1,6 +1,8 @@
 type: module
 name: Advertising Entity
-description: "Provides a consolidated management for various types of advertising instances."
+description: "Provides consolidated management for various types of advertising instances."
 package: Advertising
 configure: entity.ad_entity.collection
 core: 8.x
+dependencies:
+  - breakpoint_js_settings:breakpoint_js_settings

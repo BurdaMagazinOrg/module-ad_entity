@@ -19,7 +19,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
+  public function view(EntityInterface $entity, $view_mode = 'any', $langcode = NULL) {
     $build = $this->viewMultiple([$entity], $view_mode, $langcode);
     return reset($build);
   }
@@ -27,7 +27,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  public function viewMultiple(array $entities = [], $view_mode = 'full', $langcode = NULL) {
+  public function viewMultiple(array $entities = [], $view_mode = 'any', $langcode = NULL) {
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
     $build = [];
     foreach ($entities as $entity) {
@@ -45,6 +45,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $build[$entity_id] += [
         '#theme' => 'ad_entity',
         '#ad_entity' => $entity,
+        '#device' => $view_mode,
       ];
     }
 

@@ -34,6 +34,13 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $adEntityViewBuilder;
 
   /**
+   * List of supported devices.
+   *
+   * @var array
+   */
+  static protected $devices = ['smartphone', 'tablet', 'desktop'];
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -78,15 +85,32 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     foreach ($entities as $entity) {
       $options[$entity->id()] = $entity->label();
     }
-    $form['ad_entity_id'] = [
+    $form['ad_entity_any'] = [
       '#type' => 'select',
-      '#title' => $this->t("Advertising entity"),
-      '#description' => $this->t("The selected Advertising entity will be displayed inside this block."),
+      '#title' => $this->t("Default entity for any device"),
+      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given device. Choose none if you want to use variants per device."),
       '#empty_value' => '',
-      '#required' => TRUE,
+      '#required' => FALSE,
       '#options' => $options,
-      '#default_value' => !empty($this->configuration['ad_entity_id']) ? $this->configuration['ad_entity_id'] : NULL,
+      '#default_value' => !empty($this->configuration['ad_entity_any']) ? $this->configuration['ad_entity_any'] : NULL,
     ];
+    foreach (self::$devices as $device) {
+      $form['ad_entity_' . $device] = [
+        '#type' => 'select',
+        '#title' => $this->t("Variant for @device", ['@device' => $device]),
+        '#description' => $this->t("The selected Advertising entity will be displayed on @device devices.", ['@device' => $device]),
+        '#empty_value' => '',
+        '#required' => FALSE,
+        '#options' => $options,
+        '#default_value' => !empty($this->configuration['ad_entity_' . $device]) ? $this->configuration['ad_entity_' . $device] : NULL,
+        '#states' => [
+          'visible' => [
+            'select[name="settings[ad_entity_any]"]' => ['value' => ''],
+          ],
+        ],
+      ];
+    }
+
     return $form;
   }
 
@@ -94,8 +118,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->configuration['ad_entity_id']
-      = $form_state->getValue('ad_entity_id');
+    foreach (array_merge(self::$devices, ['any']) as $variant) {
+      $this->configuration['ad_entity_' . $variant]
+        = $form_state->getValue('ad_entity_' . $variant);
+    }
   }
 
   /**
@@ -103,23 +129,43 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function calculateDependencies() {
     $config = $this->getConfiguration();
-    if (!empty($config['ad_entity_id'])) {
-      return ['config' => ['ad_entity.ad_entity.' . $config['ad_entity_id']]];
+    $dependencies = ['config' => []];
+    foreach (array_merge(self::$devices, ['any']) as $variant) {
+      if (!empty($config['ad_entity_' . $variant])) {
+        $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
+        if (!in_array($dependency, $dependencies['config'])) {
+          $dependencies['config'][] = $dependency;
+        }
+      }
     }
-    return [];
+    return $dependencies;
   }
 
   /**
    * {@inheritdoc}
    */
   public function build() {
-    $id = !empty($this->configuration['ad_entity_id']) ? $this->configuration['ad_entity_id'] : NULL;
-    if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
-      if ($ad_entity->access('view')) {
-        return $this->adEntityViewBuilder->view($ad_entity);
+    $build = [];
+    if (!empty($this->configuration['ad_entity_any'])) {
+      $id = $this->configuration['ad_entity_any'];
+      if ($ad_entity = $this->adEntityStorage->load($id)) {
+        if ($ad_entity->access('view')) {
+          $build[] = $this->adEntityViewBuilder->view($ad_entity, 'any');
+        }
       }
     }
-    return [];
+    else {
+      foreach (self::$devices as $variant) {
+        $id = !empty($this->configuration['ad_entity_' . $variant]) ?
+          $this->configuration['ad_entity_' . $variant] : NULL;
+        if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
+          if ($ad_entity->access('view')) {
+            $build[] = $this->adEntityViewBuilder->view($ad_entity, $variant);
+          }
+        }
+      }
+    }
+    return $build;
   }
 
 }
