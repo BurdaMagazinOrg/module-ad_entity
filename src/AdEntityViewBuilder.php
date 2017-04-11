@@ -41,10 +41,11 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $cacheable_metadata->addCacheTags($this->getCacheTags());
       $cacheable_metadata->applyTo($build[$entity_id]);
 
-      // Let the assigned view handler build the content.
-      if ($view_handler = $entity->getViewPlugin()) {
-        $build[$entity_id] += $view_handler->build($entity);
-      }
+      // Build the view.
+      $build[$entity_id] += [
+        '#theme' => 'ad_entity',
+        '#ad_entity' => $entity,
+      ];
     }
 
     return $build;

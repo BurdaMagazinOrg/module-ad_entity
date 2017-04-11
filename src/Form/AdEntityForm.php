@@ -182,6 +182,36 @@ class AdEntityForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
+    $ad_entity = $this->entity;
+    if ($type_id = $form_state->getValue('type_plugin_id')) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      $type = $this->typeManager->createInstance($type_id);
+      $type->entityConfigValidate($form, $form_state, $ad_entity);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
+    $ad_entity = $this->entity;
+    if ($type_id = $form_state->getValue('type_plugin_id')) {
+      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+      $type = $this->typeManager->createInstance($type_id);
+      $type->entityConfigSubmit($form, $form_state, $ad_entity);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $ad_entity = $this->entity;
     $status = $ad_entity->save();

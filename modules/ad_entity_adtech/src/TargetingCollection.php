@@ -32,25 +32,9 @@ class TargetingCollection {
   protected $collected;
 
   /**
-   * Collects targeting info from the given user input.
-   *
-   * @param string $input
-   *   The string which holds the user input.
-   *   Keys with multiple values occur multiple times.
-   *   Example format: "key1: value1, key2: value2, key2: value3"
-   */
-  public function collectFromUserInput($input) {
-    $pairs = explode(',', $input);
-    foreach ($pairs as $pair) {
-      $pair = explode(':', trim($pair));
-      $this->add(trim($pair[0]), trim($pair[1]));
-    }
-  }
-
-  /**
    * Get the value for the given key.
    *
-   * @param $key
+   * @param string $key
    *   The targeting key.
    *
    * @return string|array|null
@@ -85,7 +69,13 @@ class TargetingCollection {
       if (!is_array($this->collected[$key])) {
         $this->collected[$key] = [$this->collected[$key]];
       }
-      $this->collected[$key] = array_unique($this->collected[$key], [$value]);
+      if (is_array($value)) {
+        $this->collected[$key] = array_merge($this->collected[$key], $value);
+      }
+      else {
+        $this->collected[$key] = array_merge($this->collected[$key], [$value]);
+      }
+      $this->collected[$key] = array_unique($this->collected[$key]);
     }
     else {
       $this->collected[$key] = $value;
@@ -95,7 +85,7 @@ class TargetingCollection {
   /**
    * Removes the given key or key-value pair from the current collection.
    *
-   * @param $key
+   * @param string $key
    *   The targeting key.
    * @param string $value
    *   (Optional) The targeting value to remove, if present.
@@ -125,9 +115,48 @@ class TargetingCollection {
   }
 
   /**
+   * Collects targeting info from the given user input.
+   *
+   * @param string $input
+   *   The string which holds the user input.
+   *   Keys with multiple values occur multiple times.
+   *   Example format: "key1: value1, key2: value2, key2: value3".
+   */
+  public function collectFromUserInput($input) {
+    $pairs = explode(',', $input);
+    foreach ($pairs as $pair) {
+      $pair = explode(':', trim($pair));
+      $this->add(trim($pair[0]), trim($pair[1]));
+    }
+  }
+
+  /**
+   * Collects targeting info from the given collection.
+   *
+   * @param \Drupal\ad_entity_adtech\TargetingCollection $collection
+   *   The targeting collection to collect from.
+   */
+  public function collectFromCollection(TargetingCollection $collection) {
+    foreach ($collection->toArray() as $key => $value) {
+      $this->add($key, $value);
+    }
+  }
+
+  /**
+   * Collects targeting info from the given JSON string.
+   *
+   * @param string $json
+   *   A JSON-encoded string which holds targeting information.
+   */
+  public function collectFromJson($json) {
+    $this->collectFromCollection(new TargetingCollection($json));
+  }
+
+  /**
    * Returns the collected targeting information as an array.
    *
    * @return array
+   *   The collection as array.
    */
   public function toArray() {
     return $this->collected;
@@ -137,6 +166,7 @@ class TargetingCollection {
    * Returns the collected targeting information as a JSON-encoded string.
    *
    * @return string
+   *   The collection as a JSON-encoded string.
    */
   public function toJson() {
     return Json::encode($this->collected);
@@ -144,6 +174,9 @@ class TargetingCollection {
 
   /**
    * Returns the collected targeting information as User-editable output.
+   *
+   * @return string
+   *   The user-editable output.
    */
   public function toUserOutput() {
     $pairs = [];

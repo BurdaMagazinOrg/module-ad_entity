@@ -21,6 +21,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "route_provider" = {
  *       "html" = "Drupal\ad_entity\AdEntityHtmlRouteProvider",
  *     },
+ *    "access" = "Drupal\entity\EntityAccessControlHandler",
+ *    "permission_provider" = "Drupal\entity\EntityPermissionProvider"
  *   },
  *   config_prefix = "ad_entity",
  *   admin_permission = "administer advertising entities",

@@ -8,12 +8,19 @@
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
 
-function template_preprocess_adtech_factory_default(&$variables) {
+/**
+ * Preprocess implementation for a default AdTech Factory view.
+ *
+ * @param array &$variables
+ *   An array of available variables.
+ */
+function template_preprocess_adtech_factory_default(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
   $ad_entity = $variables['ad_entity'];
   $settings = $ad_entity->getThirdPartySettings('ad_entity_adtech');
 
-  $id = 'atf-' . Crypt::randomBytes(4);
+  // Generate attributes.
+  $id = 'adtech-' . Crypt::randomBytesBase64(8);
   $attributes = new Attribute(['id' => $id]);
   $attributes->addClass("adtech-factory-default");
 

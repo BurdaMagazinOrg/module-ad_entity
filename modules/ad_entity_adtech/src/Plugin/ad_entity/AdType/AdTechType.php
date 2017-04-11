@@ -35,12 +35,13 @@ class AdTechType extends AdTypeBase {
       '#field_suffix' => '"',
     ];
 
-    // TODO De-serialize JSON with new TargetingCollection($settings['page_targeting']).
+    $targeting = !empty($settings['page_targeting']) ?
+      new TargetingCollection($settings['page_targeting']) : NULL;
     $element['page_targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Default page targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the page. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
-      '#default_value' => !empty($settings['page_targeting']) ? $settings['page_targeting'] : '',
+      '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
     ];
 
     return $element;
@@ -54,10 +55,10 @@ class AdTechType extends AdTypeBase {
     $values = $form_state->getValue($id);
 
     if (!empty($values['page_targeting'])) {
-      // Convert the targeting to a JSON-formatted string.
-      $collection = new TargetingCollection();
-      $collection->collectFromUserInput($values['page_targeting']);
-      $config->set($id . '.page_targeting', $collection->toJson());
+      // Convert the targeting to a JSON-encoded string.
+      $targeting = new TargetingCollection();
+      $targeting->collectFromUserInput($values['page_targeting']);
+      $config->set($id . '.page_targeting', $targeting->toJson());
     }
   }
 
@@ -90,14 +91,31 @@ class AdTechType extends AdTypeBase {
       '#required' => TRUE,
     ];
 
+    $targeting = !empty($settings['targeting']) ?
+      new TargetingCollection($settings['targeting']) : NULL;
     $element['targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Default targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the ad tag. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
-      '#default_value' => !empty($settings['targeting']) ? $settings['targeting'] : '',
+      '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
     ];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityConfigSubmit(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {
+    $provider = $this->getPluginDefinition()['provider'];
+    $values = $form_state->getValue(['third_party_settings', $provider]);
+
+    if (!empty($values['targeting'])) {
+      // Convert the targeting to a JSON-encoded string.
+      $targeting = new TargetingCollection();
+      $targeting->collectFromUserInput($values['targeting']);
+      $ad_entity->setThirdPartySetting($provider, 'targeting', $targeting->toJson());
+    }
   }
 
 }
