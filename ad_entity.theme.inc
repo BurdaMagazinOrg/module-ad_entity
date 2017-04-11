@@ -11,10 +11,10 @@ use Drupal\Component\Utility\Crypt;
 /**
  * Preprocess implementation for viewing an Advertising entity.
  *
- * @param $variables
+ * @param array $variables
  *   An array of variables.
  */
-function template_preprocess_ad_entity(&$variables) {
+function template_preprocess_ad_entity(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
   $ad_entity = $variables['ad_entity'];
   // Let the assigned view handler build the content.

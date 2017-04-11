@@ -85,8 +85,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#empty_value' => '',
       '#required' => TRUE,
       '#options' => $options,
-      '#default_value' => !empty($this->configuration['ad_entity_id']) ?
-        $this->configuration['ad_entity_id'] : NULL,
+      '#default_value' => !empty($this->configuration['ad_entity_id']) ? $this->configuration['ad_entity_id'] : NULL,
     ];
     return $form;
   }
