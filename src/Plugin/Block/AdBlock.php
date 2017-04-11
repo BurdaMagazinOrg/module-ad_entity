@@ -101,6 +101,17 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public function calculateDependencies() {
+    $config = $this->getConfiguration();
+    if (!empty($config['ad_entity_id'])) {
+      return ['config' => ['ad_entity.ad_entity.' . $config['ad_entity_id']]];
+    }
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     $id = !empty($this->configuration['ad_entity_id']) ? $this->configuration['ad_entity_id'] : NULL;
     if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
