@@ -9,11 +9,11 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  * Default view handler plugin for AdTech Factory advertisement.
  *
  * @AdView(
- *   id = "adtech_factory_default",
- *   label = "Default AdTech Factory tag"
+ *   id = "adtech_default",
+ *   label = "Default view for an AdTech Factory tag"
  * )
  */
-class AdTechView extends AdViewBase {
+class AdtechView extends AdViewBase {
 
   /**
    * {@inheritdoc}
@@ -27,7 +27,7 @@ class AdTechView extends AdViewBase {
    */
   public function build(AdEntityInterface $entity) {
     return [
-      '#theme' => 'adtech_factory_default',
+      '#theme' => 'adtech_default',
       '#ad_entity' => $entity,
     ];
   }

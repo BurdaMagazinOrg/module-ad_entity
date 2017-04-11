@@ -39,7 +39,7 @@ function ad_entity_adtech_preprocess_page(&$variables) {
  */
 function ad_entity_adtech_theme($existing, $type, $theme, $path) {
   return [
-    'adtech_factory_default' => [
+    'adtech_default' => [
       'variables' => ['ad_entity' => NULL],
       'file' => 'ad_entity_adtech.theme.inc',
     ],

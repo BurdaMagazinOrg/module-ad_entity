@@ -25,7 +25,7 @@ function template_preprocess_ad_entity(array &$variables) {
   // Generate attributes.
   $id = 'ad-entity-' . Crypt::randomBytesBase64(8);
   $attributes = new Attribute(['id' => $id]);
-  $attributes->addClass('ad-entity');
+  $attributes->addClass('ad-entity-container');
   $attributes->setAttribute('data-ad-entity', $ad_entity->id());
   $attributes->setAttribute('data-ad-entity-type', $ad_entity->get('type_plugin_id'));
   $attributes->setAttribute('data-ad-entity-view', $ad_entity->get('view_plugin_id'));

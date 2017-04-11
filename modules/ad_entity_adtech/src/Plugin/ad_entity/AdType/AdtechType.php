@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = "AdTech Factory"
  * )
  */
-class AdTechType extends AdTypeBase {
+class AdtechType extends AdTypeBase {
 
   /**
    * {@inheritdoc}
