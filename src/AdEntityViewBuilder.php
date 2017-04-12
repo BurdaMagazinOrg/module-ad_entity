@@ -4,7 +4,6 @@ namespace Drupal\ad_entity;
 
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Provides the base view builder for Advertising entities.
