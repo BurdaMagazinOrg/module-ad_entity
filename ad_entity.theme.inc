@@ -31,4 +31,7 @@ function template_preprocess_ad_entity(array &$variables) {
   $attributes->setAttribute('data-ad-entity-type', $ad_entity->get('type_plugin_id'));
   $attributes->setAttribute('data-ad-entity-view', $ad_entity->get('view_plugin_id'));
   $variables['attributes'] = $attributes;
+
+  // Attach the corresponding library.
+  $variables['#attached']['library'][] =  'ad_entity/view';
 }

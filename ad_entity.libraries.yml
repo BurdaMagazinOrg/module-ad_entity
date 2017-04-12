@@ -1,0 +1,6 @@
+view:
+  js:
+    js/prepare.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery

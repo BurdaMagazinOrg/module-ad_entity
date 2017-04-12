@@ -88,11 +88,14 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $form['ad_entity_any'] = [
       '#type' => 'select',
       '#title' => $this->t("Default entity for any device"),
-      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given device. Choose none if you want to use variants per device."),
+      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given device. <strong>Choose none</strong> if you want to use variants per device."),
       '#empty_value' => '',
       '#required' => FALSE,
       '#options' => $options,
       '#default_value' => !empty($this->configuration['ad_entity_any']) ? $this->configuration['ad_entity_any'] : NULL,
+    ];
+    $form['breakpoint_hint'] = [
+      '#markup' => $this->t("For variants, make sure you have set up the <a href='/admin/config/system/breakpoint_js' target='_blank'>breakpoint device mapping</a>."),
     ];
     foreach (self::$devices as $device) {
       $form['ad_entity_' . $device] = [
