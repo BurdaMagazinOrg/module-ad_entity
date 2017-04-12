@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -142,6 +143,27 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
     return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.path']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $tags = [];
+    $config = $this->getConfiguration();
+    foreach (array_merge(self::$devices, ['any']) as $variant) {
+      if (!empty($config['ad_entity_' . $variant])) {
+        $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
+      }
+    }
+    return Cache::mergeTags(parent::getCacheTags(), $tags);
   }
 
   /**
