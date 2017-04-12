@@ -13,8 +13,11 @@
 
   /**
    * Collects all Advertising entity containers from the given context.
+   *
+   * @param {object} context
+   *   The part of the DOM being processed.
    */
-  Drupal.ad_entity.collectAdContainers = function(context) {
+  Drupal.ad_entity.collectAdContainers = function (context) {
     $('.ad-entity-container').each(function () {
       var id = $(this).attr('id');
       Drupal.ad_entity.adContainers[id] = $(this);
@@ -54,6 +57,9 @@
   /**
    * Detects the currently used type of client device,
    * based on the information provided by the Breakpoint JS settings module.
+   *
+   * @return {string}
+   *   The detected client device type.
    */
   Drupal.ad_entity.currentDeviceType = function () {
     var Breakpoints = window.breakpointSettings.Breakpoints;
@@ -86,6 +92,6 @@
       }
     },
     detach: function (context, settings) {}
-  }
+  };
 
 }(jQuery, Drupal, window));
