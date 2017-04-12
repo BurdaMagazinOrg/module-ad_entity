@@ -33,5 +33,5 @@ function template_preprocess_ad_entity(array &$variables) {
   $variables['attributes'] = $attributes;
 
   // Attach the corresponding library.
-  $variables['#attached']['library'][] =  'ad_entity/view';
+  $variables['#attached']['library'][] = 'ad_entity/view';
 }
