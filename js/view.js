@@ -11,6 +11,8 @@
 
   Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
 
+  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
+
   /**
    * Collects all Advertising containers from the given context.
    *
@@ -95,29 +97,40 @@
       var containers = Drupal.ad_entity.collectAdContainers(context);
       Drupal.ad_entity.restrictAdsToScope(containers);
 
-      if ('views' in Drupal.ad_entity) {
-        // Let the view implementations prepare for their ads.
-        var view = '';
-        for (view in Drupal.ad_entity.views) {
-          if (Drupal.ad_entity.views.hasOwnProperty(view)) {
-            Drupal.ad_entity.views[view].prepare(containers, context, settings);
-          }
-        }
-        // Let the view implementations initialize their ads.
-        for (view in Drupal.ad_entity.views) {
-          if (Drupal.ad_entity.views.hasOwnProperty(view)) {
-            Drupal.ad_entity.views[view].initialize(containers, context, settings);
-          }
-        }
-        // Let the view implementations finalize their ads.
-        for (view in Drupal.ad_entity.views) {
-          if (Drupal.ad_entity.views.hasOwnProperty(view)) {
-            Drupal.ad_entity.views[view].finalize(containers, context, settings);
+      for (var id in containers) {
+        if (containers.hasOwnProperty(id)) {
+          var container = containers[id];
+          var handler_id = container.attr('data-ad-entity-view');
+
+          // Let the view handler build up the display of its ad.
+          if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+            var view = Drupal.ad_entity.viewHandlers[handler_id];
+            view.prepare(container, context, settings);
+            view.initialize(container, context, settings);
+            view.finalize(container, context, settings);
           }
         }
       }
     },
-    detach: function (context, settings) {}
+    detach: function (context, settings) {
+
+      var containers = $('.ad-entity-container', context);
+
+      containers.each(function () {
+        var container = $(this);
+        var id = container.attr('id');
+        var handler_id = container.attr('data-ad-entity-view');
+
+        // Let the view handler react on detachment of its ad.
+        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+          var view = Drupal.ad_entity.viewHandlers[handler_id];
+          view.detach(container, context, settings);
+        }
+
+        // Remove the detached Advertising containers from the collection.
+        delete Drupal.ad_entity.adContainers[id];
+      });
+    }
   };
 
 }(jQuery, Drupal, window));
