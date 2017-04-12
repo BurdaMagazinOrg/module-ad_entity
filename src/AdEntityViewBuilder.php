@@ -33,16 +33,11 @@ class AdEntityViewBuilder extends EntityViewBuilder {
     foreach ($entities as $entity) {
       $entity_id = $entity->id();
 
-      // Build the cache info.
+      // Build the view. No caching is defined here,
+      // because there might be multiple blocks on one page
+      // using the same advertising entity.
+      // Advertising blocks will be cached anyway.
       $build[$entity_id] = [
-        '#cache' => ['keys' => ['entity_view', 'ad_entity', $entity_id]],
-      ];
-      $cacheable_metadata = CacheableMetadata::createFromObject($entity);
-      $cacheable_metadata->addCacheTags($this->getCacheTags());
-      $cacheable_metadata->applyTo($build[$entity_id]);
-
-      // Build the view.
-      $build[$entity_id] += [
         '#theme' => 'ad_entity',
         '#ad_entity' => $entity,
         '#device' => $view_mode,

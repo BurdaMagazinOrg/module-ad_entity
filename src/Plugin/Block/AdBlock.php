@@ -95,7 +95,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#default_value' => !empty($this->configuration['ad_entity_any']) ? $this->configuration['ad_entity_any'] : NULL,
     ];
     $form['breakpoint_hint'] = [
-      '#markup' => $this->t("For variants, make sure you have set up the <a href='/admin/config/system/breakpoint_js' target='_blank'>breakpoint device mapping</a>."),
+      '#markup' => $this->t("<strong>For variants, make sure you have properly set up the <a href='/admin/config/system/breakpoint_js' target='_blank'>breakpoint device mapping</a>.</strong>"),
     ];
     foreach (self::$devices as $device) {
       $form['ad_entity_' . $device] = [
