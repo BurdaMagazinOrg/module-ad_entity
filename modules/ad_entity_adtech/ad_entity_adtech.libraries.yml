@@ -1,0 +1,6 @@
+page_targeting:
+  js:
+    js/page.targeting.js: {}
+  dependencies:
+    - ad_entity_adtech/provider
+    - core/drupalSettings

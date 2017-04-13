@@ -31,6 +31,9 @@ function template_preprocess_adtech_default(array &$variables) {
   if (!empty($settings['data_atf_format'])) {
     $attributes->setAttribute('data-atf-format', $settings['data_atf_format']);
   }
+  if (!empty($settings['targeting'])) {
+    $variables['targeting'] = $settings['targeting'];
+  }
 
   $variables['attributes'] = $attributes;
 }
