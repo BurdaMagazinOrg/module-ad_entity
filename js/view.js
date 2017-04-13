@@ -109,7 +109,7 @@
         if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
           var view_handler = Drupal.ad_entity.viewHandlers[handler_id];
           correlation[handler_id] = correlation[handler_id] || {handler: view_handler, containers: {}};
-          correlation[handler_id][containers][id] = container;
+          correlation[handler_id].containers[id] = container;
         }
       }
     }

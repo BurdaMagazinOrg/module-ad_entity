@@ -4,3 +4,10 @@ page_targeting:
   dependencies:
     - ad_entity_adtech/provider
     - core/drupalSettings
+
+view_adtech_default:
+  js:
+    js/adtech_default.view.js: {}
+  dependencies:
+    - ad_entity_adtech/provider
+    - ad_entity/view

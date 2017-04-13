@@ -24,7 +24,6 @@ function template_preprocess_adtech_default(array &$variables) {
   $attributes = new Attribute(['id' => $id]);
   $attributes->addClass('adtech-factory-ad');
   $attributes->addClass('adtech-default-view');
-
   if (!empty($settings['data_atf'])) {
     $attributes->setAttribute('data-atf', $settings['data_atf']);
   }
@@ -34,6 +33,8 @@ function template_preprocess_adtech_default(array &$variables) {
   if (!empty($settings['targeting'])) {
     $variables['targeting'] = $settings['targeting'];
   }
-
   $variables['attributes'] = $attributes;
+
+  // Attach the corresponding library.
+  $variables['#attached']['library'][] = 'ad_entity_adtech/view_adtech_default';
 }

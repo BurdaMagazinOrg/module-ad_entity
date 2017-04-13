@@ -11,7 +11,7 @@ ad_entity.settings.adtech_factory:
 
 ad_entity.ad_entity.*.third_party.adtech_factory:
   type: mapping
-  label: 'Configuration for the AdTech Factory type'
+  label: 'Entity config for the AdTech Factory type'
   mapping:
     data_atf:
       type: string
