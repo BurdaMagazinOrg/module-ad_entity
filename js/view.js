@@ -90,46 +90,71 @@
   };
 
   /**
+   * Correlates the Advertising containers with their view handlers.
+   *
+   * @param {object} containers
+   *   The list of Advertising containers to correlate.
+   *
+   * @return {object}
+   *   The correlation.
+   */
+  Drupal.ad_entity.correlate = function (containers) {
+    var correlation = {};
+    var handler_id = '';
+    for (var id in containers) {
+      if (containers.hasOwnProperty(id)) {
+        var container = containers[id];
+        handler_id = container.attr('data-ad-entity-view');
+
+        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+          var view_handler = Drupal.ad_entity.viewHandlers[handler_id];
+          correlation[handler_id] = correlation[handler_id] || {handler: view_handler, containers: {}};
+          correlation[handler_id][containers][id] = container;
+        }
+      }
+    }
+    return correlation;
+  };
+
+  /**
    * Drupal behavior for viewing Advertising entities.
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
       var containers = Drupal.ad_entity.collectAdContainers(context);
       Drupal.ad_entity.restrictAdsToScope(containers);
+      var correlation = Drupal.ad_entity.correlate(containers);
 
-      for (var id in containers) {
-        if (containers.hasOwnProperty(id)) {
-          var container = containers[id];
-          var handler_id = container.attr('data-ad-entity-view');
-
-          // Let the view handler build up the display of its ad.
-          if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
-            var view = Drupal.ad_entity.viewHandlers[handler_id];
-            view.prepare(container, context, settings);
-            view.initialize(container, context, settings);
-            view.finalize(container, context, settings);
+      // Let the view handlers act on attachment of their ads.
+      for (var handler_id in Drupal.ad_entity.viewHandlers) {
+        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+          if (correlation.hasOwnProperty(handler_id)) {
+            correlation[handler_id].handler.attach(correlation[handler_id].containers, context, settings);
           }
         }
       }
     },
     detach: function (context, settings) {
 
-      var containers = $('.ad-entity-container', context);
-
-      containers.each(function () {
+      var containers = {};
+      $('.ad-entity-container', context).each(function () {
         var container = $(this);
         var id = container.attr('id');
-        var handler_id = container.attr('data-ad-entity-view');
+        containers[id] = container;
 
-        // Let the view handler react on detachment of its ad.
-        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
-          var view = Drupal.ad_entity.viewHandlers[handler_id];
-          view.detach(container, context, settings);
-        }
-
-        // Remove the detached Advertising containers from the collection.
+        // Remove the detached container from the collection.
         delete Drupal.ad_entity.adContainers[id];
       });
+      var correlation = Drupal.ad_entity.correlate(containers);
+
+      // Let the view handlers act on detachment of their ads.
+      for (var handler_id in Drupal.ad_entity.viewHandlers) {
+        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+          if (correlation.hasOwnProperty(handler_id)) {
+            correlation[handler_id].handler.detach(correlation[handler_id].containers, context, settings);
+          }
+        }
+      }
     }
   };
 
