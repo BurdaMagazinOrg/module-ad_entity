@@ -5,7 +5,7 @@ namespace Drupal\ad_entity\Plugin\Field\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\MapDataDefinition;
 
 /**
  * Plugin implementation of the 'ad_entity_context' field type.
@@ -24,7 +24,8 @@ class ContextItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['value'] = DataDefinition::create('ad_entity.context')
+    // TODO Create typed data definition for context instances.
+    $properties['context'] = MapDataDefinition::create('map')
       ->setLabel(new TranslatableMarkup('Context'))
       ->setRequired(TRUE);
 
@@ -37,7 +38,7 @@ class ContextItem extends FieldItemBase {
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     $schema = [
       'columns' => [
-        'value' => [
+        'context' => [
           'type' => 'blob',
           'size' => 'big',
         ],
@@ -51,8 +52,8 @@ class ContextItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    $value = $this->get('value')->getValue();
-    return $value ? TRUE : FALSE;
+    $context = $this->get('context')->getValue();
+    return empty($context) ? TRUE : FALSE;
   }
 
 }

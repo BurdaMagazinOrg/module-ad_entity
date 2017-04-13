@@ -25,7 +25,7 @@ ad_entity.context:
   type: mapping
   label: 'Advertising context'
   mapping:
-    plugin_id:
+    context_plugin_id:
       type: string
       label: 'The chosen Context plugin id'
     apply_on:

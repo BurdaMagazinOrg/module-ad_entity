@@ -2,7 +2,9 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -30,6 +32,13 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
   protected $contextManager;
 
   /**
+   * The storage for Advertising entities.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $adEntityStorage;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -39,7 +48,8 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('ad_entity.context_manager')
+      $container->get('ad_entity.context_manager'),
+      $container->get('entity_type.manager')->getStorage('ad_entity')
     );
   }
 
@@ -58,10 +68,13 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    *   Any third party settings.
    * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
    *   The Advertising context manager.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $ad_storage
+   *   The storage for Advertising entities.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextManager $context_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextManager $context_manager, EntityStorageInterface $ad_storage) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->contextManager = $context_manager;
+    $this->adEntityStorage = $ad_storage;
   }
 
   /**
@@ -69,7 +82,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    */
   public static function defaultSettings() {
     return [
-      'plugin_id' => '',
+      'context_plugin_id' => '',
       'apply_on' => '',
     ] + parent::defaultSettings();
   }
@@ -78,8 +91,41 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\ad_entity\Plugin\Field\FieldType\ContextItem $item */
-    /* $item = $items[$delta]; */
+    $element = [];
+
+    $context = $items->get($delta)->get('context')->getValue();
+
+    $context_definitions = $this->contextManager->getDefinitions();
+    $options = [];
+    foreach ($context_definitions as $id => $definition) {
+      $options[$id] = $definition['label'];
+    }
+    $plugin_id = !empty($context['context_plugin_id']) ? $context['context_plugin_id'] : NULL;
+    $element['context_plugin_id'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Type'),
+      '#required' => TRUE,
+      '#options' => $options,
+      '#empty_value' => '',
+      '#default_value' => $plugin_id,
+    ];
+
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
+    $entities = $this->adEntityStorage->loadMultiple();
+    $options = [];
+    foreach ($entities as $entity) {
+      $options[$entity->id()] = $entity->label();
+    }
+    $apply_on = !empty($context['apply_on']) ? $context['apply_on'] : NULL;
+    $element['apply_on'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Apply on ads'),
+      '#required' => TRUE,
+      '#multiple' => TRUE,
+      '#options' => $options,
+      '#empty_value' => '',
+      '#default_value' => $apply_on,
+    ];
 
     return $element;
   }
@@ -106,11 +152,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    /* // TODO serialization.
-    foreach ($values as &$value) {
-    }*/
-
-    return $values;
+    return ['context' => $values];
   }
 
 }
