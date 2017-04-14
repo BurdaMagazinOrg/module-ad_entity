@@ -6,6 +6,8 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\TypedData\ListDataDefinition;
+use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Plugin implementation of the 'ad_entity_context' field type.
@@ -24,9 +26,20 @@ class ContextItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    // TODO Create typed data definition for context instances.
-    $properties['context'] = MapDataDefinition::create('map')
-      ->setLabel(new TranslatableMarkup('Context'))
+    $definition_plugin_id = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('The chosen Context plugin id'))
+      ->setRequired(TRUE);
+    $definition_context_settings = DataDefinition::create('any')
+      ->setLabel(new TranslatableMarkup('Context plugin settings'))
+      ->setRequired(TRUE);
+    $definition_apply_on = ListDataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('The Advertising entities where to apply the given context'))
+      ->setRequired(TRUE);
+    $properties['context'] = MapDataDefinition::create()
+      ->setLabel(new TranslatableMarkup('Advertising context'))
+      ->setPropertyDefinition('context_plugin_id', $definition_plugin_id)
+      ->setPropertyDefinition('context_settings', $definition_context_settings)
+      ->setPropertyDefinition('apply_on', $definition_apply_on)
       ->setRequired(TRUE);
 
     return $properties;
@@ -41,6 +54,7 @@ class ContextItem extends FieldItemBase {
         'context' => [
           'type' => 'blob',
           'size' => 'big',
+          'serialize' => TRUE,
         ],
       ],
     ];
@@ -51,9 +65,38 @@ class ContextItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function mainPropertyName() {
+    return 'context';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEmpty() {
-    $context = $this->get('context')->getValue();
-    return empty($context) ? TRUE : FALSE;
+    return !empty($this->get('context')) ? $this->get('context')->isEmpty() : TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($values, $notify = TRUE) {
+    if (empty($values['context'])) {
+      $values = [static::mainPropertyName() => $values];
+    }
+    // Unserialize the values.
+    // @todo The storage controller should take care of this, see
+    //   https://www.drupal.org/node/2414835
+    if (is_string($values['context'])) {
+      $values['context'] = unserialize($values['context']);
+    }
+
+    // The context may only contain settings of the chosen context plugin.
+    $plugin_id = $values['context']['context_plugin_id'];
+    $context_settings = !empty($values['context']['context_settings'][$plugin_id]) ?
+      $values['context']['context_settings'][$plugin_id] : [];
+    $values['context']['context_settings'] = [$plugin_id => $context_settings];
+
+    parent::setValue($values, $notify);
   }
 
 }

@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Component\Utility\Crypt;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
@@ -82,8 +83,8 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    */
   public static function defaultSettings() {
     return [
-      'context_plugin_id' => '',
-      'apply_on' => '',
+      'context_plugin_id' => NULL,
+      'apply_on' => NULL,
     ] + parent::defaultSettings();
   }
 
@@ -91,23 +92,22 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $element = [];
-
-    $context = $items->get($delta)->get('context')->getValue();
+    $context = $items->get($delta)->get('context');
 
     $context_definitions = $this->contextManager->getDefinitions();
     $options = [];
     foreach ($context_definitions as $id => $definition) {
       $options[$id] = $definition['label'];
     }
-    $plugin_id = !empty($context['context_plugin_id']) ? $context['context_plugin_id'] : NULL;
-    $element['context_plugin_id'] = [
+    $selector = Crypt::randomBytesBase64(2);
+    $element['context']['context_plugin_id'] = [
       '#type' => 'select',
-      '#title' => $this->t('Type'),
-      '#required' => TRUE,
+      '#title' => $this->t('Context type'),
+      '#required' => FALSE,
       '#options' => $options,
       '#empty_value' => '',
-      '#default_value' => $plugin_id,
+      '#attributes' => ['data-context-selector' => $selector],
+      '#default_value' => $context->get('context_plugin_id')->getValue(),
     ];
 
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
@@ -116,15 +116,20 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
     foreach ($entities as $entity) {
       $options[$entity->id()] = $entity->label();
     }
-    $apply_on = !empty($context['apply_on']) ? $context['apply_on'] : NULL;
-    $element['apply_on'] = [
+    $element['context']['apply_on'] = [
       '#type' => 'select',
       '#title' => $this->t('Apply on ads'),
-      '#required' => TRUE,
+      '#description' => $this->t('Choose none to apply this context on any ad which would appear.'),
+      '#required' => FALSE,
       '#multiple' => TRUE,
       '#options' => $options,
       '#empty_value' => '',
-      '#default_value' => $apply_on,
+      '#default_value' => $context->get('apply_on')->getValue(),
+      '#states' => [
+        'invisible' => [
+          'select[data-context-selector="' . $selector . '"]' => ['value' => ''],
+        ],
+      ],
     ];
 
     return $element;
@@ -152,7 +157,13 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    return ['context' => $values];
+    foreach ($values as $index => &$value) {
+      if (empty($value['context']['context_plugin_id'])) {
+        // Remove the whole field value in case no context was chosen.
+        unset($values[$index]);
+      }
+    }
+    return parent::massageFormValues($values, $form, $form_state);
   }
 
 }

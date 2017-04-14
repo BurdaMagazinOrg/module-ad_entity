@@ -20,22 +20,3 @@ ad_entity.ad_entity.*:
     view_plugin_id:
       type: string
       label: 'View handler plugin id'
-
-ad_entity.context:
-  type: mapping
-  label: 'Advertising context'
-  mapping:
-    context_plugin_id:
-      type: string
-      label: 'The chosen Context plugin id'
-    apply_on:
-      type: sequence
-      label: 'The Advertising entities where to apply the given context'
-
-ad_entity.context.turnoff:
-  type: mapping
-  label: 'Context for turning off the display of Advertising entities'
-  mapping:
-    enabled:
-      type: boolean
-      label: 'Whether the turn off is enabled for the given entities'
