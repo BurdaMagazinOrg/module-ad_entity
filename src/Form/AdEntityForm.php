@@ -137,14 +137,12 @@ class AdEntityForm extends EntityForm {
     if (($type_id = $form_state->getValue('type_plugin_id')) || ($type_id = $ad_entity->get('type_plugin_id'))) {
       /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
       if ($type = $this->typeManager->createInstance($type_id)) {
-        // Get all allowed view handlers for this type.
-        $view_definitions = array_keys($this->viewManager->getDefinitions());
+        // Get all allowed view handler definitions for this type.
+        $view_definitions = $this->viewManager->getDefinitions();
         $allowed_views = [];
-        foreach ($view_definitions as $view_id) {
-          /** @var \Drupal\ad_entity\Plugin\AdViewInterface $handler */
-          $handler = $this->viewManager->createInstance($view_id);
-          if (in_array($type_id, $handler->allowedTypes())) {
-            $allowed_views[$view_id] = $handler->getPluginDefinition()['label'];
+        foreach ($view_definitions as $view_id => $view_definition) {
+          if (in_array($type_id, $view_definition['allowed_types'])) {
+            $allowed_views[$view_id] = $view_definition['label'];
           }
         }
 

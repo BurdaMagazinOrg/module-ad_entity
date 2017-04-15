@@ -17,10 +17,6 @@ use Drupal\Component\Utility\Crypt;
 function template_preprocess_ad_entity(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
   $ad_entity = $variables['ad_entity'];
-  // Let the assigned view handler build the content.
-  if ($view_handler = $ad_entity->getViewPlugin()) {
-    $variables['content'] = $view_handler->build($ad_entity);
-  }
 
   // Generate attributes.
   $id = 'ad-entity-' . Crypt::randomBytesBase64(8);
@@ -32,6 +28,14 @@ function template_preprocess_ad_entity(array &$variables) {
   $attributes->setAttribute('data-ad-entity-view', $ad_entity->get('view_plugin_id'));
   $variables['attributes'] = $attributes;
 
-  // Attach the corresponding library.
+  // Attach the fundamental JS implementation for viewing Advertising entities.
   $variables['#attached']['library'][] = 'ad_entity/view';
+
+  if ($view_handler = $ad_entity->getViewPlugin()) {
+    $definition = $view_handler->getPluginDefinition();
+    // Let the assigned view handler build the content.
+    $variables['content'] = $view_handler->build($ad_entity);
+    // Attach the JS implementation of the view handler.
+    $variables['#attached']['library'][] = $definition['library'];
+  }
 }

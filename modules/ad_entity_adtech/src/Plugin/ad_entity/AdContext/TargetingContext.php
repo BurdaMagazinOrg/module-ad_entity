@@ -12,7 +12,8 @@ use Drupal\ad_entity_adtech\TargetingCollection;
  *
  * @AdContext(
  *   id = "adtech_targeting",
- *   label = "AdTech Factory Targeting"
+ *   label = "AdTech Factory Targeting",
+ *   library = "ad_entity_adtech/targeting_context"
  * )
  */
 class TargetingContext extends AdContextBase {

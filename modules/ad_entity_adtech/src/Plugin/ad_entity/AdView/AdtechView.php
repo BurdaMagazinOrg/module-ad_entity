@@ -10,17 +10,14 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  *
  * @AdView(
  *   id = "adtech_default",
- *   label = "Default view for an AdTech Factory tag"
+ *   label = "Default view for an AdTech Factory tag",
+ *   library = "ad_entity_adtech/default_view",
+ *   allowed_types = {
+ *     "adtech_factory"
+ *   }
  * )
  */
 class AdtechView extends AdViewBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function allowedTypes() {
-    return ['adtech_factory'];
-  }
 
   /**
    * {@inheritdoc}

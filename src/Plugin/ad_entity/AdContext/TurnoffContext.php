@@ -9,7 +9,8 @@ use Drupal\ad_entity\Plugin\AdContextBase;
  *
  * @AdContext(
  *   id = "turnoff",
- *   label = @Translation("Turn off Advertisement")
+ *   label = @Translation("Turn off Advertisement"),
+ *   library = "ad_entity/turnoff_context"
  * )
  */
 class TurnoffContext extends AdContextBase {}

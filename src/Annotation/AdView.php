@@ -29,4 +29,18 @@ class AdView extends Plugin {
    */
   public $label;
 
+  /**
+   * The library which contains the JS implementation for this view handler.
+   *
+   * @var string
+   */
+  public $library;
+
+  /**
+   * A list of Advertising types the view handler is compatible with.
+   *
+   * @var string[]
+   */
+  public $allowed_types;
+
 }

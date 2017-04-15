@@ -29,4 +29,11 @@ class AdContext extends Plugin {
    */
   public $label;
 
+  /**
+   * The library which contains the JS implementation for this context plugin.
+   *
+   * @var string
+   */
+  public $library;
+
 }

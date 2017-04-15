@@ -34,7 +34,4 @@ function template_preprocess_adtech_default(array &$variables) {
     $variables['targeting'] = $settings['targeting'];
   }
   $variables['attributes'] = $attributes;
-
-  // Attach the corresponding library.
-  $variables['#attached']['library'][] = 'ad_entity_adtech/view_adtech_default';
 }

@@ -5,7 +5,7 @@ page_targeting:
     - ad_entity_adtech/provider
     - core/drupalSettings
 
-view_adtech_default:
+default_view:
   js:
     js/adtech_default.view.js: {}
   dependencies:
