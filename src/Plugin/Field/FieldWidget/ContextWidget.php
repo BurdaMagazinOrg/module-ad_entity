@@ -197,11 +197,13 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
       else {
         // Let the context plugin massage its settings for storage and output.
         $id = $value['context']['context_plugin_id'];
-        $context_plugin = $this->contextManager->createInstance($id);
-        $plugin_settings = !empty($value['context']['context_settings'][$id]) ?
-          $value['context']['context_settings'][$id] : [];
-        $plugin_settings = $context_plugin->massageSettings($plugin_settings);
-        $value['context']['context_settings'] = [$id => $plugin_settings];
+        if ($this->contextManager->hasDefinition($id)) {
+          $context_plugin = $this->contextManager->createInstance($id);
+          $plugin_settings = !empty($value['context']['context_settings'][$id]) ?
+            $value['context']['context_settings'][$id] : [];
+          $plugin_settings = $context_plugin->massageSettings($plugin_settings);
+          $value['context']['context_settings'] = [$id => $plugin_settings];
+        }
       }
     }
     return parent::massageFormValues($values, $form, $form_state);

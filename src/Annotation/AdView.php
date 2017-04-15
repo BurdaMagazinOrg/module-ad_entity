@@ -41,6 +41,6 @@ class AdView extends Plugin {
    *
    * @var string[]
    */
-  public $allowed_types;
+  public $allowedTypes;
 
 }

@@ -141,7 +141,7 @@ class AdEntityForm extends EntityForm {
         $view_definitions = $this->viewManager->getDefinitions();
         $allowed_views = [];
         foreach ($view_definitions as $view_id => $view_definition) {
-          if (in_array($type_id, $view_definition['allowed_types'])) {
+          if (in_array($type_id, $view_definition['allowedTypes'])) {
             $allowed_views[$view_id] = $view_definition['label'];
           }
         }
@@ -186,9 +186,11 @@ class AdEntityForm extends EntityForm {
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
     $ad_entity = $this->entity;
     if ($type_id = $form_state->getValue('type_plugin_id')) {
-      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
-      $type = $this->typeManager->createInstance($type_id);
-      $type->entityConfigValidate($form, $form_state, $ad_entity);
+      if ($this->typeManager->hasDefinition($type_id)) {
+        /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+        $type = $this->typeManager->createInstance($type_id);
+        $type->entityConfigValidate($form, $form_state, $ad_entity);
+      }
     }
   }
 
@@ -201,9 +203,11 @@ class AdEntityForm extends EntityForm {
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
     $ad_entity = $this->entity;
     if ($type_id = $form_state->getValue('type_plugin_id')) {
-      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
-      $type = $this->typeManager->createInstance($type_id);
-      $type->entityConfigSubmit($form, $form_state, $ad_entity);
+      if ($this->typeManager->hasDefinition($type_id)) {
+        /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+        $type = $this->typeManager->createInstance($type_id);
+        $type->entityConfigSubmit($form, $form_state, $ad_entity);
+      }
     }
   }
 

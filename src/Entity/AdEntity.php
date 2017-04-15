@@ -96,7 +96,7 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   public function getViewPlugin() {
     if (!isset($this->viewPlugin)) {
       $id = $this->get('view_plugin_id');
-      $this->viewPlugin = $id ?
+      $this->viewPlugin = ($id && $this->viewManager->hasDefinition($id)) ?
         $this->viewManager->createInstance($id) : NULL;
     }
     return $this->viewPlugin;
@@ -109,8 +109,9 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     if (!isset($this->typePlugin)) {
       $id = $this->get('type_plugin_id');
       // Use the type manager only when it's really needed.
-      $this->typePlugin = $id ?
-        \Drupal::service('ad_entity.type_manager')->createInstance($id) : NULL;
+      $type_manager = \Drupal::service('ad_entity.type_manager');
+      $this->typePlugin = ($id && $type_manager->hasDefinition($id)) ?
+        $type_manager->createInstance($id) : NULL;
     }
     return $this->typePlugin;
   }
@@ -124,7 +125,9 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     // which implies that its provider is already added as dependency.
     if ($view_id = $this->get('view_plugin_id')) {
       $definition = $this->viewManager->getDefinition($view_id);
-      $this->addDependency('module', $definition['provider']);
+      if (!empty($definition['provider'])) {
+        $this->addDependency('module', $definition['provider']);
+      }
     }
     return parent::calculateDependencies();
   }
