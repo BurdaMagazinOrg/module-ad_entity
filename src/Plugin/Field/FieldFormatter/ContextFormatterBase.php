@@ -66,7 +66,7 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t("This formatter won't show any output, but will deliver Advertising context when its not hidden.");
+    $summary[] = $this->t("This formatter won't show any output, but it will deliver the user-defined context.");
     return $summary;
   }
 
