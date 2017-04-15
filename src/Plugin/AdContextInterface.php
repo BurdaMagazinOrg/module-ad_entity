@@ -3,7 +3,6 @@
 namespace Drupal\ad_entity\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Map;
 
