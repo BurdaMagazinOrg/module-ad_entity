@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ad_entity\src\Plugin\ad_entity\AdContext;
+namespace Drupal\ad_entity\Plugin\ad_entity\AdContext;
 
 use Drupal\ad_entity\Plugin\AdContextBase;
 
@@ -12,6 +12,4 @@ use Drupal\ad_entity\Plugin\AdContextBase;
  *   label = @Translation("Turn off Advertisement")
  * )
  */
-class TurnoffContext extends AdContextBase {
-
-}
+class TurnoffContext extends AdContextBase {}

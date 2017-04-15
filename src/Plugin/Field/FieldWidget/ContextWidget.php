@@ -92,7 +92,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $context = $items->get($delta)->get('context');
+    $context_item = $items->get($delta)->get('context');
 
     $context_definitions = $this->contextManager->getDefinitions();
     $options = [];
@@ -107,7 +107,19 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
       '#options' => $options,
       '#empty_value' => '',
       '#attributes' => ['data-context-selector' => $selector],
-      '#default_value' => $context->get('context_plugin_id')->getValue(),
+      '#default_value' => $context_item->get('context_plugin_id')->getValue(),
+      '#weight' => 10,
+    ];
+
+    $element['context']['context_settings'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['ad-entity-context-settings']],
+      '#states' => [
+        'invisible' => [
+          'select[data-context-selector="' . $selector . '"]' => ['value' => ''],
+        ],
+      ],
+      '#weight' => 20,
     ];
 
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
@@ -124,13 +136,33 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
       '#multiple' => TRUE,
       '#options' => $options,
       '#empty_value' => '',
-      '#default_value' => $context->get('apply_on')->getValue(),
+      '#default_value' => $context_item->get('apply_on')->getValue(),
+      '#weight' => 30,
       '#states' => [
         'invisible' => [
           'select[data-context-selector="' . $selector . '"]' => ['value' => ''],
         ],
       ],
     ];
+
+    // Build the settings form elements for the context plugins.
+    $context_settings = [];
+    foreach ($context_definitions as $id => $definition) {
+      $context_plugin = $this->contextManager->createInstance($id);
+      $item_settings = $context_item->get('context_settings')->getValue();
+      $plugin_settings = !empty($item_settings[$id]) ? $item_settings[$id] : [];
+      $context_settings[$id] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['ad-entity-context-' . $id]],
+        '#states' => [
+          'visible' => [
+            'select[data-context-selector="' . $selector . '"]' => ['value' => $id],
+          ],
+        ],
+      ];
+      $context_settings[$id] += $context_plugin->settingsForm($plugin_settings, $context_item, $form, $form_state);
+    }
+    $element['context']['context_settings'] += $context_settings;
 
     return $element;
   }
@@ -161,6 +193,15 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
       if (empty($value['context']['context_plugin_id'])) {
         // Remove the whole field value in case no context was chosen.
         unset($values[$index]);
+      }
+      else {
+        // Let the context plugin massage its settings for storage and output.
+        $id = $value['context']['context_plugin_id'];
+        $context_plugin = $this->contextManager->createInstance($id);
+        $plugin_settings = !empty($value['context']['context_settings'][$id]) ?
+          $value['context']['context_settings'][$id] : [];
+        $plugin_settings = $context_plugin->massageSettings($plugin_settings);
+        $value['context']['context_settings'] = [$id => $plugin_settings];
       }
     }
     return parent::massageFormValues($values, $form, $form_state);
