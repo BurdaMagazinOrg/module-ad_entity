@@ -28,7 +28,6 @@ class EntityContextFormatter extends ContextFormatterBase {
     // No need to create instances of context plugins,
     // because the definition already contains
     // the only needed JS library to use.
-
     return $element;
   }
 
