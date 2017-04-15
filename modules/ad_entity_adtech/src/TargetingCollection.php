@@ -126,7 +126,13 @@ class TargetingCollection {
     $pairs = explode(',', $input);
     foreach ($pairs as $pair) {
       $pair = explode(':', trim($pair));
-      $this->add(trim($pair[0]), trim($pair[1]));
+      $count = count($pair);
+      if ($count === 1) {
+        $this->add('category', trim($pair[0]));
+      }
+      elseif ($count === 2) {
+        $this->add(trim($pair[0]), trim($pair[1]));
+      }
     }
   }
 
