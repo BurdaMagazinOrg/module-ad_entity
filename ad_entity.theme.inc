@@ -11,7 +11,7 @@ use Drupal\Component\Utility\Crypt;
 /**
  * Preprocess implementation for viewing an Advertising entity.
  *
- * @param array $variables
+ * @param array &$variables
  *   An array of variables.
  */
 function template_preprocess_ad_entity(array &$variables) {
@@ -43,10 +43,10 @@ function template_preprocess_ad_entity(array &$variables) {
 /**
  * Preprocess implementation for delivering Advertising context.
  *
- * @param array $variables
+ * @param array &$variables
  *   An array of variables.
  */
-function template_preprocess_ad_entity_context(&$variables) {
+function template_preprocess_ad_entity_context(array &$variables) {
   $item = $variables['item'];
   $definition = $variables['definition'];
   $id = $definition['id'];
