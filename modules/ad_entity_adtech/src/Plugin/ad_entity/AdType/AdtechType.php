@@ -116,6 +116,9 @@ class AdtechType extends AdTypeBase {
       $targeting->collectFromUserInput($values['targeting']);
       $ad_entity->setThirdPartySetting($provider, 'targeting', $targeting->toJson());
     }
+    else {
+      $ad_entity->setThirdPartySetting($provider, 'targeting', '{}');
+    }
   }
 
 }

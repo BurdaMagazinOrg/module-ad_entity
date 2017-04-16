@@ -31,10 +31,10 @@ class ContextItem extends FieldItemBase {
       ->setRequired(TRUE);
     $definition_context_settings = DataDefinition::create('any')
       ->setLabel(new TranslatableMarkup('Context plugin settings'))
-      ->setRequired(TRUE);
+      ->setRequired(FALSE);
     $definition_apply_on = ListDataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('The Advertising entities where to apply the given context'))
-      ->setRequired(TRUE);
+      ->setRequired(FALSE);
     $properties['context'] = MapDataDefinition::create()
       ->setLabel(new TranslatableMarkup('Advertising context'))
       ->setPropertyDefinition('context_plugin_id', $definition_plugin_id)

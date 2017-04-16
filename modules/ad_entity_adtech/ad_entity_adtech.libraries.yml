@@ -11,3 +11,9 @@ default_view:
   dependencies:
     - ad_entity_adtech/provider
     - ad_entity/view
+
+targeting_context:
+  js:
+    js/targeting.context.js: {}
+  dependencies:
+    - ad_entity/context

@@ -4,3 +4,16 @@ view:
   dependencies:
     - core/drupal
     - core/jquery
+
+context:
+  js:
+    js/context.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+
+turnoff_context:
+  js:
+    js/turnoff.context.js: {}
+  dependencies:
+    - ad_entity/context

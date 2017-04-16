@@ -43,7 +43,7 @@ class TargetingContext extends AdContextBase {
     if (!empty($plugin_settings['targeting'])) {
       $targeting = new TargetingCollection();
       $targeting->collectFromUserInput($plugin_settings['targeting']);
-      $plugin_settings['targeting'] = $targeting->toJson();
+      $plugin_settings['targeting'] = $targeting->toArray();
     }
     return parent::massageSettings($plugin_settings);
   }

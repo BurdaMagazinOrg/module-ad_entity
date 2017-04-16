@@ -35,11 +35,7 @@ class TreeAggregationContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    // @todo Display the contexts, either via drupalSettings
-    // or via DOM application/json script tags.
-    // No need to create instances of context plugins,
-    // because the definition already contains
-    // the only needed JS library to use.
+    // @todo Implement tree aggregation.
     return $element;
   }
 

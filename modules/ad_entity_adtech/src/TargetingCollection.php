@@ -12,12 +12,16 @@ class TargetingCollection {
   /**
    * TargetingCollection constructor.
    *
-   * @param string $json
-   *   (Optional) A JSON-encoded string as initial targeting information.
+   * @param array|string $info
+   *   (Optional) Either an array or a JSON-encoded string
+   *   holding initial targeting information.
    */
-  public function __construct($json = NULL) {
-    if (isset($json)) {
-      $this->collected = Json::decode($json);
+  public function __construct($info = NULL) {
+    if (is_array($info)) {
+      $this->collected = $info;
+    }
+    elseif (is_string($info)) {
+      $this->collected = Json::decode($info);
     }
     else {
       $this->collected = [];

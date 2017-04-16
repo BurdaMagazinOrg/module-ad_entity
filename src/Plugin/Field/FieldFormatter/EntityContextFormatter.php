@@ -23,11 +23,19 @@ class EntityContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    // @todo Display the contexts, either via drupalSettings
-    // or via DOM application/json script tags.
-    // No need to create instances of context plugins,
-    // because the definition already contains
-    // the only needed JS library to use.
+    foreach ($items as $delta => $item) {
+      if ($context_item = $item->get('context')) {
+        $id = $context_item->get('context_plugin_id')->getValue();
+        if ($id && $this->contextManager->hasDefinition($id)) {
+          $element[$delta] = [
+            '#theme' => 'ad_entity_context',
+            '#item' => $context_item,
+            '#definition' => $this->contextManager->getDefinition($id),
+          ];
+        }
+      }
+    }
+
     return $element;
   }
 

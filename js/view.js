@@ -1,6 +1,6 @@
 /**
  * @file
- * JS implementation for viewing Advertising entities.
+ * Fundamental JS implementation for viewing Advertising entities.
  */
 
 (function ($, Drupal, window) {
@@ -10,6 +10,8 @@
   Drupal.ad_entity = Drupal.ad_entity || {};
 
   Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
+
+  Drupal.ad_entity.context = Drupal.ad_entity.context || {};
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
@@ -124,6 +126,12 @@
       var containers = Drupal.ad_entity.collectAdContainers(context);
       Drupal.ad_entity.restrictAdsToScope(containers);
       var correlation = Drupal.ad_entity.correlate(containers);
+
+      // Apply Advertising contexts, if available.
+      if (!($.isEmptyObject(Drupal.ad_entity.context))) {
+        Drupal.ad_entity.context.addFrom(context);
+        Drupal.ad_entity.context.applyOn(containers);
+      }
 
       // Let the view handlers act on attachment of their ads.
       for (var handler_id in Drupal.ad_entity.viewHandlers) {

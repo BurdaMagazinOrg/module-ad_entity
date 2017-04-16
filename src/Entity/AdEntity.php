@@ -123,7 +123,8 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     // Make sure the provider of the view plugin is given as a dependency.
     // The type plugin however usually provides third party settings,
     // which implies that its provider is already added as dependency.
-    if ($view_id = $this->get('view_plugin_id')) {
+    $view_id = $this->get('view_plugin_id');
+    if ($view_id && $this->viewManager->hasDefinition($view_id)) {
       $definition = $this->viewManager->getDefinition($view_id);
       if (!empty($definition['provider'])) {
         $this->addDependency('module', $definition['provider']);

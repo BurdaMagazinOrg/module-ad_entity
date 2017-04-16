@@ -104,8 +104,6 @@ class AdEntityForm extends EntityForm {
       '#disabled' => !$ad_entity->isNew(),
     ];
 
-    // TODO: Fieldset for type, fieldset for view settings
-    // (when multiple views are allowed).
     $type_definitions = $this->typeManager->getDefinitions();
     $options = [];
     foreach ($type_definitions as $id => $definition) {
