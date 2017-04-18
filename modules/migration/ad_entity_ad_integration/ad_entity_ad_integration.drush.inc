@@ -52,5 +52,4 @@ function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type,
   // Maybe a sleep statement is required to prevent database overload.
   $table = $entity_type . '__' . $ad_integration_field;
   $db->select($table);
-  return;
 }
