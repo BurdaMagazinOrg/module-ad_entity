@@ -42,20 +42,30 @@ into the content region to deliver the user-defined context on the page.
 
 The available field formatters differ in which context will be delivered.
 To just deliver the user-defined context from the given entity,
-choose 'Context only from entity content'. If you also want to automatically
-deliver the context being attached to terms belonging to the content,
-choose 'Context from node including its terms (without trees)' or
-'Context from node including taxonomy tree aggregation"'.
+choose 'Context from entity only'.
 
-For taxonomy terms, you can also use the tree aggregation formatter.
+If you also want to additionally deliver the context
+being attached to terms which belong to a node, choose
+'Context from node with taxonomy (without trees)'. To include the taxonomy tree,
+you can additionally choose between the 'tree aggregation'
+or 'tree override' formatter variants.
 
 Using tree aggregation means that all contexts from a term's ancestors
-will be included. Please note that such operation may be expensive.
-When using a lot terms for nodes with large trees, it's recommended to
-write your custom formatter which directly fetches the contexts you need.
+will be included. Please note that such operation could be expensive.
+
+Using tree override means that the first context found in the taxonomy tree
+will be used, in case the given term has no context defined by itself.
+The first ancestor of the erm having a context will be used (bottom-up).
+Please note that this operation could be expensive as well.
+
+For taxonomy terms, you can use tree aggregation or tree override as well.
 
 # Tips
 
 It's recommended to always display your Advertising entities through
 Advertising blocks. This way, you're able to change your advertisement
 on your whole site and switch between available variants of advertisement.
+
+The default tree aggregations and tree overrides can be expensive operations.
+When using a lot terms for nodes with large trees, it's recommended to
+write your custom formatter instead, which directly loads the context you want.
