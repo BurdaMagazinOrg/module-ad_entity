@@ -17,6 +17,10 @@
         var context_targeting = context_settings.targeting;
         if (context_targeting) {
           var ad_tag = $('.adtech-factory-ad', container[0]);
+          if (ad_tag.length === 0) {
+            // This container doesn't hold an AdTech Factory tag.
+            return;
+          }
           var targeting = ad_tag.attr('data-adtech-targeting');
           if (targeting) {
             targeting = JSON.parse(targeting);

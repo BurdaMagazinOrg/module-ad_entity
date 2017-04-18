@@ -9,7 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *
  * @FieldFormatter(
  *   id = "ad_entity_context",
- *   label = @Translation("Advertising context from entity"),
+ *   label = @Translation("Context only from entity content"),
  *   field_types = {
  *     "ad_entity_context"
  *   }
@@ -24,16 +24,7 @@ class EntityContextFormatter extends ContextFormatterBase {
     $element = [];
 
     foreach ($items as $delta => $item) {
-      if ($context_item = $item->get('context')) {
-        $id = $context_item->get('context_plugin_id')->getValue();
-        if ($id && $this->contextManager->hasDefinition($id)) {
-          $element[$delta] = [
-            '#theme' => 'ad_entity_context',
-            '#item' => $context_item,
-            '#definition' => $this->contextManager->getDefinition($id),
-          ];
-        }
-      }
+      $element[$delta] = $this->buildElementFromItem($item);
     }
 
     return $element;

@@ -9,17 +9,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
- * Plugin implementation of the 'ad_entity_tree_aggregation_context' formatter.
+ * Plugin implementation of the 'ad_entity_node_with_tree_context' formatter.
  *
  * @FieldFormatter(
- *   id = "ad_entity_tree_aggregation_context",
- *   label = @Translation("Aggregated context from taxonomy tree"),
+ *   id = "ad_entity_node_with_tree_context",
+ *   label = @Translation("Context from node including taxonomy tree aggregation"),
  *   field_types = {
  *     "ad_entity_context"
  *   }
  * )
  */
-class TreeAggregationContextFormatter extends ContextFormatterBase {
+class NodeWithTreeAggregationContextFormatter extends ContextFormatterBase {
 
   /**
    * The term storage.
@@ -33,7 +33,7 @@ class TreeAggregationContextFormatter extends ContextFormatterBase {
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     switch ($field_definition->getTargetEntityTypeId()) {
-      case 'taxonomy_term':
+      case 'node':
         return TRUE;
     }
     return FALSE;
@@ -89,12 +89,30 @@ class TreeAggregationContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    $field_name = $items->getFieldDefinition()->get('field_name');
+    /** @var \Drupal\node\Entity\Node $node */
+    $node = $items->getEntity();
+    $nid = $node->id();
     $aggregated_items = [$items];
-    $parents = $this->termStorage->loadAllParents($items->getEntity()->id());
-    foreach ($parents as $parent) {
-      if ($parent_items = $parent->get($field_name)) {
-        $aggregated_items[] = $parent_items;
+    $node_terms = $this->termStorage->getNodeTerms([$nid]);
+    if (!empty($node_terms[$nid])) {
+      /** @var \Drupal\taxonomy\TermInterface $term */
+      foreach ($node_terms[$nid] as $tid => $term) {
+        $field_definitions = $term->getFieldDefinitions();
+        $parents = $this->termStorage->loadAllParents($tid);
+        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+        foreach ($field_definitions as $definition) {
+          if ($definition->getType() == 'ad_entity_context') {
+            $field_name = $definition->getName();
+            if ($term_items = $term->get($field_name)) {
+              $aggregated_items[] = $term_items;
+            }
+            foreach ($parents as $parent) {
+              if ($parent_items = $parent->get($field_name)) {
+                $aggregated_items[] = $parent_items;
+              }
+            }
+          }
+        }
       }
     }
 

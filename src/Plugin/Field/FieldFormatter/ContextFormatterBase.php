@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -68,6 +69,28 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
     $summary = [];
     $summary[] = $this->t("This formatter won't show any output, but it will deliver the user-defined context.");
     return $summary;
+  }
+
+  /**
+   * Builds a context render element from the given field item.
+   *
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item.
+   * @return array
+   *   The context element as render array.
+   */
+  protected function buildElementFromItem(FieldItemInterface $item) {
+    if ($context_item = $item->get('context')) {
+      $id = $context_item->get('context_plugin_id')->getValue();
+      if ($id && $this->contextManager->hasDefinition($id)) {
+        return [
+          '#theme' => 'ad_entity_context',
+          '#item' => $context_item,
+          '#definition' => $this->contextManager->getDefinition($id),
+        ];
+      }
+    }
+    return [];
   }
 
 }
