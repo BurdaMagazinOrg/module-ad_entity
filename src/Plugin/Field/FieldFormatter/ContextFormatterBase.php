@@ -76,6 +76,7 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    *
    * @param \Drupal\Core\Field\FieldItemInterface $item
    *   The field item.
+   *
    * @return array
    *   The context element as render array.
    */

@@ -23,8 +23,8 @@ class EntityContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    foreach ($items as $delta => $item) {
-      $element[$delta] = $this->buildElementFromItem($item);
+    foreach ($items as $item) {
+      $element[] = $this->buildElementFromItem($item);
     }
 
     return $element;
