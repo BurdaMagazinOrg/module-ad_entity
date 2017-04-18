@@ -96,7 +96,7 @@ class NodeWithTermsContextFormatter extends ContextFormatterBase {
     $node_terms = $this->termStorage->getNodeTerms([$nid]);
     if (!empty($node_terms[$nid])) {
       /** @var \Drupal\taxonomy\TermInterface $term */
-      foreach ($node_terms[$nid] as $tid => $term) {
+      foreach ($node_terms[$nid] as $term) {
         $field_definitions = $term->getFieldDefinitions();
         /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
         foreach ($field_definitions as $definition) {
