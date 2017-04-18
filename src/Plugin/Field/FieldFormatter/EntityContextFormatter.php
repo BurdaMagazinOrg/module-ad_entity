@@ -9,7 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *
  * @FieldFormatter(
  *   id = "ad_entity_context",
- *   label = @Translation("Context only from entity content"),
+ *   label = @Translation("Context from entity only"),
  *   field_types = {
  *     "ad_entity_context"
  *   }

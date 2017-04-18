@@ -9,11 +9,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
- * Plugin implementation of the 'ad_entity_tree_aggregation_context' formatter.
+ * Plugin implementation of the 'tree_aggregation_context' formatter.
  *
  * @FieldFormatter(
- *   id = "ad_entity_tree_aggregation_context",
- *   label = @Translation("Aggregated context from taxonomy tree"),
+ *   id = "tree_aggregation_context",
+ *   label = @Translation("Context with tree aggregation"),
  *   field_types = {
  *     "ad_entity_context"
  *   }
@@ -90,7 +90,8 @@ class TreeAggregationContextFormatter extends ContextFormatterBase {
     $element = [];
 
     $field_name = $items->getFieldDefinition()->get('field_name');
-    $aggregated_items = [$items];
+    $aggregated_items = [];
+    // ::loadAllParents() already includes the term itself.
     $parents = $this->termStorage->loadAllParents($items->getEntity()->id());
     foreach ($parents as $parent) {
       if ($parent_items = $parent->get($field_name)) {

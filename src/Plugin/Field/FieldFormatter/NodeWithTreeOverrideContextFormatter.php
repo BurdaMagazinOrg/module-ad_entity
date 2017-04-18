@@ -9,17 +9,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
- * Plugin implementation of the 'node_with_tree_aggregation_context' formatter.
+ * Plugin implementation of the 'node_with_tree_override_context' formatter.
  *
  * @FieldFormatter(
- *   id = "node_with_tree_aggregation_context",
- *   label = @Translation("Context from node with taxonomy (tree aggregation)"),
+ *   id = "node_with_tree_override_context",
+ *   label = @Translation("Context from node with taxonomy (tree override)"),
  *   field_types = {
  *     "ad_entity_context"
  *   }
  * )
  */
-class NodeWithTreeAggregationContextFormatter extends ContextFormatterBase {
+class NodeWithTreeOverrideContextFormatter extends ContextFormatterBase {
 
   /**
    * The term storage.
@@ -98,15 +98,13 @@ class NodeWithTreeAggregationContextFormatter extends ContextFormatterBase {
       /** @var \Drupal\taxonomy\TermInterface $term */
       foreach ($node_terms[$nid] as $tid => $term) {
         $field_definitions = $term->getFieldDefinitions();
-        // ::loadAllParents() already includes the term itself.
-        $parents = $this->termStorage->loadAllParents($tid);
-        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
         foreach ($field_definitions as $definition) {
           if ($definition->getType() == 'ad_entity_context') {
             $field_name = $definition->getName();
-            foreach ($parents as $parent) {
-              if ($parent_items = $parent->get($field_name)) {
-                $aggregated_items[] = $parent_items;
+            if ($term_items = $term->get($field_name)) {
+              $override_items = $this->getOverrideItems($term_items);
+              if (!$override_items->isEmpty()) {
+                $aggregated_items[] = $override_items;
               }
             }
           }
@@ -121,6 +119,32 @@ class NodeWithTreeAggregationContextFormatter extends ContextFormatterBase {
     }
 
     return $element;
+  }
+
+  /**
+   * Returns the first non-empty list in the term's ancestor tree (bottom-up).
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   The given item list of the current term.
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface
+   *   The list as object when items were found, or an empty item list.
+   */
+  protected function getOverrideItems(FieldItemListInterface $items) {
+    if (!$items->isEmpty()) {
+      return $items;
+    }
+    $field_name = $items->getFieldDefinition()->get('field_name');
+    $parents = $this->termStorage->loadParents($items->getEntity()->id());
+    foreach ($parents as $parent) {
+      if ($parent_items = $parent->get($field_name)) {
+        if (!$parent_items->isEmpty()) {
+          return $parent_items;
+        }
+        return $this->getOverrideItems($parent_items);
+      }
+    }
+    return $items;
   }
 
 }

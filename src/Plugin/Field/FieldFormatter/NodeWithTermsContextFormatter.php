@@ -9,11 +9,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
- * Plugin implementation of the 'ad_entity_node_with_terms_context' formatter.
+ * Plugin implementation of the 'node_with_terms_context' formatter.
  *
  * @FieldFormatter(
- *   id = "ad_entity_node_with_terms_context",
- *   label = @Translation("Context from node including its terms (without trees)"),
+ *   id = "node_with_terms_context",
+ *   label = @Translation("Context from node with taxonomy (without trees)"),
  *   field_types = {
  *     "ad_entity_context"
  *   }
