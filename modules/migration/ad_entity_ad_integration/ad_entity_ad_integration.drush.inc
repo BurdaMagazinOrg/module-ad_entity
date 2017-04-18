@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Drush commands for migrating from Ad Integration to Advertising Entity.
+ */
+
+/**
  * Implements hook_drush_command().
  */
 function ad_entity_ad_integration_drush_command() {
@@ -26,7 +31,7 @@ function ad_entity_ad_integration_drush_command() {
  * key-value pairs of AdTech Factory targeting.
  *
  * @param string $entity_type
- *   The entity type, e.g. node or taxonomy_term
+ *   The entity type, e.g. node or taxonomy_term.
  * @param string $ad_integration_field
  *   Machine name of the entity's ad_integration field.
  * @param string $ad_entity_field
@@ -40,11 +45,12 @@ function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type,
     return;
   }
 
-  /**
-   * @todo 1. Load Ad Integration config, extract default values.
-   * 2. Extract all datasets from table, replace NULL values with default ones.
-   * Alternative: Extract single dataset from table to prevent memory overflow.
-   * 3. Insert for each row a new dataset in ad_entity context field.
-   * Maybe a sleep statement is required to prevent database overload.
-   */
+  // @todo 1. Load Ad Integration config, extract default values.
+  // 2. Extract all datasets from table, replace NULL values with default ones.
+  // Alternative: Extract single dataset from table to prevent memory overflow.
+  // 3. Insert for each row a new dataset in ad_entity context field.
+  // Maybe a sleep statement is required to prevent database overload.
+  $table = $entity_type . '__' . $ad_integration_field;
+  $db->select($table);
+  return;
 }
