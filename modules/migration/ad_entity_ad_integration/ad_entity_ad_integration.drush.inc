@@ -44,8 +44,7 @@ function ad_entity_ad_integration_drush_command() {
  */
 function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type, $bundle, $ad_integration_field, $ad_entity_field) {
   $db = \Drupal::database();
-  if (!in_array($entity_type, ['node', 'taxonomy_term'])
-  || !isset($entity_type, $ad_integration_field, $ad_entity_field)) {
+  if (!isset($entity_type, $bundle, $ad_integration_field, $ad_entity_field)) {
     drush_log('Invalid arguments supplied, aborting.', 'error');
     return;
   }
@@ -64,21 +63,23 @@ function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type,
   $default_value = $field_config->get('default_value');
   $ad_integration_settings = \Drupal::config('ad_integration.settings');
   if (empty($default_value)) {
-    $default_value = [[
-      'context' => [
-        'context_plugin_id' => 'adtech_targeting',
-        'apply_on' => [],
-        'context_settings' => [
-          'adtech_targeting' => [
-            'targeting' => [
-              'unit1' => $ad_integration_settings->get('adsc_unit1_default'),
-              'unit2' => $ad_integration_settings->get('adsc_unit2_default'),
-              'unit3' => $ad_integration_settings->get('adsc_unit3_default'),
+    $default_value = [
+      [
+        'context' => [
+          'context_plugin_id' => 'adtech_targeting',
+          'apply_on' => [],
+          'context_settings' => [
+            'adtech_targeting' => [
+              'targeting' => [
+                'unit1' => $ad_integration_settings->get('adsc_unit1_default'),
+                'unit2' => $ad_integration_settings->get('adsc_unit2_default'),
+                'unit3' => $ad_integration_settings->get('adsc_unit3_default'),
+              ],
             ],
           ],
         ],
       ],
-    ]];
+    ];
     $field_config->set('default_value', $default_value);
     $field_config->save();
     drush_print('Updated default values for field config.');
