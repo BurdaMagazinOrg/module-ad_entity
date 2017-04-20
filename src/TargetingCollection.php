@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ad_entity_adtech;
+namespace Drupal\ad_entity;
 
 use Drupal\Component\Serialization\Json;
 
@@ -143,7 +143,7 @@ class TargetingCollection {
   /**
    * Collects targeting info from the given collection.
    *
-   * @param \Drupal\ad_entity_adtech\TargetingCollection $collection
+   * @param \Drupal\ad_entity\TargetingCollection $collection
    *   The targeting collection to collect from.
    */
   public function collectFromCollection(TargetingCollection $collection) {

@@ -20,7 +20,7 @@
             var container = containers[id];
             var ad_tag = $('.adtech-factory-ad', container[0]);
             var argument = {element: ad_tag[0]};
-            var targeting = ad_tag.attr('data-adtech-targeting');
+            var targeting = ad_tag.attr('data-ad-entity-targeting');
             if (targeting) {
               argument.targeting = JSON.parse(targeting);
             }

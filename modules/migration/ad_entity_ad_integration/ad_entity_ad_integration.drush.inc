@@ -12,8 +12,8 @@ function ad_entity_ad_integration_drush_command() {
   $commands = [];
 
   // Check all translations for available updates.
-  $commands['shovel-to-adtech-targeting'] = [
-    'description' => 'Shovels field values from the ad_integration field to the ad_entity context field. Converts the Ad Integration values to key-value pairs for AdTech Factory targeting. Configures field config to have default ad integration values as default field values.',
+  $commands['shovel-to-targeting-context'] = [
+    'description' => 'Shovels field values from the ad_integration field to the ad_entity context field. Converts the Ad Integration values to key-value pairs for targeting. Configures field config to have default ad integration values as default field values.',
     'arguments' => [
       'entity_type' => "The affected entity type, either 'node' or 'taxonomy_term'",
       'bundle' => "The bundle, e.g. article or channel.",
@@ -29,7 +29,7 @@ function ad_entity_ad_integration_drush_command() {
  * Shovels field values from the ad_integration field to the ad_entity field.
  *
  * Converts the Ad Integration values to
- * key-value pairs of AdTech Factory targeting.
+ * key-value pairs of targeting.
  * Configures field config to have default
  * ad integration values as default field values.
  *
@@ -42,15 +42,10 @@ function ad_entity_ad_integration_drush_command() {
  * @param string $ad_entity_field
  *   Machine name of the entity's ad_entity field.
  */
-function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type, $bundle, $ad_integration_field, $ad_entity_field) {
+function drush_ad_entity_ad_integration_shovel_to_targeting_context($entity_type, $bundle, $ad_integration_field, $ad_entity_field) {
   $db = \Drupal::database();
   if (!isset($entity_type, $bundle, $ad_integration_field, $ad_entity_field)) {
     drush_log('Invalid arguments supplied, aborting.', 'error');
-    return;
-  }
-
-  if (!(\Drupal::moduleHandler()->moduleExists('ad_entity_adtech'))) {
-    drush_log('The AdTech Factory module for Advertising Entity is not installed, aborting.');
     return;
   }
 
@@ -66,10 +61,10 @@ function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type,
     $default_value = [
       [
         'context' => [
-          'context_plugin_id' => 'adtech_targeting',
+          'context_plugin_id' => 'targeting',
           'apply_on' => [],
           'context_settings' => [
-            'adtech_targeting' => [
+            'targeting' => [
               'targeting' => [
                 'unit1' => $ad_integration_settings->get('adsc_unit1_default'),
                 'unit2' => $ad_integration_settings->get('adsc_unit2_default'),
@@ -97,10 +92,10 @@ function drush_ad_entity_ad_integration_shovel_to_adtech_targeting($entity_type,
     LIMIT 10", [':bundle' => $bundle]);
     foreach ($records as $record) {
       $context_value = [
-        'context_plugin_id' => 'adtech_targeting',
+        'context_plugin_id' => 'targeting',
         'apply_on' => [],
         'context_settings' => [
-          'adtech_targeting' => [
+          'targeting' => [
             'targeting' => [
               'unit1' => !empty($record->{$ad_integration_field . '_adsc_unit1'}) ? $record->{$ad_integration_field . '_adsc_unit1'} : $ad_integration_settings->get('adsc_unit1_default'),
               'unit2' => !empty($record->{$ad_integration_field . '_adsc_unit2'}) ? $record->{$ad_integration_field . '_adsc_unit2'} : $ad_integration_settings->get('adsc_unit2_default'),

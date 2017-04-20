@@ -1,6 +1,6 @@
 /**
  * @file
- * JS handler implementation for the 'adtech_targeting' context.
+ * JS handler implementation for the 'targeting' context.
  */
 
 (function ($, Drupal, window) {
@@ -11,17 +11,15 @@
 
   Drupal.ad_entity.context = Drupal.ad_entity.context || {};
 
-  Drupal.ad_entity.context.adtech_targeting = {
+  Drupal.ad_entity.context.targeting = {
     apply: function (container, context_settings, newcomers) {
       if (context_settings.hasOwnProperty('targeting')) {
         var context_targeting = context_settings.targeting;
-        if (context_targeting) {
-          var ad_tag = $('.adtech-factory-ad', container[0]);
-          if (ad_tag.length === 0) {
-            // This container doesn't hold an AdTech Factory tag.
-            return;
-          }
-          var targeting = ad_tag.attr('data-adtech-targeting');
+        var targeting_element = $('[data-ad-entity-targeting]', container[0]);
+        if (context_targeting && targeting_element.length > 0) {
+          // Make sure to operate only on one targeting element.
+          targeting_element = targeting_element.first();
+          var targeting = targeting_element.attr('data-ad-entity-targeting');
           if (targeting) {
             targeting = JSON.parse(targeting);
           }
@@ -29,7 +27,7 @@
             targeting = {};
           }
 
-          // Merge the ad targeting with the given context targeting.
+          // Merge the container's current targeting with the given context targeting.
           for (var key in context_targeting) {
             if (context_targeting.hasOwnProperty(key)) {
               if (targeting.hasOwnProperty(key)) {
@@ -53,7 +51,7 @@
               }
             }
           }
-          ad_tag.attr('data-adtech-targeting', JSON.stringify(targeting));
+          targeting_element.attr('data-ad-entity-targeting', JSON.stringify(targeting));
         }
       }
     }

@@ -17,3 +17,9 @@ turnoff_context:
     js/turnoff.context.js: {}
   dependencies:
     - ad_entity/context
+
+targeting_context:
+  js:
+    js/targeting.context.js: {}
+  dependencies:
+    - ad_entity/context

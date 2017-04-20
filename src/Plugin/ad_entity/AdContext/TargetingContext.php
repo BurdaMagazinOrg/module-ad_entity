@@ -1,19 +1,19 @@
 <?php
 
-namespace Drupal\ad_entity_adtech\Plugin\ad_entity\AdContext;
+namespace Drupal\ad_entity\Plugin\ad_entity\AdContext;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\ad_entity\Plugin\AdContextBase;
-use Drupal\ad_entity_adtech\TargetingCollection;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
- * Targeting context plugin for AdTech Factory advertisement.
+ * Targeting context plugin.
  *
  * @AdContext(
- *   id = "adtech_targeting",
- *   label = "AdTech Factory Targeting",
- *   library = "ad_entity_adtech/targeting_context"
+ *   id = "targeting",
+ *   label = "Targeting",
+ *   library = "ad_entity/targeting_context"
  * )
  */
 class TargetingContext extends AdContextBase {

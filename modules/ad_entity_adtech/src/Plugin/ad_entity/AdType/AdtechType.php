@@ -4,7 +4,7 @@ namespace Drupal\ad_entity_adtech\Plugin\ad_entity\AdType;
 
 use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdTypeBase;
-use Drupal\ad_entity_adtech\TargetingCollection;
+use Drupal\ad_entity\TargetingCollection;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Form\FormStateInterface;
 
