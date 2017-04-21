@@ -20,13 +20,12 @@
         if (containers.hasOwnProperty(id)) {
           var container = containers[id];
           var ad_tag = $('.google-dfp-ad', container[0]);
-          this.define(ad_tag);
-          this.display(ad_tag);
+          this.defineAndDisplay(ad_tag);
         }
       }
     },
     detach: function (containers, context, settings) {},
-    define: function (ad_tag) {
+    defineAndDisplay: function (ad_tag) {
       googletag.cmd.push(function () {
         var ad_id = ad_tag.attr('id');
         var network_id = ad_tag.attr('data-dfp-network');
@@ -40,7 +39,6 @@
         }
 
         var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
-        slot.addService(googletag.pubads());
 
         var targeting = ad_tag.attr('data-ad-entity-targeting');
         if (targeting) {
@@ -51,12 +49,10 @@
             }
           }
         }
-      });
-    },
-    display: function (ad_tag) {
-      googletag.cmd.push(function () {
-        var ad_id = ad_tag.attr('id');
+
+        slot.addService(googletag.pubads());
         googletag.display(ad_id);
+        googletag.pubads().refresh([slot]);
       });
     }
   };

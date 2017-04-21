@@ -8,7 +8,7 @@ googletag.cmd = googletag.cmd || [];
 
 googletag.cmd.push(function () {
   'use strict';
-  googletag.pubads().enableAsyncRendering();
-  googletag.pubads().collapseEmptyDivs();
+  googletag.pubads().enableSingleRequest();
+  googletag.pubads().disableInitialLoad();
   googletag.enableServices();
 });
