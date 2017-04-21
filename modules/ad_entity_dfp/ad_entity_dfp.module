@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Advertising Entity: DFP module file.
+ */
+
+/**
+ * Implements template_preprocess_page().
+ */
+function ad_entity_dfp_preprocess_page(&$variables) {
+  $variables['#attached']['library'][] = 'ad_entity_dfp/provider';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ad_entity_dfp_theme($existing, $type, $theme, $path) {
+  return [
+    'dfp_default' => [
+      'variables' => ['ad_entity' => NULL],
+      'file' => 'ad_entity_dfp.theme.inc',
+    ],
+  ];
+}

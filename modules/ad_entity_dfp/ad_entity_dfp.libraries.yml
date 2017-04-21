@@ -1,0 +1,11 @@
+provider:
+  header: true
+  js:
+    //www.googletagservices.com/tag/js/gpt.js: { type: external, attributes: { async: async } }
+    js/init-provider.js: {}
+
+default_view:
+  js:
+    js/default.view.js: {}
+  dependencies:
+    - ad_entity/view
