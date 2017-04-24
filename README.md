@@ -25,6 +25,13 @@ Breakpoint JS settings</a> module.
   admin/structure/block. The Advertising block enables you to define the
   Advertising entities to display, optionally for each device variant.
 
+# About view handlers
+
+For each advertising type, there are usually two view handlers to choose from:
+ - A default view, which is the recommended way for viewing the ads on a page.
+ - An iframe, which should be used e.g. for embedding ads on external platforms
+   like Facebook Instant Articles.
+
 # About Advertising contexts
 
 A given Advertising context is able to extend or manipulate the information and
