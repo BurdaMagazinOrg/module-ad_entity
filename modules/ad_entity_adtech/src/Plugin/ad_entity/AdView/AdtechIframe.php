@@ -7,7 +7,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * iFrame view handler plugin for AdTech Factory advertisement.
+ * View handler plugin for AdTech Factory advertisement as iFrames.
  *
  * @AdView(
  *   id = "adtech_iframe",

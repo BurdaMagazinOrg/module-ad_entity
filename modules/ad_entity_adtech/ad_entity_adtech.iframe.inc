@@ -5,9 +5,6 @@
  * Advertising Entity: AdTech Factory iFrame implementations.
  */
 
-use Drupal\Core\Template\Attribute;
-use Drupal\Component\Utility\Crypt;
-
 /**
  * Preprocess implementation for an AdTech Factory tag as iFrame.
  *
