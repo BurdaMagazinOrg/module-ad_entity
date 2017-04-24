@@ -144,19 +144,6 @@ class AdEntityForm extends EntityForm {
           }
         }
 
-        if (!empty($allowed_views)) {
-          $form['third_party']['view_plugin_id'] = [
-            '#type' => 'select',
-            '#title' => $this->t("View handler"),
-            '#tree' => FALSE,
-            '#options' => $allowed_views,
-            '#required' => TRUE,
-            '#default_value' => $form_state->getValue('view_plugin_id') ?
-            $form_state->getValue('view_plugin_id') : $ad_entity->get('view_plugin_id'),
-            '#empty_value' => '',
-          ];
-        }
-
         // Expose the type-specific configuration.
         $definition = $type_definitions[$type_id];
         $type_form = [
@@ -166,9 +153,49 @@ class AdEntityForm extends EntityForm {
           '#collapsible' => FALSE,
           '#collapsed' => FALSE,
           '#attributes' => ['id' => 'type-plugin-' . $type_id],
-          '#title' => $this->t("Configuration for the @type type", ['@type' => $definition['label']]),
+          '#title' => $this->t("Type configuration"),
         ] + $type->entityConfigForm($form, $form_state, $ad_entity);
         $form['third_party'][$type_id] = $type_form;
+      }
+
+      if (!empty($allowed_views)) {
+        $view_id = $form_state->getValue('view_plugin_id') ?
+          $form_state->getValue('view_plugin_id') : $ad_entity->get('view_plugin_id');
+        $form['third_party']['view_plugin_id'] = [
+          '#type' => 'select',
+          '#title' => $this->t("View handler"),
+          '#tree' => FALSE,
+          '#options' => $allowed_views,
+          '#required' => TRUE,
+          '#default_value' => $view_id,
+          '#empty_value' => '',
+          '#ajax' => [
+            'callback' => [$this, 'thirdPartyChange'],
+            'wrapper' => 'third-party-config',
+            'effect' => 'fade',
+            'method' => 'replaceWith',
+            'progress' => [
+              'type' => 'throbber',
+              'message' => '',
+            ],
+          ],
+        ];
+
+        // Expose additional, view-specific configuration.
+        if (!empty($view_id)) {
+          $definition = $this->viewManager->getDefinition($view_id);
+          $view_handler = $this->viewManager->createInstance($view_id);
+          $view_form = [
+            '#type' => 'fieldset',
+            '#tree' => TRUE,
+            '#parents' => ['third_party_settings', $definition['provider']],
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+            '#attributes' => ['id' => 'view-plugin-' . $view_id],
+            '#title' => $this->t("View handler configuration"),
+          ] + $view_handler->entityConfigForm($form, $form_state, $ad_entity);
+          $form['third_party'][$view_id] = $view_form;
+        }
       }
     }
 

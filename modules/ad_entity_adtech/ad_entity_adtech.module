@@ -51,5 +51,9 @@ function ad_entity_adtech_theme($existing, $type, $theme, $path) {
       'variables' => ['ad_entity' => NULL],
       'file' => 'ad_entity_adtech.theme.inc',
     ],
+    'adtech_iframe' => [
+      'variables' => ['ad_entity' => NULL],
+      'file' => 'ad_entity_adtech.iframe.inc',
+    ],
   ];
 }

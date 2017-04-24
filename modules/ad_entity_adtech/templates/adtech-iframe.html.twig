@@ -1,0 +1,19 @@
+<iframe width='{{ iframe.width }}' height='{{ iframe.height }}' srcdoc='
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <script src="{{ library_source }}" type="text/javascript"></script>
+  </head>
+  <body>
+  <div{{ attributes }}></div>
+  <script type="text/javascript">
+    atf_lib.load_tag([{
+      element: document.getElementById("{{ attributes.id }}"),
+      targeting: {{ targeting|raw }}
+    }]);
+  </script>
+  </body>
+  </html>
+  '>
+</iframe>

@@ -36,7 +36,9 @@ function template_preprocess_ad_entity(array &$variables) {
     // Let the assigned view handler build the content.
     $variables['content'] = $view_handler->build($ad_entity);
     // Attach the JS implementation for the view handler.
-    $variables['#attached']['library'][] = $definition['library'];
+    if (!empty($definition['library'])) {
+      $variables['#attached']['library'][] = $definition['library'];
+    }
   }
 }
 
