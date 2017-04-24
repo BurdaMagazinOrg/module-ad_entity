@@ -9,7 +9,7 @@
   <div{{ attributes }}></div>
   <script type="text/javascript">
     atf_lib.load_tag([{
-      element: document.getElementById("{{ attributes.id }}"),
+      element: document.getElementById("{{- attributes.id -}}"),
       targeting: {{ targeting|raw }}
     }]);
   </script>
