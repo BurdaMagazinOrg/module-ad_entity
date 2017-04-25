@@ -25,7 +25,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *    "permission_provider" = "Drupal\entity\EntityPermissionProvider"
  *   },
  *   config_prefix = "ad_entity",
- *   admin_permission = "administer advertising entities",
+ *   admin_permission = "administer ad_entity",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",

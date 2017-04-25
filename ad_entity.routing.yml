@@ -5,6 +5,6 @@ ad_entity.settings:
     _form: '\Drupal\ad_entity\Form\GlobalSettingsForm'
     _title: 'Global settings for Advertising entities'
   requirements:
-    _permission: 'administer advertising entities'
+    _permission: 'administer ad_entity'
   options:
     _admin_route: TRUE
