@@ -46,23 +46,12 @@
    */
   Drupal.ad_entity.restrictAdsToScope = function (newcomers) {
     var client_device = Drupal.ad_entity.currentDeviceType();
-    var to_remove = [];
-    switch (client_device) {
-      case 'smartphone':
-        to_remove = ['tablet', 'desktop'];
-        break;
-      case 'tablet':
-        to_remove = ['smartphone', 'desktop'];
-        break;
-      case 'desktop':
-        to_remove = ['smartphone', 'tablet'];
-        break;
-    }
+    var to_keep = [client_device, 'any'];
     for (var id in newcomers) {
       if (newcomers.hasOwnProperty(id)) {
         var container = newcomers[id];
         var container_device = container.attr('data-ad-entity-device');
-        if (!($.inArray(container_device, to_remove) < 0)) {
+        if ($.inArray(container_device, to_keep) < 0) {
           container.remove();
           delete Drupal.ad_entity.adContainers[id];
           delete newcomers[id];
@@ -79,16 +68,8 @@
    *   The detected client device type.
    */
   Drupal.ad_entity.currentDeviceType = function () {
-    var Breakpoints = window.breakpointSettings.Breakpoints;
-    var DeviceMapping = window.breakpointSettings.DeviceMapping;
-
-    if (window.innerWidth < Breakpoints[DeviceMapping.tablet]) {
-      return 'smartphone';
-    }
-    if (window.innerWidth < Breakpoints[DeviceMapping.desktop]) {
-      return 'tablet';
-    }
-    return 'desktop';
+    var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+    return breakpoint.name;
   };
 
   /**

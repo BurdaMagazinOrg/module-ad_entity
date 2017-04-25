@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin\Block;
 
+use Drupal\breakpoint\BreakpointInterface;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -81,6 +82,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
+    $themeBreakpoints = $this->getBreakpointsForFormState($form_state);
+
     $entities = $this->adEntityStorage->loadMultiple();
     $options = [];
     foreach ($entities as $entity) {
@@ -96,17 +99,17 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#default_value' => !empty($this->configuration['ad_entity_any']) ? $this->configuration['ad_entity_any'] : NULL,
     ];
     $form['breakpoint_hint'] = [
-      '#markup' => $this->t("<strong>For variants, make sure you have properly set up the <a href='/admin/config/system/breakpoint_js' target='_blank'>breakpoint device mapping</a>.</strong>"),
+      '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
     ];
-    foreach (self::$devices as $device) {
-      $form['ad_entity_' . $device] = [
+    foreach ($themeBreakpoints as $breakpoint) {
+      $form['ad_entity_' . $breakpoint->getLabel()] = [
         '#type' => 'select',
-        '#title' => $this->t("Variant for @device", ['@device' => $device]),
-        '#description' => $this->t("The selected Advertising entity will be displayed on @device devices.", ['@device' => $device]),
+        '#title' => $this->t("Variant for @device", ['@device' => $breakpoint->getLabel()]),
+        '#description' => $this->t("The selected Advertising entity will be displayed on @device devices.", ['@device' => $breakpoint->getLabel()]),
         '#empty_value' => '',
         '#required' => FALSE,
         '#options' => $options,
-        '#default_value' => !empty($this->configuration['ad_entity_' . $device]) ? $this->configuration['ad_entity_' . $device] : NULL,
+        '#default_value' => !empty($this->configuration['ad_entity_' . $breakpoint->getLabel()]) ? $this->configuration['ad_entity_' . $breakpoint->getLabel()] : NULL,
         '#states' => [
           'visible' => [
             'select[name="settings[ad_entity_any]"]' => ['value' => ''],
@@ -122,9 +125,14 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    foreach (array_merge(self::$devices, ['any']) as $variant) {
-      $this->configuration['ad_entity_' . $variant]
-        = $form_state->getValue('ad_entity_' . $variant);
+    $themeBreakpoints = $this->getBreakpointsForFormState($form_state);
+
+    $this->configuration['ad_entity_any']
+      = $form_state->getValue('ad_entity_any');
+
+    foreach ($themeBreakpoints as $variant) {
+      $this->configuration['ad_entity_' . $variant->getLabel()]
+        = $form_state->getValue('ad_entity_' . $variant->getLabel());
     }
   }
 
@@ -134,6 +142,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function calculateDependencies() {
     $config = $this->getConfiguration();
     $dependencies = ['config' => []];
+    // TODO change this to use themeBreakpoints
     foreach (array_merge(self::$devices, ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
@@ -158,6 +167,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheTags() {
     $tags = ['config:breakpoint_js_settings.settings'];
     $config = $this->getConfiguration();
+    // TODO change this to use themeBreakpoints
     foreach (array_merge(self::$devices, ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
@@ -180,17 +190,49 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
     else {
-      foreach (self::$devices as $variant) {
-        $id = !empty($this->configuration['ad_entity_' . $variant]) ?
-          $this->configuration['ad_entity_' . $variant] : NULL;
+      $themeBreakpoints = $this->getBreakpointsForActiveTheme();
+      foreach ($themeBreakpoints as $name => $variant) {
+        $id = !empty($this->configuration['ad_entity_' . $variant->getLabel()]) ?
+          $this->configuration['ad_entity_' . $variant->getLabel()] : NULL;
         if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
           if ($ad_entity->access('view')) {
-            $build[] = $this->adEntityViewBuilder->view($ad_entity, $variant);
+            $build[] = $this->adEntityViewBuilder->view($ad_entity, $name);
           }
         }
       }
     }
     return $build;
+  }
+
+  /**
+   * @return \Drupal\breakpoint\BreakpointInterface[]
+   */
+  private function getBreakpointsForActiveTheme() {
+    /** @var \Drupal\Core\Theme\ThemeManager $themeManager */
+    $themeManager = \Drupal::service('theme.manager');
+    $activeTheme = $themeManager->getActiveTheme()->getName();
+
+    return $this->getThemeBreakpoints($activeTheme);
+  }
+
+  /**
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @return \Drupal\breakpoint\BreakpointInterface[]
+   */
+  private function getBreakpointsForFormState(FormStateInterface $form_state) {
+    $blockTheme = $form_state->get('block_theme');
+    return $this->getThemeBreakpoints($blockTheme);
+  }
+
+  /**
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @return BreakpointInterface[]
+   */
+  private function getThemeBreakpoints($theme) {
+    $breakpointManager = \Drupal::service('breakpoint.manager');
+    /** @var \Drupal\breakpoint\BreakpointInterface[] $themeBreakpoints */
+    $themeBreakpoints = $breakpointManager->getBreakpointsByGroup($theme);
+    return $themeBreakpoints;
   }
 
 }
