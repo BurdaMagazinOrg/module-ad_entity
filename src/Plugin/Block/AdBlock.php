@@ -2,13 +2,14 @@
 
 namespace Drupal\ad_entity\Plugin\Block;
 
-use Drupal\breakpoint\BreakpointInterface;
+use Drupal\breakpoint\BreakpointManager;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Theme\ThemeManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +37,20 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $adEntityViewBuilder;
 
   /**
+   * The theme manager to get the active theme.
+   *
+   * @var \Drupal\Core\Theme\ThemeManager
+   */
+  protected $themeManager;
+
+  /**
+   * The breakpoint manager to get the breakpoints of a theme.
+   *
+   * @var \Drupal\breakpoint\BreakpointManager
+   */
+  protected $breakpointManager;
+
+  /**
    * List of supported devices.
    *
    * @var array
@@ -49,12 +64,16 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $type_manager = $container->get('entity_type.manager');
     $ad_entity_storage = $type_manager->getStorage('ad_entity');
     $ad_entity_view_builder = $type_manager->getViewBuilder('ad_entity');
+    $theme_manager = $container->get('theme.manager');
+    $breakpoint_manager = $container->get('breakpoint.manager');
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $ad_entity_storage,
-      $ad_entity_view_builder
+      $ad_entity_view_builder,
+      $theme_manager,
+      $breakpoint_manager
     );
   }
 
@@ -71,11 +90,17 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The storage for Advertising entities.
    * @param \Drupal\Core\Entity\EntityViewBuilderInterface $ad_entity_view_builder
    *   The view builder for Advertising entities.
+   * @param \Drupal\Core\Theme\ThemeManager $theme_manager
+   *   The theme manager to get the active theme.
+   * @param \Drupal\breakpoint\BreakpointManager $breakpoint_manager
+   *   The breakpoint manager to get the breakpoints of a theme.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder, ThemeManager $theme_manager, BreakpointManager $breakpoint_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->adEntityStorage = $ad_entity_storage;
     $this->adEntityViewBuilder = $ad_entity_view_builder;
+    $this->themeManager = $theme_manager;
+    $this->breakpointManager = $breakpoint_manager;
   }
 
   /**
@@ -142,7 +167,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function calculateDependencies() {
     $config = $this->getConfiguration();
     $dependencies = ['config' => []];
-    // TODO change this to use themeBreakpoints
+    // TODO change this to use themeBreakpoints.
     foreach (array_merge(self::$devices, ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
@@ -167,7 +192,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheTags() {
     $tags = ['config:breakpoint_js_settings.settings'];
     $config = $this->getConfiguration();
-    // TODO change this to use themeBreakpoints
+    // TODO change this to use themeBreakpoints.
     foreach (array_merge(self::$devices, ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
@@ -205,19 +230,24 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Gets the breakpoints for the active theme of the current route.
+   *
    * @return \Drupal\breakpoint\BreakpointInterface[]
+   *   The breakpoints.
    */
   private function getBreakpointsForActiveTheme() {
-    /** @var \Drupal\Core\Theme\ThemeManager $themeManager */
-    $themeManager = \Drupal::service('theme.manager');
-    $activeTheme = $themeManager->getActiveTheme()->getName();
-
+    $activeTheme = $this->themeManager->getActiveTheme()->getName();
     return $this->getThemeBreakpoints($activeTheme);
   }
 
   /**
+   * Gets the breakpoints for the theme of the block.
+   *
    * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state, from which to extract the theme of the block.
+   *
    * @return \Drupal\breakpoint\BreakpointInterface[]
+   *   The breakpoints.
    */
   private function getBreakpointsForFormState(FormStateInterface $form_state) {
     $blockTheme = $form_state->get('block_theme');
@@ -225,13 +255,13 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   }
 
   /**
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   * @return BreakpointInterface[]
+   * Gets the breakpoints for the provided theme.
+   *
+   * @return \Drupal\breakpoint\BreakpointInterface[]
+   *   The breakpoints.
    */
   private function getThemeBreakpoints($theme) {
-    $breakpointManager = \Drupal::service('breakpoint.manager');
-    /** @var \Drupal\breakpoint\BreakpointInterface[] $themeBreakpoints */
-    $themeBreakpoints = $breakpointManager->getBreakpointsByGroup($theme);
+    $themeBreakpoints = $this->breakpointManager->getBreakpointsByGroup($theme);
     return $themeBreakpoints;
   }
 
