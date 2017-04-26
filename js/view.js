@@ -46,16 +46,16 @@
    */
   Drupal.ad_entity.restrictAdsToScope = function (newcomers) {
     var to_keep = ['any'];
-    var client_breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
-    if (client_breakpoint) {
-      to_keep.push(client_breakpoint.name);
+    var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+    if (breakpoint) {
+      to_keep.push(breakpoint.name);
     }
 
     for (var id in newcomers) {
       if (newcomers.hasOwnProperty(id)) {
         var container = newcomers[id];
-        var container_breakpoint = container.attr('data-ad-entity-breakpoint');
-        if ($.inArray(container_breakpoint, to_keep) < 0) {
+        var variant = container.attr('data-ad-entity-variant');
+        if ($.inArray(variant, to_keep) < 0) {
           container.remove();
           delete Drupal.ad_entity.adContainers[id];
           delete newcomers[id];

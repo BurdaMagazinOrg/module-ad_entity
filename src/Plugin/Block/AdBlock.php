@@ -114,15 +114,15 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $form['breakpoint_hint'] = [
       '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
     ];
-    foreach ($theme_breakpoints as $name => $breakpoint) {
-      $form['ad_entity_' . $name] = [
+    foreach ($theme_breakpoints as $variant => $breakpoint) {
+      $form['ad_entity_' . $variant] = [
         '#type' => 'select',
         '#title' => $this->t("Variant for @breakpoint", ['@breakpoint' => $breakpoint->getLabel()]),
         '#description' => $this->t("The selected Advertising entity will be displayed on @breakpoint screen width.", ['@breakpoint' => $breakpoint->getLabel()]),
         '#empty_value' => '',
         '#required' => FALSE,
         '#options' => $options,
-        '#default_value' => !empty($this->configuration['ad_entity_' . $name]) ? $this->configuration['ad_entity_' . $name] : NULL,
+        '#default_value' => !empty($this->configuration['ad_entity_' . $variant]) ? $this->configuration['ad_entity_' . $variant] : NULL,
         '#states' => [
           'visible' => [
             'select[name="settings[ad_entity_any]"]' => ['value' => ''],
@@ -143,11 +143,11 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $this->configuration['ad_entity_any']
       = $form_state->getValue('ad_entity_any');
 
-    foreach ($theme_breakpoints as $name => $breakpoint) {
-      $this->configuration['ad_entity_' . $name]
-        = $form_state->getValue('ad_entity_' . $name);
     $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName($theme_name);
 
+    foreach ($theme_breakpoints as $variant => $breakpoint) {
+      $this->configuration['ad_entity_' . $variant]
+        = $form_state->getValue('ad_entity_' . $variant);
     }
   }
 
@@ -206,12 +206,12 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     }
     else {
       $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForActiveTheme();
-      foreach ($theme_breakpoints as $name => $breakpoint) {
-        $id = !empty($this->configuration['ad_entity_' . $name]) ?
-          $this->configuration['ad_entity_' . $name] : NULL;
+      foreach ($theme_breakpoints as $variant => $breakpoint) {
+        $id = !empty($this->configuration['ad_entity_' . $variant]) ?
+          $this->configuration['ad_entity_' . $variant] : NULL;
         if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
           if ($ad_entity->access('view')) {
-            $build[] = $this->adEntityViewBuilder->view($ad_entity, $name);
+            $build[] = $this->adEntityViewBuilder->view($ad_entity, $variant);
           }
         }
       }
