@@ -94,7 +94,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForFormState($form_state);
+    $theme_name = $form_state->get('block_theme');
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName($theme_name);
 
     $entities = $this->adEntityStorage->loadMultiple();
     $options = [];
@@ -137,7 +138,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForFormState($form_state);
+    $theme_name = $form_state->get('block_theme');
 
     $this->configuration['ad_entity_any']
       = $form_state->getValue('ad_entity_any');
@@ -145,6 +146,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     foreach ($theme_breakpoints as $name => $breakpoint) {
       $this->configuration['ad_entity_' . $name]
         = $form_state->getValue('ad_entity_' . $name);
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName($theme_name);
+
     }
   }
 
