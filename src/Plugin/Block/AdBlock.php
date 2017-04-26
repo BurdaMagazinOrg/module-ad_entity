@@ -190,7 +190,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = ['config:breakpoint_js_settings.settings'];
+    $tags = [];
     $config = $this->getConfiguration();
     // TODO change this to use themeBreakpoints.
     foreach (array_merge(self::$devices, ['any']) as $variant) {
