@@ -39,37 +39,29 @@
 
   /**
    * Filters out newly collected Advertising containers
-   * which are not in the scope of the current device.
+   * which are not in the scope of the current breakpoint.
    *
    * @param {object} newcomers
    *   The list of newly collected containers to filter.
    */
   Drupal.ad_entity.restrictAdsToScope = function (newcomers) {
-    var client_device = Drupal.ad_entity.currentDeviceType();
-    var to_keep = [client_device, 'any'];
+    var to_keep = ['any'];
+    var client_breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+    if (client_breakpoint) {
+      to_keep.push(client_breakpoint.name);
+    }
+
     for (var id in newcomers) {
       if (newcomers.hasOwnProperty(id)) {
         var container = newcomers[id];
-        var container_device = container.attr('data-ad-entity-device');
-        if ($.inArray(container_device, to_keep) < 0) {
+        var container_breakpoint = container.attr('data-ad-entity-breakpoint');
+        if ($.inArray(container_breakpoint, to_keep) < 0) {
           container.remove();
           delete Drupal.ad_entity.adContainers[id];
           delete newcomers[id];
         }
       }
     }
-  };
-
-  /**
-   * Detects the currently used type of client device,
-   * based on the information provided by the Breakpoint JS settings module.
-   *
-   * @return {string}
-   *   The detected client device type.
-   */
-  Drupal.ad_entity.currentDeviceType = function () {
-    var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
-    return breakpoint.name;
   };
 
   /**

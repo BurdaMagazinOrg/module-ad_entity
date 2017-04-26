@@ -103,8 +103,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     }
     $form['ad_entity_any'] = [
       '#type' => 'select',
-      '#title' => $this->t("Default entity for any device"),
-      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given device. <strong>Choose none</strong> if you want to use variants per device."),
+      '#title' => $this->t("Default entity for any screen width"),
+      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given screen width. <strong>Choose none</strong> if you want to use variants per breakpoint."),
       '#empty_value' => '',
       '#required' => FALSE,
       '#options' => $options,
@@ -116,8 +116,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     foreach ($theme_breakpoints as $name => $breakpoint) {
       $form['ad_entity_' . $name] = [
         '#type' => 'select',
-        '#title' => $this->t("Variant for @device", ['@device' => $breakpoint->getLabel()]),
-        '#description' => $this->t("The selected Advertising entity will be displayed on @device devices.", ['@device' => $breakpoint->getLabel()]),
+        '#title' => $this->t("Variant for @breakpoint", ['@breakpoint' => $breakpoint->getLabel()]),
+        '#description' => $this->t("The selected Advertising entity will be displayed on @breakpoint screen width.", ['@breakpoint' => $breakpoint->getLabel()]),
         '#empty_value' => '',
         '#required' => FALSE,
         '#options' => $options,

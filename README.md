@@ -21,7 +21,7 @@ Theme Breakpoint JS</a> module.
   When your theme has multiple breakpoints, you can create one entity for each.
 - Once you've created your entities, create and place an Advertising block at
   admin/structure/block. The Advertising block enables you to define the
-  Advertising entities to display, optionally for each device variant.
+  Advertising entities to display, optionally for each breakpoint variant.
 
 # About view handlers
 
