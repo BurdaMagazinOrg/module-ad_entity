@@ -43,13 +43,6 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $themeBreakpointsJs;
 
   /**
-   * List of supported devices.
-   *
-   * @var array
-   */
-  static protected $devices = ['smartphone', 'tablet', 'desktop'];
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
