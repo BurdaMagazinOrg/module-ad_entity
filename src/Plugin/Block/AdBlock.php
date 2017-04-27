@@ -152,10 +152,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $config = $this->getConfiguration();
     $dependencies = ['config' => []];
 
-    $themeBreakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
       $config['ad_entity_theme']
     );
-    foreach (array_merge($themeBreakpoints, ['any' => '']) as $variant => $breakpoint) {
+    foreach (array_merge($theme_breakpoints, ['any' => '']) as $variant => $breakpoint) {
       if (!empty($config['ad_entity_' . $variant])) {
         $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
         if (!in_array($dependency, $dependencies['config'])) {
@@ -179,8 +179,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheTags() {
     $tags = [];
     $config = $this->getConfiguration();
-    $themeBreakpoints = $this->themeBreakpointsJs->getBreakpointsForActiveTheme();
-    foreach (array_merge($themeBreakpoints, ['any' => '']) as $variant => $breakpoint) {
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
+      $config['ad_entity_theme']
+    );
+    foreach (array_merge($theme_breakpoints, ['any' => '']) as $variant => $breakpoint) {
       if (!empty($config['ad_entity_' . $variant])) {
         $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
       }
@@ -202,7 +204,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
     else {
-      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForActiveTheme();
+      $config = $this->getConfiguration();
+      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
+        $config['ad_entity_theme']
+      );
       foreach ($theme_breakpoints as $variant => $breakpoint) {
         $id = !empty($this->configuration['ad_entity_' . $variant]) ?
           $this->configuration['ad_entity_' . $variant] : NULL;
