@@ -26,6 +26,7 @@
           var container = containers[id];
           var ad_tag = $('.google-dfp-ad', container[0]);
           this.defineAndDisplay(ad_tag, this.numberOfAds.toString(), onPageLoad);
+          this.addEventsFor(ad_tag, container);
         }
       }
     },
@@ -60,6 +61,17 @@
         slot.addService(googletag.pubads());
         googletag.display(ad_id);
         googletag.pubads().refresh([slot]);
+      });
+    },
+    addEventsFor: function (ad_tag, container) {
+      googletag.cmd.push(function () {
+        // Mark container as initialized once advertisement has been loaded.
+        googletag.pubads().addEventListener('slotRenderEnded', function (event) {
+          if (event.slot.getSlotElementId() === ad_tag.attr('id')) {
+            container.removeClass('not-initialized');
+            container.addClass('initialized');
+          }
+        }, false);
       });
     },
     numberOfAds: 0

@@ -35,12 +35,22 @@
             argument.targeting.slotNumber = this.numberOfAds;
             argument.targeting.onPageLoad = onPageLoad;
             load_arguments.push(argument);
+            this.addEventsFor(ad_tag, container);
           }
         }
         window.atf_lib.load_tag(load_arguments);
       }
     },
     detach: function (containers, context, settings) {},
+    addEventsFor: function (ad_tag, container) {
+      // Mark container as initialized once advertisement has been loaded.
+      window.addEventListener('atf_ad_rendered', function (event) {
+        if (event.element_id === ad_tag.attr('id')) {
+          container.removeClass('not-initialized');
+          container.addClass('initialized');
+        }
+      }, false);
+    },
     numberOfAds: 0
   };
 
