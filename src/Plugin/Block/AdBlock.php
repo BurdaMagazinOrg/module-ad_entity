@@ -88,7 +88,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $theme_name = $form_state->get('block_theme');
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName($theme_name);
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
 
     $entities = $this->adEntityStorage->loadMultiple();
     $options = [];
@@ -132,14 +132,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $theme_name = $form_state->get('block_theme');
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
 
-    $this->configuration['ad_entity_theme'] = $theme_name;
-    $this->configuration['ad_entity_any']
-      = $form_state->getValue('ad_entity_any');
-
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName($theme_name);
-
-    foreach ($theme_breakpoints as $variant => $breakpoint) {
+    $this->configuration['theme'] = $theme_name;
+    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
       $this->configuration['ad_entity_' . $variant]
         = $form_state->getValue('ad_entity_' . $variant);
     }
@@ -151,11 +147,9 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function calculateDependencies() {
     $config = $this->getConfiguration();
     $dependencies = ['config' => []];
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($config['theme']);
 
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
-      $config['ad_entity_theme']
-    );
-    foreach (array_merge($theme_breakpoints, ['any' => '']) as $variant => $breakpoint) {
+    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
         if (!in_array($dependency, $dependencies['config'])) {
@@ -179,10 +173,9 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheTags() {
     $tags = [];
     $config = $this->getConfiguration();
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
-      $config['ad_entity_theme']
-    );
-    foreach (array_merge($theme_breakpoints, ['any' => '']) as $variant => $breakpoint) {
+    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($config['theme']);
+
+    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
       if (!empty($config['ad_entity_' . $variant])) {
         $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
       }
@@ -204,11 +197,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
     else {
-      $config = $this->getConfiguration();
-      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpointsForThemeName(
-        $config['ad_entity_theme']
-      );
-      foreach ($theme_breakpoints as $variant => $breakpoint) {
+      $theme_name = $this->configuration['theme'];
+      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+
+      foreach (array_keys($theme_breakpoints) as $variant) {
         $id = !empty($this->configuration['ad_entity_' . $variant]) ?
           $this->configuration['ad_entity_' . $variant] : NULL;
         if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
