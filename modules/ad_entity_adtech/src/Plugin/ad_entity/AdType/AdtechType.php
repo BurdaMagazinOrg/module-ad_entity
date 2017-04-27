@@ -84,7 +84,7 @@ class AdtechType extends AdTypeBase {
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Value for the data-atf-format attribute on the ad tag"),
       '#default_value' => !empty($settings['data_atf_format']) ? $settings['data_atf_format'] : '',
-      '#description' => $this->stringTranslation->translate("Examples: <strong>leaderboard, skyscraper, special</strong>"),
+      '#description' => $this->stringTranslation->translate("Examples: <strong>leaderboard, skyscraper, rectangle, special</strong>"),
       '#field_prefix' => 'data-atf-format="',
       '#field_suffix' => '"',
       '#size' => 30,
