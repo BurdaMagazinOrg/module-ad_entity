@@ -39,56 +39,29 @@
 
   /**
    * Filters out newly collected Advertising containers
-   * which are not in the scope of the current device.
+   * which are not in the scope of the current breakpoint.
    *
    * @param {object} newcomers
    *   The list of newly collected containers to filter.
    */
   Drupal.ad_entity.restrictAdsToScope = function (newcomers) {
-    var client_device = Drupal.ad_entity.currentDeviceType();
-    var to_remove = [];
-    switch (client_device) {
-      case 'smartphone':
-        to_remove = ['tablet', 'desktop'];
-        break;
-      case 'tablet':
-        to_remove = ['smartphone', 'desktop'];
-        break;
-      case 'desktop':
-        to_remove = ['smartphone', 'tablet'];
-        break;
+    var to_keep = ['any'];
+    var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+    if (breakpoint) {
+      to_keep.push(breakpoint.name);
     }
+
     for (var id in newcomers) {
       if (newcomers.hasOwnProperty(id)) {
         var container = newcomers[id];
-        var container_device = container.attr('data-ad-entity-device');
-        if (!($.inArray(container_device, to_remove) < 0)) {
+        var variant = container.attr('data-ad-entity-variant');
+        if ($.inArray(variant, to_keep) < 0) {
           container.remove();
           delete Drupal.ad_entity.adContainers[id];
           delete newcomers[id];
         }
       }
     }
-  };
-
-  /**
-   * Detects the currently used type of client device,
-   * based on the information provided by the Breakpoint JS settings module.
-   *
-   * @return {string}
-   *   The detected client device type.
-   */
-  Drupal.ad_entity.currentDeviceType = function () {
-    var Breakpoints = window.breakpointSettings.Breakpoints;
-    var DeviceMapping = window.breakpointSettings.DeviceMapping;
-
-    if (window.innerWidth < Breakpoints[DeviceMapping.tablet]) {
-      return 'smartphone';
-    }
-    if (window.innerWidth < Breakpoints[DeviceMapping.desktop]) {
-      return 'tablet';
-    }
-    return 'desktop';
   };
 
   /**

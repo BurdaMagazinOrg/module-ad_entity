@@ -6,24 +6,22 @@ advertising instances.
 # Requirements
 
 - The <a href="https://www.drupal.org/project/entity">Entity API</a> module.
-- The <a href="https://www.drupal.org/project/breakpoint_js_settings">
-Breakpoint JS settings</a> module.
+- The <a href="https://github.com/BurdaMagazinOrg/module-theme_breakpoints_js">
+Theme Breakpoint JS</a> module.
 
 # Quick start
 
 - Install this module.
 - You need at least one further module which defines an Advertising type.
   The ad_entity_adtech module for example defines advertisement provided by
-  AdTech Factory. This module can be found in the 'modules' subfolder.
-- Configure your JS breakpoints on admin/config/system/breakpoint_js. 
+  AdTech Factory. This module can be found in the 'modules' subfolder. 
 - Configure global settings for Advertising entities
   at admin/structure/ad_entity/global-settings.
 - Create and manage your Advertising entities at admin/structure/ad_entity.
-  When you have different settings per client device variant
-  (smartphone / tablet / desktop), you can create one entity for each variant.
+  When your theme has multiple breakpoints, you can create one entity for each.
 - Once you've created your entities, create and place an Advertising block at
   admin/structure/block. The Advertising block enables you to define the
-  Advertising entities to display, optionally for each device variant.
+  Advertising entities to display, optionally for each breakpoint variant.
 
 # About view handlers
 

@@ -6,4 +6,4 @@ configure: entity.ad_entity.collection
 core: 8.x
 dependencies:
   - entity:entity
-  - breakpoint_js_settings:breakpoint_js_settings
+  - theme_breakpoints_js:theme_breakpoints_js

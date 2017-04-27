@@ -39,7 +39,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $build[$entity_id] = [
         '#theme' => 'ad_entity',
         '#ad_entity' => $entity,
-        '#device' => $view_mode,
+        '#variant' => $view_mode,
       ];
     }
 
