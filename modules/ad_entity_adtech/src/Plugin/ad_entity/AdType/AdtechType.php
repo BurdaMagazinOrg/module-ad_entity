@@ -6,7 +6,9 @@ use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdTypeBase;
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Core\Config\Config;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Type plugin for AdTech Factory advertisement.
@@ -17,6 +19,32 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class AdtechType extends AdTypeBase {
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->setConfigFactory($container->get('config.factory'));
+    return $instance;
+  }
+
+  /**
+   * Set the config factory object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory object.
+   */
+  protected function setConfigFactory(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
+  }
 
   /**
    * {@inheritdoc}
@@ -91,13 +119,13 @@ class AdtechType extends AdTypeBase {
       '#required' => TRUE,
     ];
 
-    $targeting = !empty($settings['targeting']) ?
-      new TargetingCollection($settings['targeting']) : NULL;
+    $targeting = !empty($settings['targeting']) && !$ad_entity->isNew() ?
+      new TargetingCollection($settings['targeting']) : $this->defaultTargeting();
     $element['targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Default targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the ad tag. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
-      '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
+      '#default_value' => $targeting->toUserOutput(),
     ];
 
     return $element;
@@ -119,6 +147,20 @@ class AdtechType extends AdTypeBase {
     else {
       $ad_entity->setThirdPartySetting($provider, 'targeting', '{}');
     }
+  }
+
+  /**
+   * Returns a default targeting collection.
+   *
+   * @return \Drupal\ad_entity\TargetingCollection
+   *   The default targeting collection.
+   */
+  protected function defaultTargeting() {
+    $info = [];
+    if ($config = $this->configFactory->get('system.site')) {
+      $info['website'] = $config->get('name');
+    }
+    return new TargetingCollection($info);
   }
 
 }
