@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for an AdTech Factory tag as iFrame.
@@ -35,8 +36,17 @@ function template_preprocess_adtech_iframe(array &$variables) {
   if (!empty($settings['iframe'])) {
     $variables['iframe'] = $settings['iframe'];
   }
-  if (!empty($settings['targeting'])) {
+  $targeting_collection = $ad_entity->getTargetingFromContextData();
+  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
     $variables['targeting'] = $settings['targeting'];
+  }
+  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
+    // Merge the targeting.
+    $targeting_collection->collectFromJson($settings['targeting']);
+    $variables['targeting'] = $targeting_collection->toJson();
+  }
+  else {
+    $variables['targeting'] = '{}';
   }
 
   if ($config = \Drupal::config('ad_entity.settings')) {

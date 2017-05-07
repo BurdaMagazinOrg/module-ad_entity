@@ -34,6 +34,7 @@ class NodeWithTermsContextFormatter extends TaxonomyContextFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
+    $appliance_mode = $this->getSetting('appliance_mode');
 
     /** @var \Drupal\node\Entity\Node $node */
     $node = $items->getEntity();
@@ -56,9 +57,19 @@ class NodeWithTermsContextFormatter extends TaxonomyContextFormatterBase {
       }
     }
 
-    foreach ($aggregated_items as $items) {
-      foreach ($items as $item) {
-        $element[] = $this->buildElementFromItem($item);
+    if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
+      foreach ($aggregated_items as $items) {
+        foreach ($items as $item) {
+          $element[] = $this->buildElementFromItem($item);
+        }
+      }
+    }
+
+    if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
+      foreach ($aggregated_items as $items) {
+        foreach ($items as $item) {
+          $this->addItemToContextData($item);
+        }
       }
     }
 

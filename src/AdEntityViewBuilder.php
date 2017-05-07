@@ -20,23 +20,32 @@ class AdEntityViewBuilder extends EntityViewBuilder {
    */
   public function view(EntityInterface $entity, $view_mode = 'any', $langcode = NULL) {
     $build = $this->viewMultiple([$entity], $view_mode, $langcode);
-    return reset($build);
+    return !empty($build) ? reset($build) : [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function viewMultiple(array $entities = [], $view_mode = 'any', $langcode = NULL) {
+    if ($view_mode == 'default' || $view_mode == 'full') {
+      $view_mode = 'any';
+    }
+
     /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
     $build = [];
+
     foreach ($entities as $entity) {
-      $entity_id = $entity->id();
+      // Check whether a given context wants to turn off the advertisement.
+      $turnoff = $entity->getContextDataForPlugin('turnoff');
+      if (!empty($turnoff)) {
+        continue;
+      }
 
       // Build the view. No caching is defined here,
       // because there might be multiple blocks on one page
       // using the same advertising entity.
       // Advertising blocks will be cached anyway.
-      $build[$entity_id] = [
+      $build[$entity->id()] = [
         '#theme' => 'ad_entity',
         '#ad_entity' => $entity,
         '#variant' => $view_mode,

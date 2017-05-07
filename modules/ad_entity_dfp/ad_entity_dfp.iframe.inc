@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for a DFP tag as iFrame.
@@ -27,9 +28,20 @@ function template_preprocess_dfp_iframe(array &$variables) {
   $variables['attributes'] = $attributes;
 
   $variables['slot_id'] = '/' . $settings['network_id'] . '/' . $settings['unit_id'];
-  if (!empty($settings['targeting'])) {
+
+  $targeting_collection = $ad_entity->getTargetingFromContextData();
+  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
     $variables['targeting'] = $settings['targeting'];
   }
+  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
+    // Merge the targeting.
+    $targeting_collection->collectFromJson($settings['targeting']);
+    $variables['targeting'] = $targeting_collection->toJson();
+  }
+  else {
+    $variables['targeting'] = '{}';
+  }
+
   if (!empty($settings['sizes'])) {
     $variables['sizes'] = $settings['sizes'];
   }

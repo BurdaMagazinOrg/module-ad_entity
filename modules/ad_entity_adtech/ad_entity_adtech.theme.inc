@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for a default AdTech Factory tag view.
@@ -30,8 +31,17 @@ function template_preprocess_adtech_default(array &$variables) {
   if (!empty($settings['data_atf_format'])) {
     $attributes->setAttribute('data-atf-format', $settings['data_atf_format']);
   }
-  if (!empty($settings['targeting'])) {
+  $targeting_collection = $ad_entity->getTargetingFromContextData();
+  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
     $variables['targeting'] = $settings['targeting'];
+  }
+  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
+    // Merge the targeting.
+    $targeting_collection->collectFromJson($settings['targeting']);
+    $variables['targeting'] = $targeting_collection->toJson();
+  }
+  else {
+    $variables['targeting'] = '{}';
   }
   $variables['attributes'] = $attributes;
 }

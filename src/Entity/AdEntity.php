@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Defines the Advertising entity.
@@ -64,6 +65,13 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $viewManager;
 
   /**
+   * The Advertising context manager.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdContextManager
+   */
+  protected $contextManager;
+
+  /**
    * An instance of the view handler plugin.
    *
    * @var \Drupal\ad_entity\Plugin\AdViewInterface
@@ -88,6 +96,7 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
     $this->viewManager = \Drupal::service('ad_entity.view_manager');
+    $this->contextManager = \Drupal::service('ad_entity.context_manager');
   }
 
   /**
@@ -131,6 +140,32 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
       }
     }
     return parent::calculateDependencies();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextData() {
+    return $this->contextManager->getContextDataForEntity($this->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextDataForPlugin($plugin_id) {
+    return $this->contextManager->getContextDataForPluginAndEntity($plugin_id, $this->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTargetingFromContextData() {
+    $collection = new TargetingCollection();
+    $data = $this->contextManager->getContextDataForPluginAndEntity('targeting', $this->id());
+    foreach ($data as $settings) {
+      $collection->collectFromCollection(new TargetingCollection($settings['targeting']));
+    }
+    return $collection;
   }
 
 }
