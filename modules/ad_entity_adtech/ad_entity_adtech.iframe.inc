@@ -7,7 +7,6 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
-use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for an AdTech Factory tag as iFrame.

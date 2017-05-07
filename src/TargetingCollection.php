@@ -165,7 +165,7 @@ class TargetingCollection {
   /**
    * Whether the collection is empty or not.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the collection is empty, FALSE otherwise.
    */
   public function isEmpty() {
