@@ -25,4 +25,31 @@ interface AdEntityInterface extends ConfigEntityInterface {
    */
   public function getViewPlugin();
 
+  /**
+   * Get a list of backend context data for this Advertising entity.
+   *
+   * @return array
+   *   The list of available backend context data for the Advertising entity.
+   */
+  public function getContextData();
+
+  /**
+   * Get a list of backend context data for a given plugin id and this entity.
+   *
+   * @param string $plugin_id
+   *   The context plugin id.
+   *
+   * @return array
+   *   The list of available backend context data for the given plugin id.
+   */
+  public function getContextDataForPlugin($plugin_id);
+
+  /**
+   * Get a targeting collection from the backend context data.
+   *
+   * @return \Drupal\ad_entity\TargetingCollection
+   *   The targeting collection from the backend context data.
+   */
+  public function getTargetingFromContextData();
+
 }

@@ -163,6 +163,16 @@ class TargetingCollection {
   }
 
   /**
+   * Whether the collection is empty or not.
+   *
+   * @return bool
+   *   TRUE if the collection is empty, FALSE otherwise.
+   */
+  public function isEmpty() {
+    return empty($this->collected);
+  }
+
+  /**
    * Returns the collected targeting information as an array.
    *
    * @return array

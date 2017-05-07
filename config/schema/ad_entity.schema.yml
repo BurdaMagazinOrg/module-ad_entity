@@ -20,3 +20,31 @@ ad_entity.ad_entity.*:
     view_plugin_id:
       type: string
       label: 'View handler plugin id'
+
+field.formatter.settings.ad_entity_context:
+  type: mapping
+  label: 'Advertising entity context formatter settings'
+  mapping:
+    appliance_mode:
+      type: string
+      label: 'Appliance mode'
+
+field.formatter.settings.node_with_terms_context:
+  type: field.formatter.settings.ad_entity_context
+  label: 'Context from node with terms formatter settings'
+
+field.formatter.settings.node_with_tree_aggregation_context:
+  type: field.formatter.settings.ad_entity_context
+  label: 'Context from node with tree aggregation formatter settings'
+
+field.formatter.settings.node_with_tree_override_context:
+  type: field.formatter.settings.ad_entity_context
+  label: 'Context form node with tree override formatter settings'
+
+field.formatter.settings.tree_aggregation_context:
+  type: field.formatter.settings.ad_entity_context
+  label: 'Context from taxonomy tree aggregation formatter settings'
+
+field.formatter.settings.tree_override_context:
+  type: field.formatter.settings.ad_entity_context
+  label: 'Context from taxonmoy tree override formatter settings'

@@ -5,6 +5,7 @@ namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
@@ -65,9 +66,39 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return ['appliance_mode' => 'frontend'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $elements = [];
+
+    $options = [
+      'frontend' => $this->t("Frontend appliance mode"),
+      'backend' => $this->t("Backend appliance mode"),
+      'both' => $this->t("Both frontend & backend"),
+    ];
+    $elements['appliance_mode'] = [
+      '#type' => 'select',
+      '#options' => $options,
+      '#title' => $this->t("Appliance mode"),
+      '#description' => $this->t("<em>Frontend appliance mode</em> lets the client's browser apply the context via Javascript - this is the recommended choice to avoid server-side performance overheads. <em>Backend appliance mode</em> lets the context being applied from server-side, which might be more suitable for iframes. The option <em>Both frontend & backend</em> appliance modes should only be considered for rare edge cases."),
+      '#default_value' => $this->getSetting('appliance_mode'),
+      '#required' => TRUE,
+    ];
+
+    return $elements;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t("This formatter won't show any output, but it will deliver the user-defined context.");
+    $summary[] = $this->t("Appliance mode: @mode", ['@mode' => $this->getSetting('appliance_mode')]);
     return $summary;
   }
 
@@ -92,6 +123,22 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       }
     }
     return [];
+  }
+
+  /**
+   * Adds the given field item to the collection of backend context data.
+   *
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item.
+   */
+  protected function addItemToContextData(FieldItemInterface $item) {
+    if ($context_item = $item->get('context')) {
+      $plugin_id = $context_item->get('context_plugin_id')->getValue();
+      $settings = $context_item->get('context_settings')->getValue();
+      $settings = !empty($settings[$plugin_id]) ? $settings[$plugin_id] : [];
+      $apply_on = $context_item->get('apply_on')->getValue();
+      $this->contextManager->addContextData($plugin_id, $settings, $apply_on);
+    }
   }
 
 }
