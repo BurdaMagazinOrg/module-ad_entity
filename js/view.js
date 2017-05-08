@@ -52,8 +52,8 @@
     }
 
     for (var id in newcomers) {
-      var in_scope = false;
       if (newcomers.hasOwnProperty(id)) {
+        var in_scope = false;
         var container = newcomers[id];
         var variant = JSON.parse(container.attr('data-ad-entity-variant'));
         for (var i = 0; i < variant.length; i++) {
