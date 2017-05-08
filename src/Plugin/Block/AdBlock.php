@@ -8,8 +8,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Serialization\Json;
+use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
 
 /**
  * Defines Advertising blocks.
@@ -95,30 +96,40 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     foreach ($entities as $entity) {
       $options[$entity->id()] = $entity->label();
     }
-    $form['ad_entity_any'] = [
+
+    $variants_by_entity = !empty($this->configuration['variants']) ? $this->configuration['variants'] : [];
+    $variants_by_breakpoint = [];
+    foreach ($variants_by_entity as $entity_id => $variant) {
+      $variant = Json::decode($variant);
+      foreach ($variant as $breakpoint) {
+        $variants_by_breakpoint[$breakpoint] = $entity_id;
+      }
+    }
+
+    $form['variant_any'] = [
       '#type' => 'select',
       '#title' => $this->t("Default entity for any screen width"),
       '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given screen width. <strong>Choose none</strong> if you want to use variants per breakpoint."),
       '#empty_value' => '',
       '#required' => FALSE,
       '#options' => $options,
-      '#default_value' => !empty($this->configuration['ad_entity_any']) ? $this->configuration['ad_entity_any'] : NULL,
+      '#default_value' => !empty($variants_by_breakpoint['any']) ? $variants_by_breakpoint['any'] : NULL,
     ];
     $form['breakpoint_hint'] = [
       '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
     ];
     foreach ($theme_breakpoints as $variant => $breakpoint) {
-      $form['ad_entity_' . $variant] = [
+      $form['variant_' . $variant] = [
         '#type' => 'select',
         '#title' => $this->t("Variant for @breakpoint", ['@breakpoint' => $breakpoint->getLabel()]),
         '#description' => $this->t("The selected Advertising entity will be displayed on @breakpoint screen width.", ['@breakpoint' => $breakpoint->getLabel()]),
         '#empty_value' => '',
         '#required' => FALSE,
         '#options' => $options,
-        '#default_value' => !empty($this->configuration['ad_entity_' . $variant]) ? $this->configuration['ad_entity_' . $variant] : NULL,
+        '#default_value' => !empty($variants_by_breakpoint[$variant]) ? $variants_by_breakpoint[$variant] : NULL,
         '#states' => [
           'visible' => [
-            'select[name="settings[ad_entity_any]"]' => ['value' => ''],
+            'select[name="settings[variant_any]"]' => ['value' => ''],
           ],
         ],
       ];
@@ -134,10 +145,14 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $theme_name = $form_state->get('block_theme');
     $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
 
-    $this->configuration['theme'] = $theme_name;
+    $this->configuration['variants'] = [];
     foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
-      $this->configuration['ad_entity_' . $variant]
-        = $form_state->getValue('ad_entity_' . $variant);
+      if ($entity_id = $form_state->getValue('variant_' . $variant)) {
+        $this->configuration['variants'][$entity_id][] = $variant;
+      }
+    }
+    foreach ($this->configuration['variants'] as $id => $variant) {
+      $this->configuration['variants'][$id] = Json::encode($variant);
     }
   }
 
@@ -147,11 +162,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function calculateDependencies() {
     $config = $this->getConfiguration();
     $dependencies = ['config' => []];
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($config['theme']);
 
-    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
-      if (!empty($config['ad_entity_' . $variant])) {
-        $dependency = 'ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
+    if (!empty($config['variants'])) {
+      foreach (array_keys($config['variants']) as $id) {
+        $dependency = 'ad_entity.ad_entity.' . $id;
         if (!in_array($dependency, $dependencies['config'])) {
           $dependencies['config'][] = $dependency;
         }
@@ -173,11 +187,10 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheTags() {
     $tags = [];
     $config = $this->getConfiguration();
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($config['theme']);
 
-    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
-      if (!empty($config['ad_entity_' . $variant])) {
-        $tags[] = 'config:ad_entity.ad_entity.' . $config['ad_entity_' . $variant];
+    if (!empty($config['variants'])) {
+      foreach (array_keys($config['variants']) as $id) {
+        $tags[] = 'config:ad_entity.ad_entity.' . $id;
       }
     }
     return Cache::mergeTags(parent::getCacheTags(), $tags);
@@ -188,22 +201,9 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function build() {
     $build = [];
-    if (!empty($this->configuration['ad_entity_any'])) {
-      $id = $this->configuration['ad_entity_any'];
-      if ($ad_entity = $this->adEntityStorage->load($id)) {
-        if ($ad_entity->access('view')) {
-          $build[] = $this->adEntityViewBuilder->view($ad_entity, 'any');
-        }
-      }
-    }
-    else {
-      $theme_name = $this->configuration['theme'];
-      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
-
-      foreach (array_keys($theme_breakpoints) as $variant) {
-        $id = !empty($this->configuration['ad_entity_' . $variant]) ?
-          $this->configuration['ad_entity_' . $variant] : NULL;
-        if ($id && ($ad_entity = $this->adEntityStorage->load($id))) {
+    if (!empty($this->configuration['variants'])) {
+      foreach ($this->configuration['variants'] as $id => $variant) {
+        if ($ad_entity = $this->adEntityStorage->load($id)) {
           if ($ad_entity->access('view')) {
             $build[] = $this->adEntityViewBuilder->view($ad_entity, $variant);
           }

@@ -24,7 +24,6 @@ function template_preprocess_ad_entity(array &$variables) {
   $attributes->addClass('ad-entity-container');
   $attributes->addClass('not-initialized');
   $attributes->setAttribute('data-ad-entity', $ad_entity->id());
-  $attributes->setAttribute('data-ad-entity-variant', $variables['variant']);
   $attributes->setAttribute('data-ad-entity-type', $ad_entity->get('type_plugin_id'));
   $attributes->setAttribute('data-ad-entity-view', $ad_entity->get('view_plugin_id'));
   $variables['attributes'] = $attributes;

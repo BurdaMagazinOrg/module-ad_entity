@@ -52,10 +52,17 @@
     }
 
     for (var id in newcomers) {
+      var in_scope = false;
       if (newcomers.hasOwnProperty(id)) {
         var container = newcomers[id];
-        var variant = container.attr('data-ad-entity-variant');
-        if ($.inArray(variant, to_keep) < 0) {
+        var variant = JSON.parse(container.attr('data-ad-entity-variant'));
+        for (var i = 0; i < variant.length; i++) {
+          if (!($.inArray(variant[i], to_keep) < 0)) {
+            in_scope = true;
+            break;
+          }
+        }
+        if (!in_scope) {
           container.remove();
           delete Drupal.ad_entity.adContainers[id];
           delete newcomers[id];
