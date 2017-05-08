@@ -45,6 +45,8 @@ The field provides different formatters for the Advertising context.
 In the 'Manage display' section of your entity type, place the context field
 into the content region to deliver the user-defined context on the page.
 
+## Types of field formatters for delivering Advertising contexts
+
 The available field formatters differ in which context will be delivered.
 To just deliver the user-defined context from the given entity,
 choose 'Context from entity only'.
@@ -64,6 +66,11 @@ The first ancestor of the erm having a context will be used (bottom-up).
 Please note that this operation could be expensive as well.
 
 For taxonomy terms, you can use tree aggregation or tree override as well.
+
+## Advertising contexts and iframes
+
+If you want to apply Advertising contexts on iframes, you'll need to use the backend appliance mode on your field formatters.
+Enabling backend appliance mode means that the context will be collected as <em>backend context data</em>, and this data will be applied on the server-side.
 
 # Tips
 
