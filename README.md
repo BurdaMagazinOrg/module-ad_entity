@@ -69,8 +69,10 @@ For taxonomy terms, you can use tree aggregation or tree override as well.
 
 ## Advertising contexts and iframes
 
-If you want to apply Advertising contexts on iframes, you'll need to use the backend appliance mode on your field formatters.
-Enabling backend appliance mode means that the context will be collected as <em>backend context data</em>, and this data will be applied on the server-side.
+If you want to apply Advertising contexts on iframes,
+you'll need to use the backend appliance mode on your field formatters.
+Enabling backend appliance mode means that the context will be collected as
+<em>backend context data</em>, and this data will be applied on the server-side.
 
 # Tips
 
