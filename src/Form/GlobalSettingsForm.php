@@ -63,32 +63,47 @@ class GlobalSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $type_ids = array_keys($this->typeManager->getDefinitions());
-    if (empty($type_ids)) {
-      return [
-        '#markup' => $this->t("There's no plugin installed which offers global settings."),
-      ];
-    }
-
     $form = parent::buildForm($form, $form_state);
     $config = $this->config('ad_entity.settings');
 
-    $form['settings_tabs'] = [
-      '#type' => 'vertical_tabs',
-      '#default_tab' => 'edit-' . key($type_ids),
+    $form['common'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Settings for any type of advertisement'),
+      '#weight' => 10,
+    ];
+    $default_behavior = $config->get('enable_responsive_behavior') !== NULL ?
+      (int) $config->get('enable_responsive_behavior') : 1;
+    $form['common']['enable_responsive_behavior'] = [
+      '#type' => 'radios',
+      '#title' => 'Responsive behavior',
+      '#options' => [0 => $this->t("Disabled"), 1 => $this->t("Enabled")],
+      '#description' => $this->t("When enabled, advertisement will be dynamically initialized on breakpoint changes (e.g. when switching from narrow to wide). When disabled, advertisement will only be initialized based on the initial breakpoint during page load."),
+      '#default_value' => $default_behavior,
     ];
 
-    foreach ($type_ids as $type_id) {
-      /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
-      $type = $this->typeManager->createInstance($type_id);
-      $label = $type->getPluginDefinition()['label'];
-      $form[$type_id] = [
-        '#type' => 'details',
-        '#group' => 'settings_tabs',
-        '#attributes' => ['id' => 'edit-' . $type_id],
-        '#title' => $this->t("@type types", ['@type' => $label]),
-        '#tree' => TRUE,
-      ] + $type->globalSettingsForm($form, $form_state, $config);
+    $type_ids = array_keys($this->typeManager->getDefinitions());
+
+    if (!empty($type_ids)) {
+      $form['settings_tabs'] = [
+        '#type' => 'vertical_tabs',
+        '#default_tab' => 'edit-' . key($type_ids),
+        '#weight' => 20,
+      ];
+
+      foreach ($type_ids as $type_id) {
+        /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
+        $type = $this->typeManager->createInstance($type_id);
+        $label = $type->getPluginDefinition()['label'];
+        $form[$type_id] = [
+            '#type' => 'details',
+            '#group' => 'settings_tabs',
+            '#attributes' => ['id' => 'edit-' . $type_id],
+            '#title' => $this->t("@type types", ['@type' => $label]),
+            '#tree' => TRUE,
+          ] + $type->globalSettingsForm($form, $form_state, $config);
+      }
     }
 
     return $form;
@@ -115,6 +130,7 @@ class GlobalSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
     $config = $this->config('ad_entity.settings');
+    $config->set('enable_responsive_behavior', (bool) $form_state->getValue('enable_responsive_behavior'));
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {

@@ -38,37 +38,49 @@
   };
 
   /**
-   * Filters out newly collected Advertising containers
-   * which are not in the scope of the current breakpoint.
+   * Restricts the given list of Advertising containers
+   * to the scope of the current breakpoint.
    *
-   * @param {object} newcomers
-   *   The list of newly collected containers to filter.
+   * @param {object} containers
+   *   The list of Advertising containers to restrict.
+   *
+   * @return {object}
+   *   The containers which are in the scope of the current breakpoint.
    */
-  Drupal.ad_entity.restrictAdsToScope = function (newcomers) {
-    var to_keep = ['any'];
-    var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
-    if (breakpoint) {
-      to_keep.push(breakpoint.name);
+  Drupal.ad_entity.restrictAdsToScope = function (containers) {
+    var scope = ['any'];
+    if (typeof window.themeBreakpoints.getCurrentBreakpoint === 'function') {
+      var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+      if (breakpoint) {
+        scope.push(breakpoint.name);
+      }
     }
 
-    for (var id in newcomers) {
-      if (newcomers.hasOwnProperty(id)) {
-        var in_scope = false;
-        var container = newcomers[id];
-        var variant = JSON.parse(container.attr('data-ad-entity-variant'));
-        for (var i = 0; i < variant.length; i++) {
-          if (!($.inArray(variant[i], to_keep) < 0)) {
-            in_scope = true;
+    var in_scope = {};
+    for (var id in containers) {
+      if (containers.hasOwnProperty(id)) {
+        var container = containers[id];
+        container.variant = container.variant || JSON.parse(container.attr('data-ad-entity-variant'));
+        for (var i = 0; i < container.variant.length; i++) {
+          if (!($.inArray(container.variant[i], scope) < 0)) {
+            in_scope[id] = container;
+            if (!container.hasClass('in-scope')) {
+              container.addClass('in-scope');
+              container.removeClass('out-of-scope');
+              container.css('display', '');
+            }
             break;
           }
         }
-        if (!in_scope) {
-          container.remove();
-          delete Drupal.ad_entity.adContainers[id];
-          delete newcomers[id];
+        if (!in_scope.hasOwnProperty(id) && !container.hasClass('out-of-scope')) {
+          container.removeClass('in-scope');
+          container.addClass('out-of-scope');
+          container.css('display', 'none');
         }
       }
     }
+
+    return in_scope;
   };
 
   /**
@@ -99,13 +111,45 @@
   };
 
   /**
+   * Applies scope restriction and proper initialization
+   * on given Advertisement containers.
+   *
+   * @param {object} containers
+   *   The list of Advertising containers to restrict and initialize.
+   * @param {object} context
+   *   The DOM context.
+   * @param {object} settings
+   *   The Drupal settings.
+   */
+  Drupal.ad_entity.restrictAndInitialize = function (containers, context, settings) {
+    var to_initialize = Drupal.ad_entity.restrictAdsToScope(containers);
+
+    // Prevent re-initialization of already initialized Advertisement.
+    for (var id in to_initialize) {
+      if (to_initialize.hasOwnProperty(id)) {
+        if (to_initialize[id].hasClass('initialized') || !to_initialize[id].hasClass('not-initialized')) {
+          delete to_initialize[id];
+        }
+      }
+    }
+
+    // Let the view handlers initialize their ads.
+    var correlation = Drupal.ad_entity.correlate(to_initialize);
+    for (var handler_id in Drupal.ad_entity.viewHandlers) {
+      if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+        if (correlation.hasOwnProperty(handler_id)) {
+          correlation[handler_id].handler.initialize(correlation[handler_id].containers, context, settings);
+        }
+      }
+    }
+  };
+
+  /**
    * Drupal behavior for viewing Advertising entities.
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
       var containers = Drupal.ad_entity.collectAdContainers(context);
-      Drupal.ad_entity.restrictAdsToScope(containers);
-      var correlation = Drupal.ad_entity.correlate(containers);
 
       // Apply Advertising contexts, if available.
       if (!($.isEmptyObject(Drupal.ad_entity.context))) {
@@ -113,12 +157,16 @@
         Drupal.ad_entity.context.applyOn(containers);
       }
 
-      // Let the view handlers act on attachment of their ads.
-      for (var handler_id in Drupal.ad_entity.viewHandlers) {
-        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
-          if (correlation.hasOwnProperty(handler_id)) {
-            correlation[handler_id].handler.attach(correlation[handler_id].containers, context, settings);
-          }
+      // Apply initial scope restriction and initialization on given Advertisement.
+      Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
+
+      // When responsive behavior is enabled,
+      // re-apply scope restriction with initialization on breakpoint changes.
+      if (settings.hasOwnProperty('ad_entity_responsive')) {
+        if (settings.ad_entity_responsive === true) {
+          $(window).on('themeBreakpoint:changed', function () {
+            Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
+          });
         }
       }
     },
@@ -133,9 +181,9 @@
         // Remove the detached container from the collection.
         delete Drupal.ad_entity.adContainers[id];
       });
-      var correlation = Drupal.ad_entity.correlate(containers);
 
       // Let the view handlers act on detachment of their ads.
+      var correlation = Drupal.ad_entity.correlate(containers);
       for (var handler_id in Drupal.ad_entity.viewHandlers) {
         if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
           if (correlation.hasOwnProperty(handler_id)) {

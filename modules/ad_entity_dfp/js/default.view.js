@@ -15,7 +15,7 @@
   googletag.cmd = googletag.cmd || [];
 
   Drupal.ad_entity.viewHandlers.dfp_default = Drupal.ad_entity.viewHandlers.dfp_default || {
-    attach: function (containers, context, settings) {
+    initialize: function (containers, context, settings) {
       var onPageLoad = 'true';
       if (this.numberOfAds > 0) {
         onPageLoad = 'false';

@@ -12,7 +12,7 @@
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
   Drupal.ad_entity.viewHandlers.adtech_default = Drupal.ad_entity.viewHandlers.adtech_default || {
-    attach: function (containers, context, settings) {
+    initialize: function (containers, context, settings) {
       if (typeof window.atf_lib !== 'undefined') {
         var load_arguments = [];
         var onPageLoad = true;

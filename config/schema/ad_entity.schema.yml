@@ -1,6 +1,10 @@
 ad_entity.settings:
   type: config_object
   label: 'Global settings for Advertising entities'
+  mapping:
+    enable_responsive_behavior:
+      type: boolean
+      label: 'Whether responsive behavior is enabled or not'
 
 ad_entity.ad_entity.*:
   type: config_entity

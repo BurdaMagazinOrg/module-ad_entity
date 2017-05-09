@@ -4,6 +4,7 @@ view:
   dependencies:
     - core/drupal
     - core/jquery
+    - theme_breakpoints_js/breakpointsLoader
 
 context:
   js:

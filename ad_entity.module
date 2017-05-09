@@ -20,3 +20,13 @@ function ad_entity_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
+
+/**
+ * Implements hook_page_attachments().
+ */
+function ad_entity_page_attachments(array &$page) {
+  if ($config = \Drupal::config('ad_entity.settings')) {
+    $page['#attached']['drupalSettings']['ad_entity_responsive'] =
+      $config->get('enable_responsive_behavior') ? TRUE : FALSE;
+  }
+}
