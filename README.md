@@ -13,8 +13,9 @@ Theme Breakpoint JS</a> module.
 
 - Install this module.
 - You need at least one further module which defines an Advertising type.
-  The ad_entity_adtech module for example defines advertisement provided by
-  AdTech Factory. This module can be found in the 'modules' subfolder. 
+  The ad_entity_dfp module for example enables you to create
+  types of Doubleclick for Publishers (DFP) advertisement.
+  This module can be found in the 'modules' subfolder. 
 - Configure global settings for Advertising entities
   at admin/structure/ad_entity/global-settings.
 - Create and manage your Advertising entities at admin/structure/ad_entity.
@@ -74,7 +75,7 @@ you'll need to use the backend appliance mode on your field formatters.
 Enabling backend appliance mode means that the context will be collected as
 <em>backend context data</em>, and this data will be applied on the server-side.
 
-# Tips
+# Tips for avoiding possible problems
 
 It's recommended to always display your Advertising entities through
 Advertising blocks. This way, you're able to change your advertisement

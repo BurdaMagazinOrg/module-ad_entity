@@ -97,12 +97,12 @@ class GlobalSettingsForm extends ConfigFormBase {
         $type = $this->typeManager->createInstance($type_id);
         $label = $type->getPluginDefinition()['label'];
         $form[$type_id] = [
-            '#type' => 'details',
-            '#group' => 'settings_tabs',
-            '#attributes' => ['id' => 'edit-' . $type_id],
-            '#title' => $this->t("@type types", ['@type' => $label]),
-            '#tree' => TRUE,
-          ] + $type->globalSettingsForm($form, $form_state, $config);
+          '#type' => 'details',
+          '#group' => 'settings_tabs',
+          '#attributes' => ['id' => 'edit-' . $type_id],
+          '#title' => $this->t("@type types", ['@type' => $label]),
+          '#tree' => TRUE,
+        ] + $type->globalSettingsForm($form, $form_state, $config);
       }
     }
 
