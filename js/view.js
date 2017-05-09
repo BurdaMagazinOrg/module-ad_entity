@@ -20,16 +20,31 @@
    *
    * @param {object} context
    *   The part of the DOM being processed.
+   * @param {boolean} force_addition
+   *   (Optional) Whether to force the addition of the containers. Default is true.
    *
    * @return {object}
    *   The newly added containers (newcomers).
    */
-  Drupal.ad_entity.collectAdContainers = function (context) {
+  Drupal.ad_entity.collectAdContainers = function (context, force_addition) {
     var newcomers = {};
     $('.ad-entity-container', context).each(function () {
       var container = $(this);
       var id = container.attr('id');
       if (!(Drupal.ad_entity.adContainers.hasOwnProperty(id))) {
+        Drupal.ad_entity.adContainers[id] = container;
+        newcomers[id] = container;
+      }
+      else if (force_addition !== false && !container.hasClass('initialized')) {
+        // When force-adding, guarantee uniqueness of the container and its children.
+        var length = Object.keys(Drupal.ad_entity.adContainers).length;
+        id = id + '-' + length;
+        container.attr('id', id);
+        $('[id]', container[0]).each(function () {
+          var $this = $(this);
+          var new_id = $this.attr('id') + '-' + length;
+          $this.attr('id', new_id);
+        });
         Drupal.ad_entity.adContainers[id] = container;
         newcomers[id] = container;
       }
@@ -149,7 +164,7 @@
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
-      var containers = Drupal.ad_entity.collectAdContainers(context);
+      var containers = Drupal.ad_entity.collectAdContainers(context, true);
 
       // Apply Advertising contexts, if available.
       if (!($.isEmptyObject(Drupal.ad_entity.context))) {
