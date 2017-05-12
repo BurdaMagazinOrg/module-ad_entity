@@ -9,6 +9,10 @@ advertising instances.
 - The <a href="https://github.com/BurdaMagazinOrg/module-theme_breakpoints_js">
 Theme Breakpoint JS</a> module.
 
+Not a requirement, but recommended:
+- The <a href="https://www.drupal.org/project/block_field">Block field</a>
+  module for attaching blocks on content.
+
 # Quick start
 
 - Install this module.
