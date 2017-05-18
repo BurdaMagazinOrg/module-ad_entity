@@ -34,8 +34,8 @@
    */
   Drupal.ad_entity.context.applyOn = function (newcomers) {
     var context_objects = Drupal.ad_entity.contextObjects;
-    for (var i = 0; i < context_objects.length; i++) {
-      var context_object = context_objects[i];
+    while (context_objects.length) {
+      var context_object = context_objects.shift();
       for (var id in newcomers) {
         if (newcomers.hasOwnProperty(id)) {
           var container = newcomers[id];
@@ -43,7 +43,7 @@
           // Determine whether to apply the given context
           // on the Advertising container.
           var to_apply = true;
-          if (context_object.hasOwnProperty('apply_on')) {
+          if (context_object.hasOwnProperty('apply_on') && context_object.apply_on.length > 0) {
             var ad_entity_id = container.attr('data-ad-entity');
             if ($.inArray(ad_entity_id, context_object.apply_on) < 0) {
               to_apply = false;
