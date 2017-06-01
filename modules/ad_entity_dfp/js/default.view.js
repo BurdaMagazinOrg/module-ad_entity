@@ -14,7 +14,7 @@
   var googletag = window.googletag || {};
   googletag.cmd = googletag.cmd || [];
 
-  var $window = $window || $(window);
+  var $window = $(window);
 
   Drupal.ad_entity.viewHandlers.dfp_default = Drupal.ad_entity.viewHandlers.dfp_default || {
     initialize: function (containers, context, settings) {

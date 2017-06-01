@@ -11,7 +11,7 @@
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
-  var $window = $window || $(window);
+  var $window = $(window);
 
   Drupal.ad_entity.viewHandlers.adtech_default = Drupal.ad_entity.viewHandlers.adtech_default || {
     initialize: function (containers, context, settings) {
