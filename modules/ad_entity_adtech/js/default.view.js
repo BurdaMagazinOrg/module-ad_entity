@@ -11,6 +11,8 @@
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
+  var $window = $window || $(window);
+
   Drupal.ad_entity.viewHandlers.adtech_default = Drupal.ad_entity.viewHandlers.adtech_default || {
     initialize: function (containers, context, settings) {
       if (typeof window.atf_lib !== 'undefined') {
@@ -38,7 +40,7 @@
             this.addEventsFor(ad_tag, container);
           }
         }
-        $(window).trigger('atf:BeforeLoad', [load_arguments, onPageLoad]);
+        $window.trigger('atf:BeforeLoad', [load_arguments, onPageLoad]);
         window.atf_lib.load_tag(load_arguments);
       }
     },

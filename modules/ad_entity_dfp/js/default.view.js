@@ -14,6 +14,8 @@
   var googletag = window.googletag || {};
   googletag.cmd = googletag.cmd || [];
 
+  var $window = $window || $(window);
+
   Drupal.ad_entity.viewHandlers.dfp_default = Drupal.ad_entity.viewHandlers.dfp_default || {
     initialize: function (containers, context, settings) {
       var onPageLoad = 'true';
@@ -47,7 +49,7 @@
         var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
         var targeting = ad_tag.attr('data-ad-entity-targeting');
 
-        $(window).trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
+        $window.trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
 
         if (targeting) {
           targeting = JSON.parse(targeting);
