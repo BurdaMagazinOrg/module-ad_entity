@@ -79,6 +79,20 @@ you'll need to use the backend appliance mode on your field formatters.
 Enabling backend appliance mode means that the context will be collected as
 <em>backend context data</em>, and this data will be applied on the server-side.
 
+## Javascript Events
+
+As an alternative way for adjusting the display and behavior of your ads,
+the Advertising implementations might provide events for you.
+
+The AdTech implementation provides the event <code>atf:BeforeLoad</code>
+which is being triggered right before <code>atf_lib.load_tags()</code>
+is called with the <code>load_arguments</code> array.
+
+The DFP implementation provides the event <code>dfp:BeforeDisplay</code>
+which is being triggered right after the slot definition and before the
+display instruction, giving you the options to act on
+the <code>slot</code> and its corresponding <code>targeting</code>.
+
 # Tips for avoiding possible problems
 
 It's recommended to always display your Advertising entities through

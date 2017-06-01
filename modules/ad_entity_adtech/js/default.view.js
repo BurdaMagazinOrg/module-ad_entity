@@ -38,6 +38,7 @@
             this.addEventsFor(ad_tag, container);
           }
         }
+        $(window).trigger('atf:BeforeLoad', [load_arguments, onPageLoad]);
         window.atf_lib.load_tag(load_arguments);
       }
     },

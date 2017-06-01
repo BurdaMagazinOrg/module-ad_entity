@@ -45,8 +45,10 @@
         }
 
         var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
-
         var targeting = ad_tag.attr('data-ad-entity-targeting');
+
+        $(window).trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
+
         if (targeting) {
           targeting = JSON.parse(targeting);
           for (var key in targeting) {
