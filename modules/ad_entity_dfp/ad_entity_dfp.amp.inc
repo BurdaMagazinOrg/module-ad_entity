@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Advertising Entity: Implementations for Accelerated Mobile Pages (AMP).
+ * Advertising Entity: DFP implementations for Accelerated Mobile Pages (AMP).
  */
 
 use Drupal\Core\Template\Attribute;
