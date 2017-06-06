@@ -25,5 +25,9 @@ function ad_entity_dfp_theme($existing, $type, $theme, $path) {
       'variables' => ['ad_entity' => NULL],
       'file' => 'ad_entity_dfp.iframe.inc',
     ],
+    'dfp_amp' => [
+      'variables' => ['ad_entity' => NULL],
+      'file' => 'ad_entity_dfp.amp.inc',
+    ],
   ];
 }

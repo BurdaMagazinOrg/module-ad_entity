@@ -24,3 +24,16 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
         height:
           type: string
           label: 'iFrame height'
+    amp:
+      type: mapping
+      label: 'AMP tag view settings'
+      mapping:
+        width:
+          type: string
+          label: 'AMP-AD tag width'
+        height:
+          type: string
+          label: 'AMP-AD tag height'
+        multi_size_validation:
+          type: boolean
+          label: 'Multi-size validation'

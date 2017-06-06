@@ -32,3 +32,9 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_adtech:
         height:
           type: string
           label: 'iFrame height'
+        title:
+          type: string
+          label: 'Value for the title attribute'
+        atf_channel:
+          type: string
+          label: 'Value for the atf_channel variable'
