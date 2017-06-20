@@ -12,6 +12,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  *   id = "dfp_default",
  *   label = "Default view for a DFP tag",
  *   library = "ad_entity_dfp/default_view",
+ *   container = "html",
  *   allowedTypes = {
  *     "dfp"
  *   }

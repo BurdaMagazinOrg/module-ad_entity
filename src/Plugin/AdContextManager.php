@@ -132,7 +132,7 @@ class AdContextManager extends DefaultPluginManager {
   }
 
   /**
-   * Set the current collecton of backend context data.
+   * Set the current collection of backend context data.
    *
    * @param array $context_data
    *   The backend context data collection.

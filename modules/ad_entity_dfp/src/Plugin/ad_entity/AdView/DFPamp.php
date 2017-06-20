@@ -12,6 +12,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  * @AdView(
  *   id = "dfp_amp",
  *   label = "DFP tag for Accelerated Mobile Pages",
+ *   container = "amp",
  *   allowedTypes = {
  *     "dfp"
  *   }

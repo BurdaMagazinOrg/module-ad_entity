@@ -9,10 +9,10 @@
 
   if (drupalSettings.hasOwnProperty('adtech_page_targeting')) {
     if (typeof window.atf_lib !== 'undefined') {
-      var targeting = JSON.parse(drupalSettings['adtech_page_targeting']);
-      for (var key in targeting) {
-        if (targeting.hasOwnProperty(key)) {
-          window.atf_lib.add_page_targeting(key, targeting[key]);
+      var page_targeting = JSON.parse(drupalSettings['adtech_page_targeting']);
+      for (var key in page_targeting) {
+        if (page_targeting.hasOwnProperty(key)) {
+          window.atf_lib.add_page_targeting(key, page_targeting[key]);
         }
       }
     }

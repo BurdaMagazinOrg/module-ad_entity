@@ -12,6 +12,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  * @AdView(
  *   id = "dfp_iframe",
  *   label = "DFP tag as iFrame",
+ *   container = "iframe",
  *   allowedTypes = {
  *     "dfp"
  *   }

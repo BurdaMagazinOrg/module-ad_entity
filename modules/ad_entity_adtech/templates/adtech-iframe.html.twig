@@ -5,8 +5,15 @@
     <meta charset="utf-8">
     <title>{{ iframe.title }}</title>
     <script src="{{ library_source }}" type="text/javascript"></script>
-    <script>
-      var atf_channel = "{{ iframe.atf_channel }}";
+    <script type="text/javascript">
+      var page_targeting = {{ page_targeting|raw }};
+      if (typeof atf_lib !== "undefined") {
+        for (var key in page_targeting) {
+          if (page_targeting.hasOwnProperty(key)) {
+            atf_lib.add_page_targeting(key, page_targeting[key]);
+          }
+        }
+      }
     </script>
   </head>
   <body>

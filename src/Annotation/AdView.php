@@ -37,6 +37,20 @@ class AdView extends Plugin {
   public $library;
 
   /**
+   * A container which wraps or holds the output of this view handler.
+   *
+   * For regular HTML ads, the value 'html' can be used.
+   * Implementations for other protocols might be different and
+   * incompatible with the 'html' container.
+   * In that case, use a value of your choice,
+   * which can be used and identified later during theme processing.
+   * You might need to override the template ad-entity.html.twig as well.
+   *
+   * @var string
+   */
+  public $container;
+
+  /**
    * A list of Advertising types the view handler is compatible with.
    *
    * @var string[]

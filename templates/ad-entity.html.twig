@@ -1,1 +1,5 @@
-<div{{ attributes }} data-ad-entity-variant='{{ variant|raw }}'>{{ content }}</div>
+{% if container == "html" %}
+  <div{{ attributes }} data-ad-entity-variant='{{ variant|raw }}'>{{ content }}</div>
+{% else %}
+  {{ content }}
+{% endif %}

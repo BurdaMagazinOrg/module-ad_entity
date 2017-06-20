@@ -33,6 +33,8 @@ function template_preprocess_ad_entity(array &$variables) {
 
   if ($view_handler = $ad_entity->getViewPlugin()) {
     $definition = $view_handler->getPluginDefinition();
+    // Pass through information about which container to use.
+    $variables['container'] = $definition['container'];
     // Let the assigned view handler build the content.
     $variables['content'] = $view_handler->build($ad_entity);
     // Attach the JS implementation for the view handler.

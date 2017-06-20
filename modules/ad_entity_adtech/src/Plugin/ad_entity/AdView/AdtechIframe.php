@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @AdView(
  *   id = "adtech_iframe",
  *   label = "AdTech Factory tag as iFrame",
+ *   container = "iframe",
  *   allowedTypes = {
  *     "adtech_factory"
  *   }
@@ -69,16 +70,6 @@ class AdtechIframe extends AdViewBase {
       '#field_prefix' => '&lt;title&gt;',
       '#field_suffix' => '&lt;/title&gt;',
       '#default_value' => !empty($settings['title']) ? $settings['title'] : 'fbinstantarticles',
-    ];
-
-    $element['iframe']['atf_channel'] = [
-      '#type' => 'textfield',
-      '#required' => TRUE,
-      '#title' => $this->stringTranslation->translate('Value for the atf_channel variable'),
-      '#size' => 30,
-      '#field_prefix' => 'atf_channel = "',
-      '#field_suffix' => '"',
-      '#default_value' => !empty($settings['atf_channel']) ? $settings['atf_channel'] : 'facebookinstantarticles',
     ];
 
     return $element;

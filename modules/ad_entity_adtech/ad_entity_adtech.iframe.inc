@@ -53,5 +53,7 @@ function template_preprocess_adtech_iframe(array &$variables) {
     if (!empty($global_settings['library_source'])) {
       $variables['library_source'] = $global_settings['library_source'];
     }
+    $variables['page_targeting'] = !empty($global_settings['page_targeting']) ?
+      $global_settings['page_targeting'] : '{}';
   }
 }
