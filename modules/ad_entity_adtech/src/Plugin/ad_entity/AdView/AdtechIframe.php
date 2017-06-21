@@ -38,10 +38,6 @@ class AdtechIframe extends AdViewBase {
 
     $settings = $ad_entity->getThirdPartySettings($this->getPluginDefinition()['provider']);
 
-    $element['targeting_hint'] = [
-      '#markup' => $this->stringTranslation->translate("For Facebook Instant Articles, make sure the <strong>default targeting</strong> above contains <strong>website: Your Website name</strong> and <strong>channel: FIA</strong> in case you have no other channel specified."),
-    ];
-
     $element['iframe']['width'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
@@ -69,7 +65,7 @@ class AdtechIframe extends AdViewBase {
       '#size' => 30,
       '#field_prefix' => '&lt;title&gt;',
       '#field_suffix' => '&lt;/title&gt;',
-      '#default_value' => !empty($settings['title']) ? $settings['title'] : 'fbinstantarticles',
+      '#default_value' => !empty($settings['iframe']['title']) ? $settings['iframe']['title'] : '',
     ];
 
     return $element;

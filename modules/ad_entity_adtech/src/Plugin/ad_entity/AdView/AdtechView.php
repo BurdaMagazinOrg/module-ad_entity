@@ -6,11 +6,11 @@ use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdViewBase;
 
 /**
- * Default view handler plugin for AdTech Factory advertisement.
+ * Default HTML view handler plugin for AdTech Factory advertisement.
  *
  * @AdView(
  *   id = "adtech_default",
- *   label = "Default view for an AdTech Factory tag",
+ *   label = "Default HTML view for an AdTech Factory tag",
  *   library = "ad_entity_adtech/default_view",
  *   container = "html",
  *   allowedTypes = {

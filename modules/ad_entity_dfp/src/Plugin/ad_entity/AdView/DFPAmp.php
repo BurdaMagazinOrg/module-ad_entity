@@ -18,7 +18,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  *   }
  * )
  */
-class DFPamp extends AdViewBase {
+class DFPAmp extends AdViewBase {
 
   /**
    * {@inheritdoc}

@@ -6,11 +6,11 @@ use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdViewBase;
 
 /**
- * Default view handler plugin for DFP advertisement.
+ * Default HTML view handler plugin for DFP advertisement.
  *
  * @AdView(
  *   id = "dfp_default",
- *   label = "Default view for a DFP tag",
+ *   label = "Default HTML view for a DFP tag",
  *   library = "ad_entity_dfp/default_view",
  *   container = "html",
  *   allowedTypes = {
