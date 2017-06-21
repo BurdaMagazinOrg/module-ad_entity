@@ -78,12 +78,25 @@ Please note that this operation could be expensive as well.
 
 For taxonomy terms, you can use tree aggregation or tree override as well.
 
-## Advertising contexts and iframes
+## Appliance modes for Advertising contexts
 
-If you want to apply Advertising contexts on iframes,
+When choosing the proper field formatter for delivering the Advertising context,
+you may additionally choose between <em>frontend appliance</em>
+and <em>backend appliance</em> mode. Frontend appliance mode will use
+Javascript to apply the delivered context, whereas backend appliance mode
+will do this job on the server-side. 
+
+For regular HTML ads, it's recommended to use the frontend appliance mode.
+If you want to apply Advertising contexts on iframes or feeds,
 you'll need to use the backend appliance mode on your field formatters.
-Enabling backend appliance mode means that the context will be collected as
-<em>backend context data</em>, and this data will be applied on the server-side.
+
+<strong>Tip:</strong> Collected context data on the server-side
+(<em>"backend context data"</em>) will be cleared anytime an entity is rendered,
+which delivers its own Advertising context. The clearance happens in the
+hook implementation <code>ad_entity_entity_view()</code>.
+In case you want to define backend context data
+which should be applied globally, you might want to accomplish this
+with an implementation of hook_entity_view_alter().
 
 ## Javascript Events
 
@@ -99,7 +112,7 @@ which is being triggered right after the slot definition and before the
 display instruction, giving you the options to act on
 the <code>slot</code> and its corresponding <code>targeting</code>.
 
-# Tips for avoiding possible problems
+# Further tips for avoiding possible problems
 
 It's recommended to always display your Advertising entities through
 Advertising blocks. This way, you're able to change your advertisement

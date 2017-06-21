@@ -6,7 +6,9 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Implements hook_theme().
@@ -38,18 +40,32 @@ function ad_entity_page_attachments(array &$page) {
  * Implements hook_entity_view().
  */
 function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  if (strpos($view_mode, 'rss') !== FALSE) {
-    // Prevent conflicting or wrong context data on RSS feeds by
-    // removing the context data, after each feed item has been rendered.
-    $build['#post_render'][] = 'ad_entity_clear_context_data';
-  }
-}
-
-/**
- * Clears the currently collected backend context data.
- */
-function ad_entity_clear_context_data() {
-  if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
-    $context_manager->setContextData([]);
+  // Check whether the entity being shown defines its own context data.
+  // If so, clear any previously defined data to prevent a wrong context.
+  // Furthermore, make sure to provide elementary entity information
+  // which might help identifying and organizing ad campaigns.
+  if ($entity instanceof FieldableEntityInterface) {
+    $field_definitions = $entity->getFieldDefinitions();
+    /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+    foreach ($field_definitions as $definition) {
+      if ($definition->getType() == 'ad_entity_context') {
+        $field_name = $definition->getName();
+        if ($display->getComponent($field_name)) {
+          /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
+          if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+            // Clear any previously defined context data.
+            $context_manager->setContextData([]);
+            // Provide elementary entity information.
+            $info = [
+              'entitytype' => $entity->getEntityTypeId() . '/' . $entity->bundle(),
+              'entitylabel' => Xss::filter($entity->label()),
+              'entityuuid' => $entity->uuid(),
+            ];
+            $context_manager
+              ->addContextData('targeting', ['targeting' => $info]);
+          }
+        }
+      }
+    }
   }
 }

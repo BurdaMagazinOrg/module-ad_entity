@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Class for collected targeting information.
@@ -127,7 +128,7 @@ class TargetingCollection {
    *   Example format: "key1: value1, key2: value2, key2: value3".
    */
   public function collectFromUserInput($input) {
-    $pairs = explode(',', $input);
+    $pairs = explode(',', Xss::filter($input));
     foreach ($pairs as $pair) {
       $pair = explode(':', trim($pair));
       $count = count($pair);
