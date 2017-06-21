@@ -47,7 +47,7 @@ function template_preprocess_adtech_iframe(array &$variables) {
   else {
     $variables['targeting'] = '{}';
   }
-  \Drupal::logger('ad_entity')->info('After Targeting merge');
+
   if ($config = \Drupal::config('ad_entity.settings')) {
     $global_settings = $config->get('adtech_factory');
     if (!empty($global_settings['library_source'])) {
