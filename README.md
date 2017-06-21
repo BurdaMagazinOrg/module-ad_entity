@@ -58,18 +58,22 @@ The available field formatters differ in which context will be delivered.
 To just deliver the user-defined context from the given entity,
 choose 'Context from entity only'.
 
-If you also want to additionally deliver the context
-being attached to terms which belong to a node, choose
-'Context from node with taxonomy (without trees)'. To include the taxonomy tree,
+If you want to include any context by referenced entities,
+choose 'Context from entity with references'.
+
+If you want to include context being attached to terms
+which belong to a node, choose
+'Context from node with taxonomy (without trees)'.
+To include the taxonomy tree,
 you can additionally choose between the 'tree aggregation'
-or 'tree override' formatter variants.
+and 'tree override' formatter variants.
 
 Using tree aggregation means that all contexts from a term's ancestors
 will be included. Please note that such operation could be expensive.
 
 Using tree override means that the first context found in the taxonomy tree
 will be used, in case the given term has no context defined by itself.
-The first ancestor of the erm having a context will be used (bottom-up).
+The first ancestor of the term having a context will be used (bottom-up).
 Please note that this operation could be expensive as well.
 
 For taxonomy terms, you can use tree aggregation or tree override as well.
