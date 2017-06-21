@@ -30,10 +30,12 @@ Not a requirement, but recommended:
 
 # About view handlers
 
-For each advertising type, there are usually two view handlers to choose from:
- - A default view, which is the recommended way for viewing the ads on a page.
- - An iframe, which should be used e.g. for embedding ads on external platforms
-   like Facebook Instant Articles.
+For each advertising type, there are usually different view handlers to choose:
+ - A default HTML view, which is the way for viewing the ads on a regular page.
+ - An iframe, which could be used for feeds or publishing on external sources.
+ - Facebook Instant Articles (FIA), which is basically an iframe as well.
+ - Accelerated Mobile Pages (AMP),
+   currently only provided by the DFP submodule.
 
 # About Advertising contexts
 

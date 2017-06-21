@@ -30,7 +30,7 @@ class AdtechFia extends AdtechIframe {
     $element['iframe']['title']['#default_value'] = !empty($settings['iframe']['title']) ? $settings['iframe']['title'] : 'fbinstantarticles';
 
     $element['targeting_hint'] = [
-      '#markup' => $this->stringTranslation->translate("For Facebook Instant Articles, make sure the <strong>default targeting</strong> above contains <strong>website: Your Website name</strong> and <strong>channel: FIA</strong> in case you have no other channel specified."),
+      '#markup' => $this->stringTranslation->translate("For Facebook Instant Articles, make sure the <strong>default targeting</strong> above contains <strong>website: Your Website name</strong>, <strong>platform: FIA</strong> and  - in case you have no other channel specified - <strong>channel: FIA</strong>."),
       '#weight' => '-10',
     ];
 
