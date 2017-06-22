@@ -2,9 +2,11 @@
 
 namespace Drupal\ad_entity\Plugin;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\CurrentRouteMatch;
 
 /**
  * Provides the manager for Advertising context plugins and collected data.
@@ -22,6 +24,13 @@ class AdContextManager extends DefaultPluginManager {
   protected $contextData;
 
   /**
+   * An array holding previously collected context data.
+   *
+   * @var array
+   */
+  protected $previousContextData;
+
+  /**
    * Constructor method.
    *
    * @param \Traversable $namespaces
@@ -31,12 +40,23 @@ class AdContextManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
+   *   The current route match service.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CurrentRouteMatch $current_route_match) {
     parent::__construct('Plugin/ad_entity/AdContext', $namespaces, $module_handler, 'Drupal\ad_entity\Plugin\AdContextInterface', 'Drupal\ad_entity\Annotation\AdContext');
+
+    $this->previousContextData = [];
+    $this->setContextData([]);
+    // When given, initialize the context for the entity from the current route.
+    foreach ($current_route_match->getParameters() as $param) {
+      if ($param instanceof EntityInterface) {
+        $this->resetContextDataFor($param);
+      }
+    }
+
     $this->alterInfo('ad_entity_adcontext');
     $this->setCacheBackend($cache_backend, 'ad_entity_adcontext');
-    $this->setContextData([]);
   }
 
   /**
@@ -129,6 +149,35 @@ class AdContextManager extends DefaultPluginManager {
    */
   public function getContextData() {
     return $this->contextData;
+  }
+
+  /**
+   * Resets the backend context data for the given entity.
+   *
+   * This might be useful when displaying the given entity with ads,
+   * which should only have context corresponding to this entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity for which to reset the context data.
+   */
+  public function resetContextDataFor(EntityInterface $entity) {
+    // Memorize the current state of the collected data,
+    // for being able to revert back to it later.
+    $this->previousContextData = $this->contextData;
+    // Reset the collected context data.
+    $this->setContextData([]);
+    // Allow other modules to react on the reset of the context data.
+    $this->moduleHandler->invokeAll('ad_context_data_reset', [$this, $entity]);
+  }
+
+  /**
+   * Resets the collected context data to a previous state.
+   *
+   * This method reverts the last call of ::resetContextDataFor(),
+   * with any other subsequent additions or changes to the collected data.
+   */
+  public function resetToPreviousContextData() {
+    $this->contextData = $this->previousContextData;
   }
 
   /**

@@ -7,4 +7,4 @@ services:
     parent: default_plugin_manager
   ad_entity.context_manager:
     class: Drupal\ad_entity\Plugin\AdContextManager
-    parent: default_plugin_manager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@current_route_match']

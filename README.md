@@ -90,14 +90,6 @@ For regular HTML ads, it's recommended to use the frontend appliance mode.
 If you want to apply Advertising contexts on iframes or feeds,
 you'll need to use the backend appliance mode on your field formatters.
 
-<strong>Tip:</strong> Collected context data on the server-side
-(<em>"backend context data"</em>) will be cleared anytime an entity is rendered,
-which delivers its own Advertising context. The clearance happens in the
-hook implementation <code>ad_entity_entity_view()</code>.
-In case you want to define backend context data
-which should be applied globally, you might want to accomplish this
-with an implementation of hook_entity_view_alter().
-
 ## Javascript Events
 
 As an alternative way for adjusting the display and behavior of your ads,
