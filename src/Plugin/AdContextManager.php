@@ -3,13 +3,16 @@
 namespace Drupal\ad_entity\Plugin;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FormatterPluginManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Provides the manager for Advertising context plugins and collected data.
+ * Provides the manager for Advertising context plugins and context data.
  */
 class AdContextManager extends DefaultPluginManager {
 
@@ -31,6 +34,20 @@ class AdContextManager extends DefaultPluginManager {
   protected $previousContextData;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The field formatter plugin manager.
+   *
+   * @var \Drupal\Core\Field\FormatterPluginManager
+   */
+  protected $formatterManager;
+
+  /**
    * Constructor method.
    *
    * @param \Traversable $namespaces
@@ -40,23 +57,21 @@ class AdContextManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
-   *   The current route match service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager.
+   * @param \Drupal\Core\Field\FormatterPluginManager
+   *   The field formatter plugin manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CurrentRouteMatch $current_route_match) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_manager) {
     parent::__construct('Plugin/ad_entity/AdContext', $namespaces, $module_handler, 'Drupal\ad_entity\Plugin\AdContextInterface', 'Drupal\ad_entity\Annotation\AdContext');
+    $this->alterInfo('ad_entity_adcontext');
+    $this->setCacheBackend($cache_backend, 'ad_entity_adcontext');
+
+    $this->entityTypeManager = $entity_type_manager;
+    $this->formatterManager = $formatter_manager;
 
     $this->previousContextData = [];
     $this->setContextData([]);
-    // When given, initialize the context for the entity from the current route.
-    foreach ($current_route_match->getParameters() as $param) {
-      if ($param instanceof EntityInterface) {
-        $this->resetContextDataFor($param);
-      }
-    }
-
-    $this->alterInfo('ad_entity_adcontext');
-    $this->setCacheBackend($cache_backend, 'ad_entity_adcontext');
   }
 
   /**
@@ -152,6 +167,25 @@ class AdContextManager extends DefaultPluginManager {
   }
 
   /**
+   * Resets the context for the entity from the given route match (when given).
+   *
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
+   */
+  public function resetContextDataForRoute(RouteMatchInterface $route_match) {
+    // Although this is also done in ::resetContextDataForEntity(),
+    // it should be made sure that the reset to the previous state
+    // won't result in context data loss.
+    $this->previousContextData = $this->contextData;
+
+    foreach ($route_match->getParameters() as $param) {
+      if ($param instanceof EntityInterface) {
+        $this->resetContextDataForEntity($param);
+      }
+    }
+  }
+
+  /**
    * Resets the backend context data for the given entity.
    *
    * This might be useful when displaying the given entity with ads,
@@ -160,7 +194,7 @@ class AdContextManager extends DefaultPluginManager {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for which to reset the context data.
    */
-  public function resetContextDataFor(EntityInterface $entity) {
+  public function resetContextDataForEntity(EntityInterface $entity) {
     // Memorize the current state of the collected data,
     // for being able to revert back to it later.
     $this->previousContextData = $this->contextData;
@@ -173,11 +207,67 @@ class AdContextManager extends DefaultPluginManager {
   /**
    * Resets the collected context data to a previous state.
    *
-   * This method reverts the last call of ::resetContextDataFor(),
+   * This method undos the last call either of
+   * ::resetContextDataForEntity() or ::resetContextDataForRoute(),
    * with any other subsequent additions or changes to the collected data.
    */
   public function resetToPreviousContextData() {
     $this->contextData = $this->previousContextData;
+  }
+
+  /**
+   * Collects backend context data provided by the fields of the given entity.
+   *
+   * Any data found will be added to the collection
+   * managed by the AdContextManager.
+   * The data will be fetched from the Advertising context fields.
+   * If and how Advertising context is being delivered, depends on the
+   * (already configured) display options of the entity's fields.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity from which to fetch context data.
+   * @param string|array $display_options
+   *   (Optional) Can be either the name of a view mode which has properly
+   *   configured field formatters for the Advertising context fields,
+   *   or an array of display settings.
+   *   See EntityViewBuilderInterface::viewField() for more information.
+   */
+  public function collectContextDataFrom(FieldableEntityInterface $entity, $display_options = 'default') {
+    $context_fields = [];
+    foreach ($entity->getFieldDefinitions() as $definition) {
+      if ($definition->getType() == 'ad_entity_context') {
+        $context_fields[$definition->getName()] = $definition;
+      }
+    }
+
+    if (is_string($display_options)) {
+      // Fetch the configured display options for this view mode.
+      $display_storage = $this->entityTypeManager->getStorage('entity_view_display');
+      /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
+      $display = $display_storage->load($entity->getEntityTypeId() . '.' . $entity->bundle() . '.' . $display_options);
+      foreach ($context_fields as $field_name => $definition) {
+        if ($configured_options = $display->getComponent($field_name)) {
+          $configured_options['settings']['appliance_mode'] = 'backend';
+          $configured_options['field_definition'] = $definition;
+          $configured_options['view_mode'] = $display_options;
+          /** @var \Drupal\Core\Field\FormatterInterface $formatter */
+          $formatter = $this->formatterManager
+            ->createInstance($configured_options['type'], $configured_options);
+          $formatter->viewElements($entity->get($field_name), $entity->language()->getId());
+        }
+      }
+    }
+    else {
+      if (empty($display_options['settings']['appliance_mode'])) {
+        $display_options['settings']['appliance_mode'] = 'backend';
+      }
+      foreach ($context_fields as $field_name => $definition) {
+        /** @var \Drupal\Core\Field\FormatterInterface $formatter */
+        $formatter = $this->formatterManager
+          ->createInstance($display_options['type'], $display_options);
+        $formatter->viewElements($entity->get($field_name), $entity->language()->getId());
+      }
+    }
   }
 
   /**

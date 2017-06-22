@@ -7,4 +7,6 @@ services:
     parent: default_plugin_manager
   ad_entity.context_manager:
     class: Drupal\ad_entity\Plugin\AdContextManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@current_route_match']
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager', '@plugin.manager.field.formatter']
+    calls:
+      - [resetContextDataForRoute, ['@current_route_match']]

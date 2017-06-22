@@ -13,7 +13,7 @@
 /**
  * Act on resetting the backend context data for the given entity.
  *
- * For more information, see AdContextManager::resetContextDataFor().
+ * For more information, see AdContextManager::resetContextDataForEntity().
  *
  * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
  *   The manager for Advertising context plugins and backend context data.
