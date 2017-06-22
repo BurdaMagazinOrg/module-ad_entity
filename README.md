@@ -113,3 +113,23 @@ on your whole site and switch between available variants of advertisement.
 The default tree aggregations and tree overrides can be expensive operations.
 When using a lot terms for nodes with large trees, it's recommended to
 write your custom formatter instead, which directly loads the context you want.
+
+When you write custom code for embedding Advertising entites, you might want
+to use a context which corresponds to a certain (content) entity.
+For this use case, you could rebuild the context on the server-side,
+e.g. inside a preprocess function like this:
+```php
+<?php
+if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+  $context_manager->resetContextDataForEntity($entity);
+  if ($entity instanceof FieldableEntityInterface) {
+    $context_manager->collectContextDataFrom($entity);
+  }
+
+  // .. Load and view your ad_entity instances.
+
+  // Reset to previous context data state (if any).
+  $context_manager->resetToPreviousContextData();
+}
+?>
+```
