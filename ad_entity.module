@@ -79,13 +79,11 @@ function ad_entity_ad_context_data_reset(AdContextManager $context_manager, Enti
  *
  * @param string $markup
  *   The markup result of the rendering.
- * @param array $element
- *   The processed element.
  *
  * @return string
  *   The markup result.
  */
-function _ad_entity_reset_to_previous_context_data($markup, $element) {
+function _ad_entity_reset_to_previous_context_data($markup) {
   /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
   if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
     $context_manager->resetToPreviousContextData();
