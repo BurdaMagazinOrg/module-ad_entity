@@ -120,10 +120,8 @@ For this use case, you could rebuild the context on the server-side,
 e.g. inside a preprocess function like this:
 ```
 if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+  // $entity may be a node, term, user or any other entity.
   $context_manager->resetContextDataForEntity($entity);
-  if ($entity instanceof FieldableEntityInterface) {
-    $context_manager->collectContextDataFrom($entity);
-  }
 
   // .. Load and view your ad_entity instances.
 
