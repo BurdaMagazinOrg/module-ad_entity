@@ -124,8 +124,9 @@ if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
   $context_manager->resetContextDataForEntity($entity);
 
   // .. Load and view your ad_entity instances.
+  // .. $ad_view = $view_builder->view($ad_entity);
 
   // Reset to previous context data state (if any).
-  $context_manager->resetToPreviousContextData();
+  $ad_view['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
 }
 ```
