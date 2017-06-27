@@ -4,6 +4,7 @@ namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -67,7 +68,12 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return ['appliance_mode' => 'frontend'];
+    return [
+      'appliance_mode' => 'frontend',
+      'targeting' => [
+        'bundle_label' => FALSE,
+      ],
+    ];
   }
 
   /**
@@ -85,9 +91,24 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       '#type' => 'select',
       '#options' => $options,
       '#title' => $this->t("Appliance mode"),
-      '#description' => $this->t("<em>Frontend appliance mode</em> lets the client's browser apply the context via Javascript - this is the recommended choice to avoid server-side performance overheads. <em>Backend appliance mode</em> lets the context being applied from server-side, which might be more suitable for iframes. The option <em>Both frontend & backend</em> appliance modes should only be considered for rare edge cases."),
+      '#description' => $this->t("<em>Frontend appliance mode</em> lets the client's browser apply the context via Javascript. <em>Backend appliance mode</em> lets the context being applied from server-side, which might be more suitable for iframes or feeds. The option <em>Both frontend & backend</em> appliance modes should only be considered for rare edge cases."),
       '#default_value' => $this->getSetting('appliance_mode'),
       '#required' => TRUE,
+      '#weight' => 10,
+    ];
+    $elements['targeting'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Targeting'),
+      '#weight' => 20,
+    ];
+    $elements['targeting']['bundle_label'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include "bundle: label" information'),
+      '#description' => $this->t('Example: A term "red" of the "color" vocabulary would add "color: red" to the targeting. <strong>Applies for any entity which has a context field.</strong>'),
+      '#default_value' => !empty($this->getSetting('targeting')['bundle_label']),
+      '#weight' => 10,
     ];
 
     return $elements;
@@ -99,7 +120,38 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   public function settingsSummary() {
     $summary = [];
     $summary[] = $this->t("Appliance mode: @mode", ['@mode' => $this->getSetting('appliance_mode')]);
+    if (!empty($this->getSetting('targeting')['bundle_label'])) {
+      $summary[] = $this->t('Include "bundle: label" information');
+    }
     return $summary;
+  }
+
+  /**
+   * Includes the Advertising context from the given items for later appliance.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   The list of field items holding Advertising context.
+   *
+   * @return array
+   *   A render array containing Advertising context for frontend appliance.
+   */
+  protected function includeForAppliance(FieldItemListInterface $items) {
+    $element = [];
+    $appliance_mode = $this->getSetting('appliance_mode');
+
+    if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
+      foreach ($items as $item) {
+        $element[] = $this->buildElementFromItem($item);
+      }
+    }
+
+    if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
+      foreach ($items as $item) {
+        $this->addItemToContextData($item);
+      }
+    }
+
+    return $element;
   }
 
   /**

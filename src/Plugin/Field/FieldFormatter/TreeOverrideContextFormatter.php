@@ -34,20 +34,9 @@ class TreeOverrideContextFormatter extends TaxonomyContextFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
-    $appliance_mode = $this->getSetting('appliance_mode');
 
-    $override_items = $this->getOverrideItems($items);
-
-    if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
-      foreach ($override_items as $item) {
-        $element[] = $this->buildElementFromItem($item);
-      }
-    }
-
-    if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
-      foreach ($override_items as $item) {
-        $this->addItemToContextData($item);
-      }
+    foreach ($this->getOverrideItems($items) as $to_include) {
+      $element = array_merge($element, $this->includeForAppliance($to_include));
     }
 
     return $element;

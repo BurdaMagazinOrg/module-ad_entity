@@ -34,7 +34,6 @@ class TreeAggregationContextFormatter extends TaxonomyContextFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
-    $appliance_mode = $this->getSetting('appliance_mode');
 
     $field_name = $items->getFieldDefinition()->get('field_name');
     $aggregated_items = [];
@@ -46,20 +45,8 @@ class TreeAggregationContextFormatter extends TaxonomyContextFormatterBase {
       }
     }
 
-    if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
-      foreach ($aggregated_items as $items) {
-        foreach ($items as $item) {
-          $element[] = $this->buildElementFromItem($item);
-        }
-      }
-    }
-
-    if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
-      foreach ($aggregated_items as $items) {
-        foreach ($items as $item) {
-          $this->addItemToContextData($item);
-        }
-      }
+    foreach ($aggregated_items as $to_include) {
+      $element = array_merge($element, $this->includeForAppliance($to_include));
     }
 
     return $element;
