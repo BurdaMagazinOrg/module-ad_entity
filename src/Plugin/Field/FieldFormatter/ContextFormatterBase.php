@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -24,6 +25,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected $contextManager;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -35,7 +43,8 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('ad_entity.context_manager')
+      $container->get('ad_entity.context_manager'),
+      $container->get('module_handler')
     );
   }
 
@@ -58,10 +67,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    *   Third party settings.
    * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
    *   The Advertising context manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->contextManager = $context_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -101,12 +113,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#title' => $this->t('Targeting'),
+      '#description' => $this->t('<strong>Please note:</strong> These options apply for any entity which has a context field.'),
       '#weight' => 20,
     ];
     $elements['targeting']['bundle_label'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Include "bundle: label" information'),
-      '#description' => $this->t('Example: A term "red" of the "color" vocabulary would add "color: red" to the targeting. <strong>Applies for any entity which has a context field.</strong>'),
+      '#description' => $this->t('Example: A term "red" of the "color" vocabulary would add "color: red" to the targeting.'),
       '#default_value' => !empty($this->getSetting('targeting')['bundle_label']),
       '#weight' => 10,
     ];
@@ -138,6 +151,10 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected function includeForAppliance(FieldItemListInterface $items) {
     $element = [];
     $appliance_mode = $this->getSetting('appliance_mode');
+
+    // Allow other modules to act on the inclusion of Advertising context.
+    $this->moduleHandler
+      ->invokeAll('ad_context_include', [$items, $this->getSettings()]);
 
     if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
       foreach ($items as $item) {

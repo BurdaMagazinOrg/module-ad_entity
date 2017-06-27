@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
@@ -69,13 +70,32 @@ function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityVie
 }
 
 /**
+ * Implements hook_ad_context_include().
+ */
+function ad_entity_ad_context_include(FieldItemListInterface $items, array $settings) {
+  // When enabled, include "bundle: label" for targeting.
+  if (!empty($settings['targeting']['bundle_label'])) {
+    $bundle = $items->getEntity()->bundle();
+    $label = $items->getEntity()->label();
+    $item_value['context'] = [
+      'context_plugin_id' => 'targeting',
+      'context_settings' => [
+        'targeting' => ['targeting' => [$bundle => $label]],
+      'apply_on' => [],
+      ],
+    ];
+    $items->appendItem($item_value);
+  }
+}
+
+/**
  * Implements hook_ad_context_data_reset().
  */
 function ad_entity_ad_context_data_reset(AdContextManager $context_manager, EntityInterface $entity) {
   if ($config = \Drupal::config('ad_entity.settings')) {
     $behavior = $config->get('behavior_on_context_reset');
-    // When enabled, provide elementary entity information.
-    if (!empty($behavior['provide_entity_info'])) {
+    // When enabled, include elementary entity information for targeting.
+    if (!empty($behavior['include_entity_info'])) {
       $info = [
         'entitytype' => $entity->getEntityTypeId() . '/' . $entity->bundle(),
         'entitylabel' => Xss::filter($entity->label()),

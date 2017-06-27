@@ -11,7 +11,7 @@
 function ad_entity_update_8001() {
   if ($config = \Drupal::configFactory()->getEditable('ad_entity.settings')) {
     $behavior_reset = [
-      'provide_entity_info' => TRUE,
+      'include_entity_info' => TRUE,
       'collect_default_data' => TRUE,
     ];
     $config->set('behavior_on_context_reset', $behavior_reset);

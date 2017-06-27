@@ -11,6 +11,28 @@
  */
 
 /**
+ * Act on the inclusion of Advertising context.
+ *
+ * @param \Drupal\Core\Field\FieldItemListInterface $items
+ *   A list of field items containing Advertising context,
+ *   which is about to be included for appliance.
+ * @param array $settings
+ *   The settings of the formatter being used for the list of field items.
+ */
+function hook_ad_context_include(\Drupal\Core\Field\FieldItemListInterface $items, array $settings) {
+  $to_append['context'] = [
+    'context_plugin_id' => 'targeting',
+    'context_settings' => [
+      'targeting' => ['targeting' => [
+        'entityid' => $items->getEntity()->id(),
+      ]],
+    ],
+    'apply_on' => [],
+  ];
+  $items->appendItem($to_append);
+}
+
+/**
  * Act on resetting the backend context data for the given entity.
  *
  * For more information, see AdContextManager::resetContextDataForEntity().

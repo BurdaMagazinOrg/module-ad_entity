@@ -9,9 +9,9 @@ ad_entity.settings:
       type: mapping
       label: 'Behavior when backend context has been reset to the scope of an entity'
       mapping:
-        provide_entity_info:
+        include_entity_info:
           type: boolean
-          label: 'Provide elementary targeting info of the entity scope (type, label, uuid)'
+          label: 'Include elementary information about the entity scope (type, label, uuid)'
         collect_default_data:
           type: boolean
           label: 'Enforce the collection of default Advertising context from the entity scope'
@@ -48,7 +48,6 @@ field.formatter.settings.ad_entity_context:
       mapping:
         bundle_label:
           type: boolean
-          label: 'Include "bundle: label" information'
 
 field.formatter.settings.node_with_terms_context:
   type: field.formatter.settings.ad_entity_context

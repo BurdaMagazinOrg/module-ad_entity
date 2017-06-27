@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\taxonomy\TermStorageInterface;
@@ -33,6 +34,7 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
       $configuration['view_mode'],
       $configuration['third_party_settings'],
       $container->get('ad_entity.context_manager'),
+      $container->get('module_handler'),
       $container->get('entity_type.manager')->getStorage('taxonomy_term')
     );
   }
@@ -59,8 +61,8 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, TermStorageInterface $term_storage) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $context_manager);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, TermStorageInterface $term_storage) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $context_manager, $module_handler);
     $this->termStorage = $term_storage;
   }
 

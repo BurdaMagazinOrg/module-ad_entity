@@ -104,17 +104,17 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#markup' => $this->t('Advertising context will be reset to the scope of an entity from the route and anytime an entity is being viewed which delivers its own context.'),
       '#weight' => 10,
     ];
-    $form['common']['behavior_on_context_reset']['provide_entity_info'] = [
+    $form['common']['behavior_on_context_reset']['include_entity_info'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Provide elementary targeting info of the entity scope (type, label, uuid)'),
-      '#parents' => ['behavior_on_context_reset', 'provide_entity_info'],
-      '#default_value' => isset($behavior_reset['provide_entity_info']) ? (int) $behavior_reset['provide_entity_info'] : 1,
+      '#title' => $this->t('Include elementary information about the entity scope (type, label, uuid)'),
+      '#parents' => ['behavior_on_context_reset', 'include_entity_info'],
+      '#default_value' => isset($behavior_reset['include_entity_info']) ? (int) $behavior_reset['include_entity_info'] : 1,
       '#weight' => 20,
     ];
     $form['common']['behavior_on_context_reset']['collect_default_data'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enforce the collection of default Advertising context from the entity scope'),
-      '#description' => $this->t('When enabled, backend context data will be collected from the context fields, which are enabled in the default view mode of the entity.'),
+      '#description' => $this->t('When enabled, backend context data will be collected from the context fields, which are enabled in the default view mode for the entity.'),
       '#parents' => ['behavior_on_context_reset', 'collect_default_data'],
       '#default_value' => isset($behavior_reset['collect_default_data']) ? (int) $behavior_reset['collect_default_data'] : 1,
       '#weight' => 30,
