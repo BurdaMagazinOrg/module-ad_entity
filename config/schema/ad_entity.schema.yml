@@ -48,6 +48,7 @@ field.formatter.settings.ad_entity_context:
       mapping:
         bundle_label:
           type: boolean
+          label: 'Include "bundle: label" information'
 
 field.formatter.settings.node_with_terms_context:
   type: field.formatter.settings.ad_entity_context

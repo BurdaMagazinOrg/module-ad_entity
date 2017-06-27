@@ -22,12 +22,14 @@
 function hook_ad_context_include(\Drupal\Core\Field\FieldItemListInterface $items, array $settings) {
   $to_append['context'] = [
     'context_plugin_id' => 'targeting',
-    'context_settings' => [
-      'targeting' => ['targeting' => [
-        'entityid' => $items->getEntity()->id(),
-      ]],
-    ],
     'apply_on' => [],
+    'context_settings' => [
+      'targeting' => [
+        'targeting' => [
+          'entityid' => $items->getEntity()->id(),
+        ],
+      ],
+    ],
   ];
   $items->appendItem($to_append);
 }

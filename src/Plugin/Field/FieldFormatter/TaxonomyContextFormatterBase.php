@@ -58,6 +58,8 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    *   Third party settings.
    * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
    *   The Advertising context manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
    */

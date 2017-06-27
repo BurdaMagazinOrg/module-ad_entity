@@ -79,9 +79,9 @@ function ad_entity_ad_context_include(FieldItemListInterface $items, array $sett
     $label = $items->getEntity()->label();
     $item_value['context'] = [
       'context_plugin_id' => 'targeting',
+      'apply_on' => [],
       'context_settings' => [
         'targeting' => ['targeting' => [$bundle => $label]],
-      'apply_on' => [],
       ],
     ];
     $items->appendItem($item_value);
