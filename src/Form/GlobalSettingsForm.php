@@ -73,14 +73,51 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Settings for any type of advertisement'),
       '#weight' => 10,
     ];
+    $form['common']['frontend'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Frontend'),
+      '#weight' => 10,
+    ];
     $default_behavior = $config->get('enable_responsive_behavior') !== NULL ?
       (int) $config->get('enable_responsive_behavior') : 1;
-    $form['common']['enable_responsive_behavior'] = [
+    $form['common']['frontend']['enable_responsive_behavior'] = [
       '#type' => 'radios',
-      '#title' => 'Responsive behavior',
+      '#title' => $this->t('Responsive behavior'),
       '#options' => [0 => $this->t("Disabled"), 1 => $this->t("Enabled")],
       '#description' => $this->t("When enabled, advertisement will be dynamically initialized on breakpoint changes (e.g. when switching from narrow to wide). When disabled, advertisement will only be initialized based on the initial breakpoint during page load."),
       '#default_value' => $default_behavior,
+      '#weight' => 10,
+    ];
+    $behavior_reset = $config->get('behavior_on_context_reset');
+    $form['common']['behavior_on_context_reset'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Behavior when backend context has been reset'),
+      '#weight' => 20,
+    ];
+    $form['common']['behavior_on_context_reset']['info'] = [
+      '#prefix' => '<div class="description">',
+      '#suffix' => '</div>',
+      '#markup' => $this->t('Advertising context will be reset to the scope of an entity from the route and anytime an entity is being viewed which delivers its own context.'),
+      '#weight' => 10,
+    ];
+    $form['common']['behavior_on_context_reset']['provide_entity_info'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Provide elementary targeting info of the entity scope (type, label, uuid)'),
+      '#parents' => ['behavior_on_context_reset', 'provide_entity_info'],
+      '#default_value' => isset($behavior_reset['provide_entity_info']) ? (int) $behavior_reset['provide_entity_info'] : 1,
+      '#weight' => 20,
+    ];
+    $form['common']['behavior_on_context_reset']['collect_default_data'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enforce the collection of default Advertising context from the entity scope'),
+      '#description' => $this->t('When enabled, backend context data will be collected from the context fields, which are enabled in the default view mode of the entity.'),
+      '#parents' => ['behavior_on_context_reset', 'collect_default_data'],
+      '#default_value' => isset($behavior_reset['collect_default_data']) ? (int) $behavior_reset['collect_default_data'] : 1,
+      '#weight' => 30,
     ];
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
@@ -131,6 +168,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     parent::submitForm($form, $form_state);
     $config = $this->config('ad_entity.settings');
     $config->set('enable_responsive_behavior', (bool) $form_state->getValue('enable_responsive_behavior'));
+    $config->set('behavior_on_context_reset', $form_state->getValue('behavior_on_context_reset'));
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {

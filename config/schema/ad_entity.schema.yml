@@ -5,6 +5,16 @@ ad_entity.settings:
     enable_responsive_behavior:
       type: boolean
       label: 'Whether responsive behavior is enabled or not'
+    behavior_on_context_reset:
+      type: mapping
+      label: 'Behavior when backend context has been reset to the scope of an entity'
+      mapping:
+        provide_entity_info:
+          type: boolean
+          label: 'Provide elementary targeting info of the entity scope (type, label, uuid)'
+        collect_default_data:
+          type: boolean
+          label: 'Enforce the collection of default Advertising context from the entity scope'
 
 ad_entity.ad_entity.*:
   type: config_entity
