@@ -106,7 +106,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     ];
     $form['common']['behavior_on_context_reset']['include_entity_info'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Include elementary information about the entity scope (type, label, uuid)'),
+      '#title' => $this->t('Include elementary targeting information about the entity scope (type, label, uuid)'),
       '#parents' => ['behavior_on_context_reset', 'include_entity_info'],
       '#default_value' => isset($behavior_reset['include_entity_info']) ? (int) $behavior_reset['include_entity_info'] : 1,
       '#weight' => 20,

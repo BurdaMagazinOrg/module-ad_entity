@@ -11,7 +11,7 @@ ad_entity.settings:
       mapping:
         include_entity_info:
           type: boolean
-          label: 'Include elementary information about the entity scope (type, label, uuid)'
+          label: 'Include elementary targeting information about the entity scope (type, label, uuid)'
         collect_default_data:
           type: boolean
           label: 'Enforce the collection of default Advertising context from the entity scope'
