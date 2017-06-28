@@ -34,6 +34,9 @@ ad_entity.ad_entity.*:
     view_plugin_id:
       type: string
       label: 'View handler plugin id'
+    disable_initialization:
+      type: boolean
+      label: 'Disable automatic initialization'
 
 field.formatter.settings.ad_entity_context:
   type: mapping

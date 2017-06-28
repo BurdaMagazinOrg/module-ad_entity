@@ -20,11 +20,13 @@
    *
    * @param {object} context
    *   The part of the DOM being processed.
+   * @param {object} settings
+   *   The Drupal settings.
    *
    * @return {object}
    *   The newly added containers (newcomers).
    */
-  Drupal.ad_entity.collectAdContainers = function (context) {
+  Drupal.ad_entity.collectAdContainers = function (context, settings) {
     var newcomers = {};
     $('.ad-entity-container', context).each(function () {
       var container = $(this);
@@ -43,6 +45,7 @@
         }
         Drupal.ad_entity.adContainers[id] = container;
         newcomers[id] = container;
+        container.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
       }
     });
     return newcomers;
@@ -135,10 +138,14 @@
   Drupal.ad_entity.restrictAndInitialize = function (containers, context, settings) {
     var to_initialize = Drupal.ad_entity.restrictAdsToScope(containers);
 
-    // Prevent re-initialization of already initialized Advertisement.
     for (var id in to_initialize) {
       if (to_initialize.hasOwnProperty(id)) {
-        if (to_initialize[id].hasClass('initialized') || !to_initialize[id].hasClass('not-initialized')) {
+        // Do not initialize disabled containers.
+        if (to_initialize[id].hasClass('initialization-disabled')) {
+          delete to_initialize[id];
+        }
+        // Prevent re-initialization of already initialized Advertisement.
+        else if (to_initialize[id].hasClass('initialized') || !to_initialize[id].hasClass('not-initialized')) {
           delete to_initialize[id];
         }
       }
@@ -160,7 +167,7 @@
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
-      var containers = Drupal.ad_entity.collectAdContainers(context);
+      var containers = Drupal.ad_entity.collectAdContainers(context, settings);
 
       // Apply Advertising contexts, if available.
       if (!($.isEmptyObject(Drupal.ad_entity.context))) {

@@ -90,29 +90,30 @@ For regular HTML ads, it's recommended to use the frontend appliance mode.
 If you want to apply Advertising contexts on iframes or feeds,
 you'll need to use the backend appliance mode on your field formatters.
 
+# Tips for developers
+
 ## Javascript Events
 
 As an alternative way for adjusting the display and behavior of your ads,
 the Advertising implementations might provide events for you.
 
-The AdTech implementation provides the event <code>atf:BeforeLoad</code>
+Following events are provided in general:
+ - When the container for an Advertising entity has been collected from context:
+   `container.trigger('adEntity:collected',
+   [Drupal.ad_entity.adContainers, newcomers, context, settings]);`
+ - After Advertisement has been initialized inside the container:
+   `container.trigger('adEntity:initialized', [ad_tag]);`
+
+The AdTech implementation provides the window event <code>atf:BeforeLoad</code>
 which is being triggered right before <code>atf_lib.load_tags()</code>
 is called with the <code>load_arguments</code> array.
 
-The DFP implementation provides the event <code>dfp:BeforeDisplay</code>
+The DFP implementation provides the window event <code>dfp:BeforeDisplay</code>
 which is being triggered right after the slot definition and before the
 display instruction, giving you the options to act on
 the <code>slot</code> and its corresponding <code>targeting</code>.
 
-# Further tips for avoiding possible problems
-
-It's recommended to always display your Advertising entities through
-Advertising blocks. This way, you're able to change your advertisement
-on your whole site and switch between available variants of advertisement.
-
-The default tree aggregations and tree overrides can be expensive operations.
-When using a lot terms for nodes with large trees, it's recommended to
-write your custom formatter instead, which directly loads the context you want.
+## Manually loading and rendering Advertising entities
 
 When you write custom code for embedding Advertising entites, you might want
 to use a context which corresponds to a certain (content) entity.
@@ -130,3 +131,23 @@ if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
   $ad_view['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
 }
 ```
+
+# Manually initializing ads
+
+Advertising entities have the option to disable automatic initalization.
+When the automatic initialization has been disabled, containers of Advertising
+entities get the CSS class `initialization-disabled` during theme processing.
+
+To initialize your ads manually, you'll need to remove the class mentioned
+above from the containers and call 
+`Drupal.ad_entity.restrictAndInitialize(containers, context, settings)`.
+
+# Further tips for avoiding possible problems
+
+It's recommended to always display your Advertising entities through
+Advertising blocks. This way, you're able to change your advertisement
+on your whole site and switch between available variants of advertisement.
+
+The default tree aggregations and tree overrides can be expensive operations.
+When using a lot terms for nodes with large trees, it's recommended to
+write your custom formatter instead, which directly loads the context you want.

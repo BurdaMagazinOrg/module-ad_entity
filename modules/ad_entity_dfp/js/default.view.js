@@ -74,6 +74,7 @@
           if (event.slot.getSlotElementId() === ad_tag.attr('id')) {
             container.removeClass('not-initialized');
             container.addClass('initialized');
+            container.trigger('adEntity:initialized', [ad_tag]);
           }
         }, false);
       });

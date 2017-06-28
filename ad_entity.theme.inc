@@ -22,6 +22,9 @@ function template_preprocess_ad_entity(array &$variables) {
   $id = 'ad-entity-' . Crypt::randomBytesBase64(8);
   $attributes = new Attribute(['id' => $id]);
   $attributes->addClass('ad-entity-container');
+  if ($ad_entity->get('disable_initialization')) {
+    $attributes->addClass('initialization-disabled');
+  }
   $attributes->addClass('not-initialized');
   $attributes->setAttribute('data-ad-entity', $ad_entity->id());
   $attributes->setAttribute('data-ad-entity-type', $ad_entity->get('type_plugin_id'));
