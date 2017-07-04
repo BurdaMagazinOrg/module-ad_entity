@@ -235,8 +235,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
           $this->configuration['variants'][$theme_name][$id][] = $variant;
         }
       }
-      foreach ($this->configuration['variants'][$theme_name] as $id => $variant) {
-        $this->configuration['variants'][$theme_name][$id] = Json::encode($variant);
+      foreach ($this->configuration['variants'][$theme_name] as $id => $variants) {
+        $this->configuration['variants'][$theme_name][$id] = Json::encode($variants);
       }
     }
 
@@ -252,7 +252,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $config = $this->getConfiguration();
 
     if (!empty($config['variants'])) {
-      foreach ($config['variants'] as $theme => $theme_variants) {
+      foreach ($config['variants'] as $theme_variants) {
         if (!empty($theme_variants)) {
           foreach (array_keys($theme_variants) as $id) {
             $dependency = 'ad_entity.ad_entity.' . $id;
@@ -281,7 +281,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $config = $this->getConfiguration();
 
     if (!empty($config['variants'])) {
-      foreach ($config['variants'] as $theme => $theme_variants) {
+      foreach ($config['variants'] as $theme_variants) {
         if (!empty($theme_variants)) {
           foreach (array_keys($theme_variants) as $id) {
             $tag = 'config:ad_entity.ad_entity.' . $id;
