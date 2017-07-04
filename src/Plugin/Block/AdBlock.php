@@ -4,10 +4,12 @@ namespace Drupal\ad_entity\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
@@ -37,6 +39,20 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $adEntityViewBuilder;
 
   /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * The theme manager service.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
    * The theme breakpoints js manager.
    *
    * @var \Drupal\theme_breakpoints_js\ThemeBreakpointsJs
@@ -50,6 +66,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $type_manager = $container->get('entity_type.manager');
     $ad_entity_storage = $type_manager->getStorage('ad_entity');
     $ad_entity_view_builder = $type_manager->getViewBuilder('ad_entity');
+    $config_factory = $container->get('config.factory');
+    $theme_manager = $container->get('theme.manager');
     $theme_breakpoints_js = $container->get('theme_breakpoints_js');
     return new static(
       $configuration,
@@ -57,6 +75,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $plugin_definition,
       $ad_entity_storage,
       $ad_entity_view_builder,
+      $config_factory,
+      $theme_manager,
       $theme_breakpoints_js
     );
   }
@@ -74,13 +94,19 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The storage for Advertising entities.
    * @param \Drupal\Core\Entity\EntityViewBuilderInterface $ad_entity_view_builder
    *   The view builder for Advertising entities.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager service.
    * @param \Drupal\theme_breakpoints_js\ThemeBreakpointsJs $theme_breakpoints_js
    *   The theme breakpoints js manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder, ThemeBreakpointsJs $theme_breakpoints_js) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder, ConfigFactoryInterface $config_factory, ThemeManagerInterface $theme_manager, ThemeBreakpointsJs $theme_breakpoints_js) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->adEntityStorage = $ad_entity_storage;
     $this->adEntityViewBuilder = $ad_entity_view_builder;
+    $this->configFactory = $config_factory;
+    $this->themeManager = $theme_manager;
     $this->themeBreakpointsJs = $theme_breakpoints_js;
   }
 
@@ -88,52 +114,107 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $theme_name = $form_state->get('block_theme');
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+    $default_theme = $this->configFactory->get('system.theme') ?
+      $this->configFactory->get('system.theme')->get('default') : NULL;
+    $selected_theme = $form_state->get('block_theme');
 
+    $installed_themes = $this->configFactory->get('core.extension')->get('theme') ? : [];
+    // Change orders: default and selected theme should appear first.
+    $installed_themes = array_keys($installed_themes);
+    foreach ($installed_themes as $index => $theme_name) {
+      if ($default_theme == $theme_name || $selected_theme == $theme_name) {
+        unset($installed_themes[$index]);
+      }
+    }
+    if (!empty($default_theme)) {
+      array_unshift($installed_themes, $default_theme);
+    }
+    if (!empty($selected_theme) && ($default_theme != $selected_theme)) {
+      array_unshift($installed_themes, $selected_theme);
+    }
+
+    // Get all Advertising entities to choose from.
     $entities = $this->adEntityStorage->loadMultiple();
     $options = [];
     foreach ($entities as $entity) {
       $options[$entity->id()] = $entity->label();
     }
 
-    $variants_by_entity = !empty($this->configuration['variants']) ? $this->configuration['variants'] : [];
-    $variants_by_breakpoint = [];
-    foreach ($variants_by_entity as $entity_id => $variant) {
-      $variant = Json::decode($variant);
-      foreach ($variant as $breakpoint) {
-        $variants_by_breakpoint[$breakpoint] = $entity_id;
-      }
-    }
+    // Provide settings per theme.
+    foreach ($installed_themes as $index => $theme_name) {
+      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
 
-    $form['variant_any'] = [
-      '#type' => 'select',
-      '#title' => $this->t("Default entity for any screen width"),
-      '#description' => $this->t("The selected Advertising entity will always be displayed, regardless of the given screen width. <strong>Choose none</strong> if you want to use variants per breakpoint."),
-      '#empty_value' => '',
-      '#required' => FALSE,
-      '#options' => $options,
-      '#default_value' => !empty($variants_by_breakpoint['any']) ? $variants_by_breakpoint['any'] : NULL,
-    ];
-    $form['breakpoint_hint'] = [
-      '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
-    ];
-    foreach ($theme_breakpoints as $variant => $breakpoint) {
-      $form['variant_' . $variant] = [
+      $variants_by_entity = !empty($this->configuration['variants'][$theme_name]) ? $this->configuration['variants'][$theme_name] : [];
+      $variants_by_breakpoint = [];
+      foreach ($variants_by_entity as $entity_id => $variant) {
+        $variant = Json::decode($variant);
+        foreach ($variant as $breakpoint) {
+          $variants_by_breakpoint[$breakpoint] = $entity_id;
+        }
+      }
+
+      $form['theme'][$theme_name] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Display settings for theme "@theme"', ['@theme' => $theme_name]),
+        '#collapsible' => TRUE,
+        '#collapsed' => $index > 0 ? TRUE : FALSE,
+        '#tree' => TRUE,
+      ];
+      $form['theme'][$theme_name]['variant_any'] = [
         '#type' => 'select',
-        '#title' => $this->t("Variant for @breakpoint", ['@breakpoint' => $breakpoint->getLabel()]),
-        '#description' => $this->t("The selected Advertising entity will be displayed on @breakpoint screen width.", ['@breakpoint' => $breakpoint->getLabel()]),
+        '#title' => $this->t("Default entity for any screen width"),
+        '#description' => !empty($theme_breakpoints) ? $this->t("The selected Advertising entity will always be displayed, regardless of the given screen width. <strong>Choose none</strong> if you want to use variants per breakpoint.") : '',
         '#empty_value' => '',
         '#required' => FALSE,
         '#options' => $options,
-        '#default_value' => !empty($variants_by_breakpoint[$variant]) ? $variants_by_breakpoint[$variant] : NULL,
-        '#states' => [
-          'visible' => [
-            'select[name="settings[variant_any]"]' => ['value' => ''],
-          ],
-        ],
+        '#default_value' => !empty($variants_by_breakpoint['any']) ? $variants_by_breakpoint['any'] : NULL,
       ];
+      if (!empty($theme_breakpoints)) {
+        $form['theme'][$theme_name]['breakpoint_hint'] = [
+          '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
+        ];
+        foreach ($theme_breakpoints as $variant => $breakpoint) {
+          $form['theme'][$theme_name]['variant_' . $variant] = [
+            '#type' => 'select',
+            '#title' => $this->t("Variant for @breakpoint", ['@breakpoint' => $breakpoint->getLabel()]),
+            '#description' => $this->t("The selected Advertising entity will be displayed on @breakpoint screen width.", ['@breakpoint' => $breakpoint->getLabel()]),
+            '#empty_value' => '',
+            '#required' => FALSE,
+            '#options' => $options,
+            '#default_value' => !empty($variants_by_breakpoint[$variant]) ? $variants_by_breakpoint[$variant] : NULL,
+            '#states' => [
+              'visible' => [
+                'select[name="settings[theme][' . $theme_name . '][variant_any]"]' => ['value' => ''],
+              ],
+            ],
+          ];
+        }
+      }
     }
+
+    $form['fallback'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#title' => $this->t('Fallback settings'),
+      '#tree' => TRUE,
+    ];
+    $form['fallback']['description'] = [
+      '#markup' => $this->t("Define what to do, when a theme is used which has no Advertisement assigned at the display settings above."),
+    ];
+    $form['fallback']['use_base_theme'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use the display settings of a base theme, if available.'),
+      '#default_value' => !empty($this->configuration['fallback']['use_base_theme']),
+    ];
+    $form['fallback']['use_settings_from'] = [
+      '#type' => 'select',
+      '#title' => $this->t("Use display settings of theme"),
+      '#options' => array_combine($installed_themes, $installed_themes),
+      '#empty_value' => '',
+      '#default_value' => !empty($this->configuration['fallback']['use_settings_from']) ? $this->configuration['fallback']['use_settings_from'] : '',
+      '#required' => FALSE,
+    ];
 
     return $form;
   }
@@ -142,32 +223,42 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $theme_name = $form_state->get('block_theme');
-    $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+    $theme_settings = $form_state->getValue('theme') ? : [];
 
-    $this->configuration['variants'] = [];
-    foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
-      if ($entity_id = $form_state->getValue('variant_' . $variant)) {
-        $this->configuration['variants'][$entity_id][] = $variant;
+    foreach ($theme_settings as $theme_name => $settings) {
+      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+
+      $this->configuration['variants'][$theme_name] = [];
+      foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
+        if ($entity_id = $form_state->getValue(['theme', $theme_name, 'variant_' . $variant])) {
+          $this->configuration['variants'][$theme_name][$entity_id][] = $variant;
+        }
+      }
+      foreach ($this->configuration['variants'][$theme_name] as $id => $variant) {
+        $this->configuration['variants'][$theme_name][$id] = Json::encode($variant);
       }
     }
-    foreach ($this->configuration['variants'] as $id => $variant) {
-      $this->configuration['variants'][$id] = Json::encode($variant);
-    }
+
+    $this->configuration['fallback']['use_base_theme'] = (bool) $form_state->getValue(['fallback', 'use_base_theme']);
+    $this->configuration['fallback']['use_settings_from'] = $form_state->getValue(['fallback', 'use_settings_from']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    $config = $this->getConfiguration();
     $dependencies = ['config' => []];
+    $config = $this->getConfiguration();
 
     if (!empty($config['variants'])) {
-      foreach (array_keys($config['variants']) as $id) {
-        $dependency = 'ad_entity.ad_entity.' . $id;
-        if (!in_array($dependency, $dependencies['config'])) {
-          $dependencies['config'][] = $dependency;
+      foreach ($config['variants'] as $theme => $theme_variants) {
+        if (!empty($theme_variants)) {
+          foreach (array_keys($theme_variants) as $id) {
+            $dependency = 'ad_entity.ad_entity.' . $id;
+            if (!in_array($dependency, $dependencies['config'])) {
+              $dependencies['config'][] = $dependency;
+            }
+          }
         }
       }
     }
@@ -189,8 +280,15 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $config = $this->getConfiguration();
 
     if (!empty($config['variants'])) {
-      foreach (array_keys($config['variants']) as $id) {
-        $tags[] = 'config:ad_entity.ad_entity.' . $id;
+      foreach ($config['variants'] as $theme => $theme_variants) {
+        if (!empty($theme_variants)) {
+          foreach (array_keys($theme_variants) as $id) {
+            $tag = 'config:ad_entity.ad_entity.' . $id;
+            if (!in_array($tag, $tags)) {
+              $tags[] = $tag;
+            }
+          }
+        }
       }
     }
     return Cache::mergeTags(parent::getCacheTags(), $tags);
@@ -200,9 +298,27 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function build() {
+    $theme = $this->themeManager->getActiveTheme();
+    $theme_name = $theme->getName();
+    if (empty($this->configuration['variants'][$theme_name])) {
+      // Check for enabled fallback settings, and switch to these when given.
+      if (!empty($this->configuration['fallback']['use_settings_from'])) {
+        $theme_name = $this->configuration['fallback']['use_settings_from'];
+      }
+      if (!empty($this->configuration['fallback']['use_base_theme'])) {
+        foreach ($theme->getBaseThemes() as $base_theme) {
+          if (!empty($this->configuration['variants'][$base_theme->getName()])) {
+            $theme_name = $base_theme->getName();
+            break;
+          }
+        }
+      }
+    }
+
+    // When given, load and view the assigned Advertisement.
     $build = [];
-    if (!empty($this->configuration['variants'])) {
-      foreach ($this->configuration['variants'] as $id => $variant) {
+    if (!empty($this->configuration['variants'][$theme_name])) {
+      foreach ($this->configuration['variants'][$theme_name] as $id => $variant) {
         if ($ad_entity = $this->adEntityStorage->load($id)) {
           if ($ad_entity->access('view')) {
             $build[] = $this->adEntityViewBuilder->view($ad_entity, $variant);

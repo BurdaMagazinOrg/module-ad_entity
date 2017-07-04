@@ -18,3 +18,37 @@ function ad_entity_update_8001() {
     $config->save();
   }
 }
+
+/**
+ * Re-organizing block settings. Synchronize your config after this update.
+ */
+function ad_entity_update_8002(&$sandbox) {
+  $storage = \Drupal::entityTypeManager()->getStorage('block');
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = $storage->getQuery()->count()->execute();
+    $sandbox['current'] = 0;
+  }
+
+  $query = $storage->getQuery();
+  $query->range($sandbox['current'], $sandbox['current'] + 20);
+  $block_ids = $query->execute();
+  if (!empty($block_ids)) {
+    /** @var \Drupal\block\Entity\Block $block */
+    foreach ($storage->loadMultiple($block_ids) as $block) {
+      if (($block->get('plugin') == 'ad_entity_block') && ($settings = $block->get('settings'))) {
+        if (($theme_name = $block->get('theme')) && !empty($settings['variants'])) {
+          $theme_variants = $settings['variants'];
+          unset($settings['variants']);
+          $settings['variants'][$theme_name] = $theme_variants;
+        }
+        $settings['fallback']['use_base_theme'] = FALSE;
+        $settings['fallback']['use_settings_from'] = '';
+        $block->set('settings', $settings);
+        $storage->save($block);
+      }
+      $sandbox['current']++;
+    }
+  }
+
+  $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+}
