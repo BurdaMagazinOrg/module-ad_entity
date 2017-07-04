@@ -62,6 +62,7 @@ class DFPAmp extends AdViewBase {
       '#type' => 'radios',
       '#required' => TRUE,
       '#title' => $this->stringTranslation->translate('Multi-size validation'),
+      '#description' => $this->stringTranslation->translate('Read about multi-size ads <a href="@url" target="_blant">here</a>.', ['@url' => 'https://github.com/ampproject/amphtml/blob/master/ads/google/doubleclick.md#multi-size-ad']),
       '#options' => ['1' => 'true', '0' => 'false'],
       '#default_value' => !empty($settings['amp']['multi_size_validation']) ? $settings['amp']['multi_size_validation'] : 0,
     ];
