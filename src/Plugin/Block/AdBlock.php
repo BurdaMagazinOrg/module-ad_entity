@@ -118,7 +118,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $this->configFactory->get('system.theme')->get('default') : NULL;
     $selected_theme = $form_state->get('block_theme');
 
-    $installed_themes = $this->configFactory->get('core.extension')->get('theme') ? : [];
+    $installed_themes = $this->configFactory->get('core.extension')->get('theme') ?: [];
     // Change orders: default and selected theme should appear first.
     $installed_themes = array_keys($installed_themes);
     foreach ($installed_themes as $index => $theme_name) {
@@ -171,7 +171,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       ];
       if (!empty($theme_breakpoints)) {
         $form['theme'][$theme_name]['breakpoint_hint'] = [
-          '#markup' => $this->t("<strong>For variants, make sure that the theme has its breakpoints properly set up.</strong>"),
+          '#markup' => $this->t("<strong>When using variants, make sure that the theme has its breakpoints properly set up.</strong>"),
         ];
         foreach ($theme_breakpoints as $variant => $breakpoint) {
           $form['theme'][$theme_name]['variant_' . $variant] = [
@@ -223,15 +223,16 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $theme_settings = $form_state->getValue('theme') ? : [];
+    $theme_settings = $form_state->getValue('theme') ?: [];
 
     foreach ($theme_settings as $theme_name => $settings) {
       $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
 
       $this->configuration['variants'][$theme_name] = [];
       foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {
-        if ($entity_id = $form_state->getValue(['theme', $theme_name, 'variant_' . $variant])) {
-          $this->configuration['variants'][$theme_name][$entity_id][] = $variant;
+        if (!empty($settings['variant_' . $variant])) {
+          $id = $settings['variant_' . $variant];
+          $this->configuration['variants'][$theme_name][$id][] = $variant;
         }
       }
       foreach ($this->configuration['variants'][$theme_name] as $id => $variant) {

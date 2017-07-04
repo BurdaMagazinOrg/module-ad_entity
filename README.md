@@ -132,7 +132,7 @@ if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
 }
 ```
 
-# Manually initializing ads
+## Manually initializing ads
 
 Advertising entities have the option to disable automatic initalization.
 When the automatic initialization has been disabled, containers of Advertising
