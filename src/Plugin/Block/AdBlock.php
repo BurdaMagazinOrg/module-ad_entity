@@ -278,7 +278,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function getCacheMaxAge() {
     $max_age = parent::getCacheMaxAge();
-    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+    foreach ($this->adContextManager->getInvolvedEntities() as $entities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       foreach ($entities as $entity) {
         $max_age = Cache::mergeMaxAges($entity->getCacheMaxAge(), $max_age);
@@ -292,7 +292,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function getCacheContexts() {
     $contexts = ['url.path'];
-    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+    foreach ($this->adContextManager->getInvolvedEntities() as $entities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       foreach ($entities as $entity) {
         $contexts = Cache::mergeContexts($entity->getCacheContexts(), $contexts);
@@ -321,7 +321,7 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
 
-    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+    foreach ($this->adContextManager->getInvolvedEntities() as $entities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       foreach ($entities as $entity) {
         $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
