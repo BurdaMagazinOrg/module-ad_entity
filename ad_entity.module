@@ -103,6 +103,7 @@ function ad_entity_ad_context_data_reset(AdContextManager $context_manager, Enti
       ];
       $context_manager
         ->addContextData('targeting', ['targeting' => $info]);
+      $context_manager->addInvolvedEntity($entity);
     }
     // When enabled, collect context data from the context fields being
     // enabled in the default view mode of this entity.

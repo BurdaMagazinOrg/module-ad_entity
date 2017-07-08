@@ -44,8 +44,13 @@ class NodeWithTreeOverrideContextFormatter extends TaxonomyContextFormatterBase 
       /** @var \Drupal\taxonomy\TermInterface $term */
       foreach ($node_terms[$nid] as $term) {
         $field_definitions = $term->getFieldDefinitions();
+        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
         foreach ($field_definitions as $definition) {
           if ($definition->getType() == 'ad_entity_context') {
+            $this->renderer->addCacheableDependency($element, $term);
+            foreach ($this->termStorage->loadParents($term->id()) as $parent) {
+              $this->renderer->addCacheableDependency($element, $parent);
+            }
             $field_name = $definition->getName();
             if ($term_items = $term->get($field_name)) {
               $override_items = $this->getOverrideItems($term_items);

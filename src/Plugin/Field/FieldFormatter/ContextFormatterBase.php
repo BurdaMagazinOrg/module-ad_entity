@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Renderer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
@@ -32,6 +33,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected $moduleHandler;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\Renderer
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -44,7 +52,8 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       $configuration['view_mode'],
       $configuration['third_party_settings'],
       $container->get('ad_entity.context_manager'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('renderer')
     );
   }
 
@@ -69,11 +78,14 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    *   The Advertising context manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Render\Renderer $renderer
+   *   The renderer service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->contextManager = $context_manager;
     $this->moduleHandler = $module_handler;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -167,6 +179,9 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
         $this->addItemToContextData($item);
       }
     }
+
+    // Inform the context manager that the entity could have provided context.
+    $this->contextManager->addInvolvedEntity($items->getEntity());
 
     return $element;
   }

@@ -34,7 +34,11 @@ class TreeOverrideContextFormatter extends TaxonomyContextFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $override_items = $this->getOverrideItems($items);
-    return $this->includeForAppliance($override_items);
+    $element = $this->includeForAppliance($override_items);
+    foreach ($this->termStorage->loadParents($items->getEntity()->id()) as $parent) {
+      $this->renderer->addCacheableDependency($element, $parent);
+    }
+    return $element;
   }
 
 }

@@ -24,13 +24,15 @@ class EntityWithReferencesContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
+    $entity = $items->getEntity();
     $aggregated_items = [$items];
-    foreach ($items->getEntity()->referencedEntities() as $reference) {
+    foreach ($entity->referencedEntities() as $reference) {
       if ($reference instanceof FieldableEntityInterface) {
         $field_definitions = $reference->getFieldDefinitions();
         /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
         foreach ($field_definitions as $definition) {
           if ($definition->getType() == 'ad_entity_context') {
+            $this->renderer->addCacheableDependency($element, $reference);
             $field_name = $definition->getName();
             if ($items_from_reference = $reference->get($field_name)) {
               $aggregated_items[] = $items_from_reference;

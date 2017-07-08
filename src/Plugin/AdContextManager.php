@@ -34,6 +34,20 @@ class AdContextManager extends DefaultPluginManager {
   protected $previousContextData;
 
   /**
+   * An array of entities which are involved to provide Advertising context.
+   *
+   * @var array
+   */
+  protected $involvedEntities;
+
+  /**
+   * An array of previously involved entities which provide Advertising context.
+   *
+   * @var array
+   */
+  protected $previouslyInvolvedEntities;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -71,7 +85,9 @@ class AdContextManager extends DefaultPluginManager {
     $this->formatterManager = $formatter_manager;
 
     $this->previousContextData = [];
+    $this->previouslyInvolvedEntities = [];
     $this->setContextData([]);
+    $this->setInvolvedEntities([]);
   }
 
   /**
@@ -90,6 +106,36 @@ class AdContextManager extends DefaultPluginManager {
       'settings' => $settings,
       'apply_on' => $apply_on,
     ];
+  }
+
+  /**
+   * Informs the manager that this entity has provided Advertising context.
+   *
+   * Other components might need to know which entities were involved
+   * during the delivering of Advertising context.
+   * Advertising blocks will use them to define cache tags.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity which has provided Advertising context.
+   */
+  public function addInvolvedEntity(EntityInterface $entity) {
+    $this->involvedEntities[$entity->getEntityTypeId()][$entity->id()] = $entity;
+  }
+
+  /**
+   * Check whether the entity is involved for providing Advertising context.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to check for.
+   *
+   * @return boolean
+   *   TRUE if entity is known to be involved, FALSE otherwise.
+   */
+  public function entityIsInvolved(EntityInterface $entity) {
+    if (isset($this->involvedEntities[$entity->getEntityTypeId()][$entity->id()])) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -167,6 +213,16 @@ class AdContextManager extends DefaultPluginManager {
   }
 
   /**
+   * Returns all known entities which are involved for providing Ad context.
+   *
+   * @return array
+   *   All known involved entities, keyed by entity type and id.
+   */
+  public function getInvolvedEntities() {
+    return $this->involvedEntities;
+  }
+
+  /**
    * Resets the context for the entity from the given route match (when given).
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
@@ -177,6 +233,7 @@ class AdContextManager extends DefaultPluginManager {
     // it should be made sure that the reset to the previous state
     // won't result in context data loss.
     $this->previousContextData = $this->contextData;
+    $this->previouslyInvolvedEntities = $this->involvedEntities;
 
     foreach ($route_match->getParameters() as $param) {
       if ($param instanceof EntityInterface) {
@@ -198,8 +255,10 @@ class AdContextManager extends DefaultPluginManager {
     // Memorize the current state of the collected data,
     // for being able to revert back to it later.
     $this->previousContextData = $this->contextData;
+    $this->previouslyInvolvedEntities = $this->involvedEntities;
     // Reset the collected context data.
     $this->setContextData([]);
+    $this->setInvolvedEntities([]);
     // Allow other modules to react on the reset of the context data.
     $this->moduleHandler->invokeAll('ad_context_data_reset', [$this, $entity]);
   }
@@ -213,6 +272,7 @@ class AdContextManager extends DefaultPluginManager {
    */
   public function resetToPreviousContextData() {
     $this->contextData = $this->previousContextData;
+    $this->involvedEntities = $this->previouslyInvolvedEntities;
   }
 
   /**
@@ -278,6 +338,16 @@ class AdContextManager extends DefaultPluginManager {
    */
   public function setContextData(array $context_data) {
     $this->contextData = $context_data;
+  }
+
+  /**
+   * Set the list of known entities which have provided Advertising context.
+   *
+   * @param array $involved
+   *   An array of involved entities, keyed by entity type and id.
+   */
+  public function setInvolvedEntities(array $involved) {
+    $this->involvedEntities = $involved;
   }
 
 }

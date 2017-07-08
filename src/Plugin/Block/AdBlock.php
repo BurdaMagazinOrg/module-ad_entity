@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Serialization\Json;
+use Drupal\ad_entity\Plugin\AdContextManager;
 use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
 
 /**
@@ -39,6 +40,13 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $adEntityViewBuilder;
 
   /**
+   * The manager for Advertising context plugins and data.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdContextManager
+   */
+  protected $adContextManager;
+
+  /**
    * The config factory service.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -64,20 +72,16 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $type_manager = $container->get('entity_type.manager');
-    $ad_entity_storage = $type_manager->getStorage('ad_entity');
-    $ad_entity_view_builder = $type_manager->getViewBuilder('ad_entity');
-    $config_factory = $container->get('config.factory');
-    $theme_manager = $container->get('theme.manager');
-    $theme_breakpoints_js = $container->get('theme_breakpoints_js');
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $ad_entity_storage,
-      $ad_entity_view_builder,
-      $config_factory,
-      $theme_manager,
-      $theme_breakpoints_js
+      $type_manager->getStorage('ad_entity'),
+      $type_manager->getViewBuilder('ad_entity'),
+      $container->get('ad_entity.context_manager'),
+      $container->get('config.factory'),
+      $container->get('theme.manager'),
+      $container->get('theme_breakpoints_js')
     );
   }
 
@@ -94,6 +98,8 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The storage for Advertising entities.
    * @param \Drupal\Core\Entity\EntityViewBuilderInterface $ad_entity_view_builder
    *   The view builder for Advertising entities.
+   * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
+   *   The manager for Advertising context plugins and data.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
@@ -101,10 +107,11 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @param \Drupal\theme_breakpoints_js\ThemeBreakpointsJs $theme_breakpoints_js
    *   The theme breakpoints js manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder, ConfigFactoryInterface $config_factory, ThemeManagerInterface $theme_manager, ThemeBreakpointsJs $theme_breakpoints_js) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $ad_entity_storage, EntityViewBuilderInterface $ad_entity_view_builder, AdContextManager $context_manager, ConfigFactoryInterface $config_factory, ThemeManagerInterface $theme_manager, ThemeBreakpointsJs $theme_breakpoints_js) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->adEntityStorage = $ad_entity_storage;
     $this->adEntityViewBuilder = $ad_entity_view_builder;
+    $this->adContextManager = $context_manager;
     $this->configFactory = $config_factory;
     $this->themeManager = $theme_manager;
     $this->themeBreakpointsJs = $theme_breakpoints_js;
@@ -269,15 +276,36 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCacheMaxAge() {
+    $max_age = parent::getCacheMaxAge();
+    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        $max_age = Cache::mergeMaxAges($entity->getCacheMaxAge(), $max_age);
+      }
+    }
+    return $max_age;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheContexts() {
-    return Cache::mergeContexts(parent::getCacheContexts(), ['url.path']);
+    $contexts = ['url.path'];
+    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        $contexts = Cache::mergeContexts($entity->getCacheContexts(), $contexts);
+      }
+    }
+    return Cache::mergeContexts(parent::getCacheContexts(), $contexts);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = [];
+    $tags = ['config:ad_entity.settings'];
     $config = $this->getConfiguration();
 
     if (!empty($config['variants'])) {
@@ -292,6 +320,14 @@ class AdBlock extends BlockBase implements ContainerFactoryPluginInterface {
         }
       }
     }
+
+    foreach ($this->adContextManager->getInvolvedEntities() as $type => $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
+      }
+    }
+
     return Cache::mergeTags(parent::getCacheTags(), $tags);
   }
 

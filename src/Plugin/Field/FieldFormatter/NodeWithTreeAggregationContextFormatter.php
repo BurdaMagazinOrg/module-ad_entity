@@ -43,14 +43,16 @@ class NodeWithTreeAggregationContextFormatter extends TaxonomyContextFormatterBa
     if (!empty($node_terms[$nid])) {
       /** @var \Drupal\taxonomy\TermInterface $term */
       foreach ($node_terms[$nid] as $tid => $term) {
+        $parents = [];
         $field_definitions = $term->getFieldDefinitions();
-        // ::loadAllParents() already includes the term itself.
-        $parents = $this->termStorage->loadAllParents($tid);
         /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
         foreach ($field_definitions as $definition) {
           if ($definition->getType() == 'ad_entity_context') {
+            // ::loadAllParents() already includes the term itself.
+            $parents = !empty($parents) ? $parents : $this->termStorage->loadAllParents($tid);
             $field_name = $definition->getName();
             foreach ($parents as $parent) {
+              $this->renderer->addCacheableDependency($element, $parent);
               if ($parent_items = $parent->get($field_name)) {
                 $aggregated_items[] = $parent_items;
               }
