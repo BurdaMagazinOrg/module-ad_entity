@@ -128,7 +128,7 @@ class AdContextManager extends DefaultPluginManager {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to check for.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if entity is known to be involved, FALSE otherwise.
    */
   public function entityIsInvolved(EntityInterface $entity) {
