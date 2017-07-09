@@ -110,7 +110,7 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
   /**
    * Get the terms of a node.
    *
-   * @param $nid
+   * @param int $nid
    *   The node id.
    *
    * @return array
