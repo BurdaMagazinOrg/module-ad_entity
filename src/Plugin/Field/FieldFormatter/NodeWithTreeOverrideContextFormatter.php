@@ -35,27 +35,23 @@ class NodeWithTreeOverrideContextFormatter extends TaxonomyContextFormatterBase 
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    /** @var \Drupal\node\Entity\Node $node */
-    $node = $items->getEntity();
-    $nid = $node->id();
     $aggregated_items = [$items];
-    $node_terms = $this->termStorage->getNodeTerms([$nid]);
-    if (!empty($node_terms[$nid])) {
-      /** @var \Drupal\taxonomy\TermInterface $term */
-      foreach ($node_terms[$nid] as $term) {
-        $field_definitions = $term->getFieldDefinitions();
-        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
-        foreach ($field_definitions as $definition) {
-          if ($definition->getType() == 'ad_entity_context') {
-            $this->renderer->addCacheableDependency($element, $term);
-            foreach ($this->termStorage->loadParents($term->id()) as $parent) {
-              $this->renderer->addCacheableDependency($element, $parent);
-            }
-            $field_name = $definition->getName();
-            if ($term_items = $term->get($field_name)) {
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    foreach ($this->getTermsForNode($items->getEntity()->id()) as $term) {
+      $field_definitions = $term->getFieldDefinitions();
+      /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+      foreach ($field_definitions as $definition) {
+        if ($definition->getType() == 'ad_entity_context') {
+          foreach ($this->termStorage->loadAllParents($term->id()) as $parent) {
+            $this->renderer->addCacheableDependency($element, $parent);
+          }
+          $field_name = $definition->getName();
+          if ($term_items = $term->get($field_name)) {
+            $aggregated_items[] = $term_items;
+            if ($term_items->isEmpty()) {
               $override_items = $this->getOverrideItems($term_items);
               if (!$override_items->isEmpty()) {
-                $aggregated_items[] = $override_items;
+                $aggregated_items[] = $this->getOverrideItems($term_items);
               }
             }
           }

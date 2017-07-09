@@ -23,6 +23,13 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
   protected $termStorage;
 
   /**
+   * An array of known node terms, keyed by nid.
+   *
+   * @var array
+   */
+  protected $nodeTerms;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -70,6 +77,7 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer, TermStorageInterface $term_storage) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $context_manager, $module_handler, $renderer);
     $this->termStorage = $term_storage;
+    $this->nodeTerms = [];
   }
 
   /**
@@ -97,6 +105,23 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
       }
     }
     return $items;
+  }
+
+  /**
+   * Get the terms of a node.
+   *
+   * @param $nid
+   *   The node id.
+   *
+   * @return array
+   *   The list of terms which belong to the node.
+   */
+  protected function getTermsForNode($nid) {
+    if (!isset($this->nodeTerms[$nid])) {
+      $node_terms = $this->termStorage->getNodeTerms([$nid]);
+      $this->nodeTerms[$nid] = !empty($node_terms[$nid]) ? $node_terms[$nid] : [];
+    }
+    return $this->nodeTerms[$nid];
   }
 
 }

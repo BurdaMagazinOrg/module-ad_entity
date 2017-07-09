@@ -35,23 +35,17 @@ class NodeWithTermsContextFormatter extends TaxonomyContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    /** @var \Drupal\node\Entity\Node $node */
-    $node = $items->getEntity();
-    $nid = $node->id();
     $aggregated_items = [$items];
-    $node_terms = $this->termStorage->getNodeTerms([$nid]);
-    if (!empty($node_terms[$nid])) {
-      /** @var \Drupal\taxonomy\TermInterface $term */
-      foreach ($node_terms[$nid] as $term) {
-        $field_definitions = $term->getFieldDefinitions();
-        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
-        foreach ($field_definitions as $definition) {
-          if ($definition->getType() == 'ad_entity_context') {
-            $this->renderer->addCacheableDependency($element, $term);
-            $field_name = $definition->getName();
-            if ($term_items = $term->get($field_name)) {
-              $aggregated_items[] = $term_items;
-            }
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    foreach ($this->getTermsForNode($items->getEntity()->id()) as $term) {
+      $field_definitions = $term->getFieldDefinitions();
+      /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+      foreach ($field_definitions as $definition) {
+        if ($definition->getType() == 'ad_entity_context') {
+          $this->renderer->addCacheableDependency($element, $term);
+          $field_name = $definition->getName();
+          if ($term_items = $term->get($field_name)) {
+            $aggregated_items[] = $term_items;
           }
         }
       }

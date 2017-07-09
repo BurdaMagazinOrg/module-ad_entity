@@ -163,6 +163,9 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected function includeForAppliance(FieldItemListInterface $items) {
     $element = [];
     $appliance_mode = $this->getSetting('appliance_mode');
+    // Other components might want to manipulate the list,
+    // which should be only valid in the scope of this function.
+    $items = clone $items;
 
     // Allow other modules to act on the inclusion of Advertising context.
     $this->moduleHandler
