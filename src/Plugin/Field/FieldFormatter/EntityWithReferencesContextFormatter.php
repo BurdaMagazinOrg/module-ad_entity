@@ -24,9 +24,8 @@ class EntityWithReferencesContextFormatter extends ContextFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
 
-    $entity = $items->getEntity();
     $aggregated_items = [$items];
-    foreach ($entity->referencedEntities() as $reference) {
+    foreach ($items->getEntity()->referencedEntities() as $reference) {
       if ($reference instanceof FieldableEntityInterface) {
         $field_definitions = $reference->getFieldDefinitions();
         /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */

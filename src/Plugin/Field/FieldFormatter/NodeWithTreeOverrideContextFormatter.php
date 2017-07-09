@@ -44,6 +44,7 @@ class NodeWithTreeOverrideContextFormatter extends TaxonomyContextFormatterBase 
         if ($definition->getType() == 'ad_entity_context') {
           foreach ($this->termStorage->loadAllParents($term->id()) as $parent) {
             $this->renderer->addCacheableDependency($element, $parent);
+            $this->contextManager->addInvolvedEntity($parent);
           }
           $field_name = $definition->getName();
           if ($term_items = $term->get($field_name)) {
