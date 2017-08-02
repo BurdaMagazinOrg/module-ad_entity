@@ -7,7 +7,6 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
-use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for a DFP tag for AMP.
