@@ -36,4 +36,7 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
           label: 'AMP-AD tag height'
         multi_size_validation:
           type: boolean
-          label: 'Multi-size validation'
+          label: 'Enable multi-size validation'
+        same_domain_rendering:
+          type: boolean
+          label: 'Enable same domain rendering'

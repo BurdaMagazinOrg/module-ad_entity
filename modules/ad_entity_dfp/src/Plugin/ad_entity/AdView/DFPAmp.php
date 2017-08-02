@@ -61,10 +61,19 @@ class DFPAmp extends AdViewBase {
     $element['amp']['multi_size_validation'] = [
       '#type' => 'radios',
       '#required' => TRUE,
-      '#title' => $this->stringTranslation->translate('Multi-size validation'),
-      '#description' => $this->stringTranslation->translate('Read about multi-size ads <a href="@url" target="_blank">here</a>.', ['@url' => 'https://github.com/ampproject/amphtml/blob/master/ads/google/doubleclick.md#multi-size-ad']),
-      '#options' => ['1' => 'true', '0' => 'false'],
+      '#title' => $this->stringTranslation->translate('Enable multi-size validation'),
+      '#description' => $this->stringTranslation->translate('Read more about this <a href="@url" target="_blank">here</a>.', ['@url' => 'https://github.com/ampproject/amphtml/blob/master/ads/google/doubleclick.md#multi-size-ad']),
+      '#options' => ['1' => $this->stringTranslation->translate('yes'), '0' => $this->stringTranslation->translate('no')],
       '#default_value' => !empty($settings['amp']['multi_size_validation']) ? $settings['amp']['multi_size_validation'] : 0,
+    ];
+
+    $element['amp']['same_domain_rendering'] = [
+      '#type' => 'radios',
+      '#required' => TRUE,
+      '#title' => $this->stringTranslation->translate('Enable same domain rendering'),
+      '#description' => $this->stringTranslation->translate('Read more about this <a href="@url" target="_blank">here</a>.', ['@url' => 'https://github.com/ampproject/amphtml/blob/master/ads/google/doubleclick.md#temporary-use-of-usesamedomainrenderinguntildeprecated']),
+      '#options' => ['1' => $this->stringTranslation->translate('yes'), '0' => $this->stringTranslation->translate('no')],
+      '#default_value' => !empty($settings['amp']['same_domain_rendering']) ? $settings['amp']['same_domain_rendering'] : 0,
     ];
 
     return $element;

@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for a DFP tag for AMP.
@@ -45,16 +46,16 @@ function template_preprocess_dfp_amp(array &$variables) {
   }
   $variables['attributes'] = $attributes;
 
+  // Generate the json attribute.
+  $json = [];
+  if (!empty($settings['amp']['same_domain_rendering'])) {
+    $json['useSameDomainRenderingUntilDeprecated'] = 1;
+  }
   $targeting_collection = $ad_entity->getTargetingFromContextData();
-  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
-    $variables['targeting'] = $settings['targeting'];
+  // Merge the targeting.
+  $targeting_collection->collectFromJson($settings['targeting']);
+  if (!$targeting_collection->isEmpty()) {
+    $json['targeting'] = $targeting_collection->toArray();
   }
-  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
-    // Merge the targeting.
-    $targeting_collection->collectFromJson($settings['targeting']);
-    $variables['targeting'] = $targeting_collection->toJson();
-  }
-  else {
-    $variables['targeting'] = '{}';
-  }
+  $variables['json'] = $json;
 }
