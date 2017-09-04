@@ -280,6 +280,7 @@ class AdContextManager extends DefaultPluginManager {
    *
    * Any data found will be added to the collection
    * managed by the AdContextManager.
+   *
    * The data will be fetched from the Advertising context fields.
    * If and how Advertising context is being delivered, depends on the
    * (already configured) display options of the entity's fields.
@@ -313,7 +314,11 @@ class AdContextManager extends DefaultPluginManager {
           /** @var \Drupal\Core\Field\FormatterInterface $formatter */
           $formatter = $this->formatterManager
             ->createInstance($configured_options['type'], $configured_options);
-          $formatter->viewElements($entity->get($field_name), $entity->language()->getId());
+          if (($item_list = $entity->get($field_name)) && ($language = $entity->language())) {
+            if (!$item_list->isEmpty()) {
+              $formatter->viewElements($item_list, $language->getId());
+            }
+          }
         }
       }
     }
@@ -325,7 +330,11 @@ class AdContextManager extends DefaultPluginManager {
         /** @var \Drupal\Core\Field\FormatterInterface $formatter */
         $formatter = $this->formatterManager
           ->createInstance($display_options['type'], $display_options);
-        $formatter->viewElements($entity->get($field_name), $entity->language()->getId());
+        if (($item_list = $entity->get($field_name)) && ($language = $entity->language())) {
+          if (!$item_list->isEmpty()) {
+            $formatter->viewElements($item_list, $language->getId());
+          }
+        }
       }
     }
   }
