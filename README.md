@@ -142,7 +142,7 @@ To initialize your ads manually, you'll need to remove the class mentioned
 above from the containers and call 
 `Drupal.ad_entity.restrictAndInitialize(containers, context, settings)`.
 
-# Further tips for avoiding possible problems
+## Further tips for avoiding possible problems
 
 It's recommended to always display your Advertising entities through
 Advertising blocks. This way, you're able to change your advertisement
