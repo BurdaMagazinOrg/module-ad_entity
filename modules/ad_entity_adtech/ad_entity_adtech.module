@@ -17,7 +17,10 @@ function ad_entity_adtech_library_info_build() {
       $libraries['provider'] = [
         'header' => TRUE,
         'js' => [
-          $settings['library_source'] => ['type' => 'external'],
+          $settings['library_source'] => [
+            'type' => 'external',
+            'attributes' => ['async' => 'async'],
+          ],
         ],
       ];
     }

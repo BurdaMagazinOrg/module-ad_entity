@@ -43,6 +43,13 @@
         $window.trigger('atf:BeforeLoad', [load_arguments, onPageLoad]);
         window.atf_lib.load_tag(load_arguments);
       }
+      else {
+        if (this.numberOfLoadingAttempts < 20) {
+          this.numberOfLoadingAttempts++;
+          var delay = 10 * this.numberOfLoadingAttempts;
+          window.setTimeout(this.initialize.bind(this), delay, containers, context, settings);
+        }
+      }
     },
     detach: function (containers, context, settings) {},
     addEventsFor: function (ad_tag, container) {
@@ -55,7 +62,8 @@
         }
       }, false);
     },
-    numberOfAds: 0
+    numberOfAds: 0,
+    numberOfLoadingAttempts: 0
   };
 
 }(jQuery, Drupal, window));
