@@ -120,7 +120,8 @@ to use a context which corresponds to a certain (content) entity.
 For this use case, you could rebuild the context on the server-side,
 e.g. inside a preprocess function like this:
 ```
-if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+if (\Drupal::hasService('ad_entity.context_manager')) {
+  $context_manager = \Drupal::service('ad_entity.context_manager');
   // $entity may be a node, term, user or any other entity.
   $context_manager->resetContextDataForEntity($entity);
 
@@ -131,6 +132,13 @@ if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
   $ad_view['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
 }
 ```
+
+**Please note** the following if you want to render manually via `render()`
+or when you create additional templates for your custom ads:
+Some variables need to be rendered raw without any HTML sanitization.
+Typical variables are JSON-encoded strings. Template variables which
+output an Advertising entity should therefore be associated
+with the raw filter. Twig example: `{{ my_custom_ad|raw }}`
 
 ## Manually initializing ads
 
