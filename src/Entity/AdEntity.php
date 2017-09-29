@@ -11,6 +11,9 @@ use Drupal\ad_entity\TargetingCollection;
  * @ConfigEntityType(
  *   id = "ad_entity",
  *   label = @Translation("Advertising entity"),
+ *   label_collection = @Translation("Advertising entities"),
+ *   label_singular = @Translation("Advertising entity"),
+ *   label_plural = @Translation("Advertising entities"),
  *   handlers = {
  *     "list_builder" = "Drupal\ad_entity\AdEntityListBuilder",
  *     "view_builder" = "Drupal\ad_entity\AdEntityViewBuilder",
