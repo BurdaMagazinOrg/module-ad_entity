@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides the base view builder for Advertising entities.
+ * Provides the view builder for Advertising entities.
  */
 class AdEntityViewBuilder extends EntityViewBuilder {
 
