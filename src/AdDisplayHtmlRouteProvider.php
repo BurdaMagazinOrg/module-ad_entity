@@ -42,10 +42,13 @@ class AdDisplayHtmlRouteProvider extends AdminHtmlRouteProvider {
     if ($entity_type->hasLinkTemplate('collection') && $entity_type->hasListBuilderClass()) {
       $entity_type_id = $entity_type->id();
       $route = new Route($entity_type->getLinkTemplate('collection'));
+
+      /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $label */
+      $label = $entity_type->getCollectionLabel();
       $route
         ->setDefaults([
           '_entity_list' => $entity_type_id,
-          '_title' => $entity_type->getCollectionLabel(),
+          '_title' => $label->getUntranslatedString(),
         ])
         ->setRequirement('_permission', $entity_type->getAdminPermission())
         ->setOption('_admin_route', TRUE);

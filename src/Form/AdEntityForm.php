@@ -88,10 +88,10 @@ class AdEntityForm extends EntityForm {
     $ad_entity = $this->entity;
     $form['label'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Label'),
+      '#title' => $this->t('Label for the Advertising entity'),
       '#maxlength' => 255,
       '#default_value' => $ad_entity->label(),
-      '#description' => $this->t("Label for the Advertising entity."),
+      '#description' => $this->t("Useful parts of the label could be information about <em>provider, format, placement  and / or usage.</em>"),
       '#required' => TRUE,
     ];
 

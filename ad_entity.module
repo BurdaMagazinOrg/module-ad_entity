@@ -62,7 +62,8 @@ function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityVie
   }
   if (!empty($to_reset[$type][$view_mode])) {
     /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
-    if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+    if (\Drupal::hasService('ad_entity.context_manager')) {
+      $context_manager = \Drupal::service('ad_entity.context_manager');
       $context_manager->resetContextDataForEntity($entity);
       $build['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
     }

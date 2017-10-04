@@ -45,9 +45,9 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       }
 
       // Build the view. No caching is defined here,
-      // because there might be multiple blocks on one page
+      // because there might be multiple display configs on one page
       // using the same advertising entity.
-      // Advertising blocks will be cached anyway.
+      // Display configs will be cached anyway.
       $build[$entity->id()] = [
         '#theme' => 'ad_entity',
         '#ad_entity' => $entity,
