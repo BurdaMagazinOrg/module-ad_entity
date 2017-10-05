@@ -103,6 +103,7 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
    * Get the view builder for Advertising entities.
    *
    * @return \Drupal\Core\Entity\EntityViewBuilderInterface
+   *   The view builder for Advertising entities.
    */
   public function getAdEntityViewBuilder() {
     return $this->adEntityViewBuilder;

@@ -5,8 +5,6 @@
  * Advertising Entity install file.
  */
 
-use Drupal\Core\Cache\Cache;
-
 /**
  * Enable new settings for the behavior on context data reset.
  */

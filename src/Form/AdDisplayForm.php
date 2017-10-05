@@ -212,14 +212,6 @@ class AdDisplayForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-    // TODO Validate the form submissions.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $theme_settings = $form_state->getValue('theme') ?: [];
     /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $ad_display */
