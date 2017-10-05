@@ -64,11 +64,13 @@ function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityVie
     }
   }
   if (!empty($to_reset[$type][$view_mode]) && \Drupal::hasService('ad_entity.context_manager')) {
+    // Initialize the context manager already here, to ensure the context
+    // data has been reset for the current route.
     /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
     $context_manager = \Drupal::service('ad_entity.context_manager');
-    // The context data has already been reset for the current route. In case
-    // the route belongs to the entity, it doesn't make sense to reset again.
     if ($route_match = \Drupal::routeMatch()) {
+      // The context data has already been reset for the current route. In case
+      // the route belongs to the entity, it doesn't make sense to reset again.
       foreach ($route_match->getParameters() as $param) {
         if ($param === $entity) {
           $to_reset[$type][$view_mode] = FALSE;
