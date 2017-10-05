@@ -2,8 +2,8 @@
 
 namespace Drupal\ad_entity\Entity;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Theme\ActiveTheme;
 
 /**
  * Defines Display configurations for Advertisement.
@@ -26,8 +26,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "html" = "Drupal\ad_entity\AdDisplayHtmlRouteProvider",
  *     },
  *    "access" = "Drupal\entity\EntityAccessControlHandler",
- *    "permission_provider" = "Drupal\entity\EntityPermissionProvider",
- *    "required_services" = "Drupal\ad_entity\AdEntityServices"
+ *    "permission_provider" = "Drupal\entity\EntityPermissionProvider"
  *   },
  *   config_prefix = "display",
  *   admin_permission = "administer ad_entity",
@@ -62,27 +61,6 @@ class AdDisplay extends ConfigEntityBase implements AdDisplayInterface {
   protected $label;
 
   /**
-   * The handler which delivers any required service.
-   *
-   * @var \Drupal\ad_entity\AdEntityServices
-   */
-  protected $services;
-
-  /**
-   * Get the handler which delivers any required service.
-   *
-   * @return \Drupal\ad_entity\AdEntityServices
-   *   The services handler.
-   */
-  protected function services() {
-    if (!isset($this->services)) {
-      $this->services = $this->entityTypeManager()
-        ->getHandler($this->getEntityTypeId(), 'required_services');
-    }
-    return $this->services;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function calculateDependencies() {
@@ -104,74 +82,25 @@ class AdDisplay extends ConfigEntityBase implements AdDisplayInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheMaxAge() {
-    $this->cacheMaxAge = parent::getCacheMaxAge();
-
-    $context_manager = $this->services()->getContextManager();
-    foreach ($context_manager->getInvolvedEntities() as $entities) {
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
-      foreach ($entities as $entity) {
-        if ($entity !== $this) {
-          $this->cacheMaxAge = Cache::mergeMaxAges($entity->getCacheMaxAge(), $this->cacheMaxAge);
-        }
+  public function getVariantsForTheme(ActiveTheme $theme) {
+    $theme_name = $theme->getName();
+    $variants = $this->get('variants') ?: [];
+    if (empty($variants[$theme_name])) {
+      // Check for enabled fallback settings, and switch to these when given.
+      $fallback = $this->get('fallback') ?: [];
+      if (!empty($fallback['use_settings_from'])) {
+        $theme_name = $fallback['use_settings_from'];
       }
-    }
-
-    return $this->cacheMaxAge;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    $this->cacheContexts = parent::getCacheContexts();
-
-    $this->addCacheContexts(['url.path']);
-    $context_manager = $this->services()->getContextManager();
-    foreach ($context_manager->getInvolvedEntities() as $entities) {
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
-      foreach ($entities as $entity) {
-        if ($entity !== $this) {
-          $this->addCacheContexts($entity->getCacheContexts());
-        }
-      }
-    }
-
-    return $this->cacheContexts;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    $this->cacheTags = parent::getCacheTags();
-
-    $tags = ['config:ad_entity.settings'];
-    if (!empty($this->get('variants'))) {
-      foreach ($this->get('variants') as $theme_variants) {
-        if (!empty($theme_variants)) {
-          foreach (array_keys($theme_variants) as $id) {
-            $tag = 'config:ad_entity.ad_entity.' . $id;
-            if (!in_array($tag, $tags)) {
-              $tags[] = $tag;
-            }
+      if (!empty($fallback['use_base_theme'])) {
+        foreach ($theme->getBaseThemes() as $base_theme) {
+          if (!empty($variants[$base_theme->getName()])) {
+            $theme_name = $base_theme->getName();
+            break;
           }
         }
       }
     }
-    $this->addCacheTags($tags);
-
-    $context_manager = $this->services()->getContextManager();
-    foreach ($context_manager->getInvolvedEntities() as $entities) {
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
-      foreach ($entities as $entity) {
-        if ($entity !== $this) {
-          $this->addCacheTags($entity->getCacheTags());
-        }
-      }
-    }
-
-    return $this->cacheTags;
+    return !empty($variants[$theme_name]) ? $variants[$theme_name] : [];
   }
 
 }

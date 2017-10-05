@@ -9,8 +9,8 @@ use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * Provides the view builder for Display configs for Advertisement.
@@ -125,27 +125,49 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getBuildDefaults(EntityInterface $entity, $view_mode) {
+  public function buildComponents(array &$build, array $entities, array $displays, $view_mode) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function view(EntityInterface $entity, $view_mode = 'default', $langcode = NULL) {
+    /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $entity */
     $build = [
+      '#theme' => 'ad_display',
+      '#ad_display' => $entity,
+      '#variants' => [],
       '#cache' => [
+        'keys' => ['entity_view', 'ad_display', $entity->id(), $view_mode],
+        'bin' => $this->cacheBin,
         'tags' => Cache::mergeTags($this->getCacheTags(), $entity->getCacheTags()),
         'contexts' => $entity->getCacheContexts(),
         'max-age' => $entity->getCacheMaxAge(),
       ],
     ];
-    if ($this->isViewModeCacheable($view_mode) && !$entity->isNew() && $this->entityType->isRenderCacheable()) {
-      $build['#cache'] += [
-        'keys' => [
-          'entity_view',
-          $entity->getEntityTypeId(),
-          $entity->id(),
-          $view_mode,
-        ],
-        'bin' => $this->cacheBin,
-      ];
-
-      if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
-        $build['#cache']['keys'][] = $entity->language()->getId();
+    if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
+      $build['#cache']['keys'][] = $entity->language()->getId();
+    }
+    // When given, load and view the assigned Advertisement.
+    $theme = $this->themeManager->getActiveTheme();
+    foreach ($entity->getVariantsForTheme($theme) as $id => $variant) {
+      if ($ad_entity = $this->adEntityStorage->load($id)) {
+        $view = $this->adEntityViewBuilder->view($ad_entity, $variant);
+        if (!empty($view['#cache'])) {
+          // Let the Display care for caching, not the single AdEntity.
+          if (!empty($view['#cache']['tags'])) {
+            $build['#cache']['tags'] = Cache::mergeTags($build['#cache']['tags'], $view['#cache']['tags']);
+          }
+          if (!empty($view['#cache']['contexts'])) {
+            $build['#cache']['contexts'] = Cache::mergeContexts($build['#cache']['contexts'], $view['#cache']['contexts']);
+          }
+          if (!empty($view['#cache']['max-age'])) {
+            $build['#cache']['max-age'] = Cache::mergeMaxAges($build['#cache']['max-age'], $view['#cache']['max-age']);
+          }
+          unset($view['#cache']);
+        }
+        if ($ad_entity->access('view')) {
+          $build['#variants'][$ad_entity->id()] = $view;
+        }
       }
     }
 
@@ -155,58 +177,12 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  public function buildComponents(array &$build, array $entities, array $displays, $view_mode) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public function view(EntityInterface $entity, $view_mode = 'default', $langcode = NULL) {
-    $build = $this->viewMultiple([$entity], $view_mode, $langcode);
-    return !empty($build) ? reset($build) : [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function viewMultiple(array $entities = [], $view_mode = 'default', $langcode = NULL) {
-    $theme = $this->themeManager->getActiveTheme();
-    $build_list = [];
-
-    foreach ($entities as $ad_display) {
-      $theme_name = $theme->getName();
-      $variants = $ad_display->get('variants') ?: [];
-      if (empty($variants[$theme_name])) {
-        // Check for enabled fallback settings, and switch to these when given.
-        $fallback = $ad_display->get('fallback') ?: [];
-        if (!empty($fallback['use_settings_from'])) {
-          $theme_name = $fallback['use_settings_from'];
-        }
-        if (!empty($fallback['use_base_theme'])) {
-          foreach ($theme->getBaseThemes() as $base_theme) {
-            if (!empty($variants[$base_theme->getName()])) {
-              $theme_name = $base_theme->getName();
-              break;
-            }
-          }
-        }
-      }
-
-      $build = $this->getBuildDefaults($ad_display, $view_mode);
-      // When given, load and view the assigned Advertisement.
-      if (!empty($variants[$theme_name])) {
-        foreach ($variants[$theme_name] as $id => $variant) {
-          if ($ad_entity = $this->adEntityStorage->load($id)) {
-            if ($ad_entity->access('view')) {
-              $build[$ad_entity->id()] = $this
-                ->adEntityViewBuilder->view($ad_entity, $variant);
-            }
-          }
-        }
-      }
-      $build_list[$ad_display->id()] = $build;
+    $build = [];
+    foreach ($entities as $entity) {
+      $build[$entity->id()] = $this->view($entity, $view_mode, $langcode);
     }
-
-    return $build_list;
+    return $build;
   }
 
 }

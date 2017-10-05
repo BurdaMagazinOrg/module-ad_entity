@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\ad_entity\TargetingCollection;
 
@@ -94,6 +95,64 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
         ->getHandler($this->getEntityTypeId(), 'required_services');
     }
     return $this->services;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $this->cacheMaxAge = parent::getCacheMaxAge();
+
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->cacheMaxAge = Cache::mergeMaxAges($entity->getCacheMaxAge(), $this->cacheMaxAge);
+        }
+      }
+    }
+
+    return $this->cacheMaxAge;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $this->cacheContexts = parent::getCacheContexts();
+
+    $this->addCacheContexts(['url.path']);
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->addCacheContexts($entity->getCacheContexts());
+        }
+      }
+    }
+
+    return $this->cacheContexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $this->addCacheTags(['config:ad_entity.settings']);
+
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->addCacheTags($entity->getCacheTags());
+        }
+      }
+    }
+
+    return Cache::mergeTags(parent::getCacheTags(), $this->cacheTags);
   }
 
   /**
