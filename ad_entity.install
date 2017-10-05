@@ -60,6 +60,28 @@ function ad_entity_update_8002(&$sandbox) {
  */
 function ad_entity_update_8003(&$sandbox) {
   drupal_flush_all_caches();
+
+  // Let the role give adequate permissions regards Display configurations.
+  $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+  $ad_entity_permissions = [
+    'view ad_entity' => 'view ad_display',
+    'administer ad_entity' => 'administer ad_display',
+    'create ad_entity' => 'create ad_display',
+    'delete ad_entity' => 'delete ad_display',
+    'update ad_entity' => 'update ad_display',
+    'access ad_entity overview' => 'access ad_display overview',
+  ];
+  /** @var \Drupal\user\RoleInterface $role */
+  foreach ($role_storage->loadMultiple() as $role) {
+    $permissions = $role->get('permissions');
+    foreach ($permissions as $permission) {
+      if (!empty($ad_entity_permissions[$permission])) {
+        $role->grantPermission($ad_entity_permissions[$permission]);
+      }
+    }
+    $role_storage->save($role);
+  }
+
   $block_storage = \Drupal::entityTypeManager()->getStorage('block');
   $ad_display_storage = \Drupal::entityTypeManager()->getStorage('ad_display');
   if (!isset($sandbox['total'])) {
