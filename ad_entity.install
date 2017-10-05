@@ -52,3 +52,90 @@ function ad_entity_update_8002(&$sandbox) {
 
   $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
 }
+
+/**
+ * Convert AdBlocks to AdDisplay configs. Export your config after this update.
+ */
+function ad_entity_update_8003(&$sandbox) {
+  drupal_flush_all_caches();
+
+  // Let the role give adequate permissions regards Display configurations.
+  $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+  $ad_entity_permissions = [
+    'view ad_entity' => 'view ad_display',
+    'administer ad_entity' => 'administer ad_display',
+    'create ad_entity' => 'create ad_display',
+    'delete ad_entity' => 'delete ad_display',
+    'update ad_entity' => 'update ad_display',
+    'access ad_entity overview' => 'access ad_display overview',
+  ];
+  /** @var \Drupal\user\RoleInterface $role */
+  foreach ($role_storage->loadMultiple() as $role) {
+    $permissions = $role->get('permissions');
+    foreach ($permissions as $permission) {
+      if (!empty($ad_entity_permissions[$permission])) {
+        $role->grantPermission($ad_entity_permissions[$permission]);
+      }
+    }
+    $role_storage->save($role);
+  }
+
+  $block_storage = \Drupal::entityTypeManager()->getStorage('block');
+  $ad_display_storage = \Drupal::entityTypeManager()->getStorage('ad_display');
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = $block_storage->getQuery()->count()->execute();
+    $sandbox['current'] = 0;
+  }
+
+  $query = $block_storage->getQuery();
+  $query->range($sandbox['current'], $sandbox['current'] + 20);
+  $block_ids = $query->execute();
+  if (!empty($block_ids)) {
+    /** @var \Drupal\block\Entity\Block $block */
+    foreach ($block_storage->loadMultiple($block_ids) as $block) {
+      if ($block->get('plugin') == 'ad_entity_block') {
+        $settings = $block->get('settings');
+        $id = $block->get('id');
+        $id = str_replace('advertisingblock_', '', $id);
+        $id = str_replace('block', 'display', $id);
+
+        $label = $settings['label'];
+        // Create a display config for the given block config.
+        /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $ad_display */
+        $ad_display = $ad_display_storage->create(['id' => $id, 'label' => $label]);
+        $display_dependencies = $block->get('dependencies');
+        unset($display_dependencies['theme']);
+        unset($display_dependencies['module']);
+        $display_dependencies['module'][] = 'ad_entity';
+        $ad_display->set('dependencies', $display_dependencies);
+        $ad_display->set('status', $block->get('status'));
+        $ad_display->set('langcode', $block->get('langcode'));
+        $ad_display->set('variants', $settings['variants']);
+        $ad_display->set('fallback', $settings['fallback']);
+        $ad_display_storage->save($ad_display);
+
+        $block->set('plugin', 'ad_display:' . $id);
+        $dependencies = $block->get('dependencies');
+        $dependencies['config'] = ['ad_entity.display.' . $id];
+        $block->set('dependencies', $dependencies);
+
+        unset($settings['variants']);
+        unset($settings['fallback']);
+        $settings['id'] = 'ad_display:' . $id;
+        $settings['provider'] = 'ad_entity';
+        $block->set('settings', $settings);
+
+        $block_storage->save($block);
+
+        // For whatever reason, the entity needs to be updated again
+        // to ensure the dependency is being correctly set.
+        \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
+        $block = $block_storage->loadUnchanged($block->id());
+        $block_storage->save($block);
+      }
+      $sandbox['current']++;
+    }
+  }
+
+  $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+}

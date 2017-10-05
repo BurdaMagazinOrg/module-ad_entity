@@ -4,9 +4,11 @@ namespace Drupal\ad_entity;
 
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
- * Provides the base view builder for Advertising entities.
+ * Provides the view builder for Advertising entities.
  */
 class AdEntityViewBuilder extends EntityViewBuilder {
 
@@ -19,14 +21,6 @@ class AdEntityViewBuilder extends EntityViewBuilder {
    * {@inheritdoc}
    */
   public function view(EntityInterface $entity, $view_mode = '["any"]', $langcode = NULL) {
-    $build = $this->viewMultiple([$entity], $view_mode, $langcode);
-    return !empty($build) ? reset($build) : [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function viewMultiple(array $entities = [], $view_mode = '["any"]', $langcode = NULL) {
     if ($view_mode == 'default' || $view_mode == 'full') {
       $view_mode = '["any"]';
     }
@@ -34,27 +28,40 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $view_mode = '["' . $view_mode . '"]';
     }
 
-    /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
-    $build = [];
-
-    foreach ($entities as $entity) {
-      // Check whether a given context wants to turn off the advertisement.
-      $turnoff = $entity->getContextDataForPlugin('turnoff');
-      if (!empty($turnoff)) {
-        continue;
-      }
-
-      // Build the view. No caching is defined here,
-      // because there might be multiple blocks on one page
-      // using the same advertising entity.
-      // Advertising blocks will be cached anyway.
-      $build[$entity->id()] = [
-        '#theme' => 'ad_entity',
-        '#ad_entity' => $entity,
-        '#variant' => $view_mode,
-      ];
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $entity */
+    // Check whether a given context wants to turn off the advertisement.
+    $turnoff = $entity->getContextDataForPlugin('turnoff');
+    if (!empty($turnoff)) {
+      return [];
     }
 
+    $build = [
+      '#theme' => 'ad_entity',
+      '#ad_entity' => $entity,
+      '#variant' => $view_mode,
+      '#cache' => [
+        'keys' => ['entity_view', 'ad_entity', $entity->id(), $view_mode],
+        'bin' => $this->cacheBin,
+        'tags' => Cache::mergeTags($this->getCacheTags(), $entity->getCacheTags()),
+        'contexts' => $entity->getCacheContexts(),
+        'max-age' => $entity->getCacheMaxAge(),
+      ],
+    ];
+    if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
+      $build['#cache']['keys'][] = $entity->language()->getId();
+    }
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewMultiple(array $entities = [], $view_mode = '["any"]', $langcode = NULL) {
+    $build = [];
+    foreach ($entities as $entity) {
+      $build[$entity->id()] = $this->view($entity, $view_mode, $langcode);
+    }
     return $build;
   }
 

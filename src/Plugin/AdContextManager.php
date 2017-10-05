@@ -113,7 +113,6 @@ class AdContextManager extends DefaultPluginManager {
    *
    * Other components might need to know which entities were involved
    * during the delivering of Advertising context.
-   * Advertising blocks will use them to define cache tags.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity which has provided Advertising context.

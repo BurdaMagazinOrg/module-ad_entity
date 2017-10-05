@@ -17,6 +17,9 @@ use Drupal\ad_entity\Plugin\AdContextManager;
  */
 function ad_entity_theme($existing, $type, $theme, $path) {
   return [
+    'ad_display' => [
+      'variables' => ['ad_display' => NULL, 'variants' => []],
+    ],
     'ad_entity' => [
       'variables' => ['ad_entity' => NULL, 'variant' => '["any"]'],
       'file' => 'ad_entity.theme.inc',
@@ -60,9 +63,22 @@ function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityVie
       }
     }
   }
-  if (!empty($to_reset[$type][$view_mode])) {
+  if (!empty($to_reset[$type][$view_mode]) && \Drupal::hasService('ad_entity.context_manager')) {
+    // Initialize the context manager already here, to ensure the context
+    // data has been reset for the current route.
     /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
-    if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
+    $context_manager = \Drupal::service('ad_entity.context_manager');
+    if ($route_match = \Drupal::routeMatch()) {
+      // The context data has already been reset for the current route. In case
+      // the route belongs to the entity, it doesn't make sense to reset again.
+      foreach ($route_match->getParameters() as $param) {
+        if ($param === $entity) {
+          $to_reset[$type][$view_mode] = FALSE;
+          break;
+        }
+      }
+    }
+    if (!empty($to_reset[$type][$view_mode])) {
       $context_manager->resetContextDataForEntity($entity);
       $build['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
     }

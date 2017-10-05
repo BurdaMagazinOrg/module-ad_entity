@@ -38,6 +38,38 @@ ad_entity.ad_entity.*:
       type: boolean
       label: 'Disable automatic initialization'
 
+ad_entity.display.*:
+  type: config_entity
+  label: 'Display config for Advertisement'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    variants:
+      type: sequence
+      label: 'List of variants to display, keyed by themes.'
+      sequence:
+        type: sequence
+        label: 'List of variants for a theme, keyed by Advertising entities.'
+        sequence:
+          type: string
+          label: 'JSON-encoded string of breakpoints, where the given Advertising entity should be displayed.'
+    fallback:
+      type: mapping
+      label: 'Fallback settings'
+      mapping:
+        use_base_theme:
+          type: boolean
+          label: 'Use the display settings of a base theme, if available.'
+        use_settings:from:
+          type: string
+          label: 'Use display settings of theme'
+
 field.formatter.settings.ad_entity_context:
   type: mapping
   label: 'Advertising entity context formatter settings'

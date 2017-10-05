@@ -9,10 +9,6 @@ advertising instances.
 - The <a href="https://github.com/BurdaMagazinOrg/module-theme_breakpoints_js">
 Theme Breakpoint JS</a> module.
 
-Not a requirement, but recommended:
-- The <a href="https://www.drupal.org/project/block_field">Block field</a>
-  module for attaching blocks on content.
-
 # Quick start
 
 - Install this module.
@@ -24,9 +20,9 @@ Not a requirement, but recommended:
   at admin/structure/ad_entity/global-settings.
 - Create and manage your Advertising entities at admin/structure/ad_entity.
   When your theme has multiple breakpoints, you can create one entity for each.
-- Once you've created your entities, create and place an Advertising block at
-  admin/structure/block. The Advertising block enables you to define the
-  Advertising entities to display, optionally for each breakpoint variant.
+- Create and manage Display configurations for your Advertisement at
+  admin/structure/ad_entity/display. Once you've created a Display config,
+  you'll be able to place it as a block at admin/structure/block.
 
 # About view handlers
 
@@ -153,7 +149,7 @@ above from the containers and call
 ## Further tips for avoiding possible problems
 
 It's recommended to always display your Advertising entities through
-Advertising blocks. This way, you're able to change your advertisement
+Display configurations. This way, you're able to change your advertisement
 on your whole site and switch between available variants of advertisement.
 
 The default tree aggregations and tree overrides can be expensive operations.

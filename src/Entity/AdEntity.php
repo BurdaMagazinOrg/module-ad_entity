@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\ad_entity\TargetingCollection;
 
@@ -11,6 +12,9 @@ use Drupal\ad_entity\TargetingCollection;
  * @ConfigEntityType(
  *   id = "ad_entity",
  *   label = @Translation("Advertising entity"),
+ *   label_collection = @Translation("Advertising entities"),
+ *   label_singular = @Translation("Advertising entity"),
+ *   label_plural = @Translation("Advertising entities"),
  *   handlers = {
  *     "list_builder" = "Drupal\ad_entity\AdEntityListBuilder",
  *     "view_builder" = "Drupal\ad_entity\AdEntityViewBuilder",
@@ -23,7 +27,8 @@ use Drupal\ad_entity\TargetingCollection;
  *       "html" = "Drupal\ad_entity\AdEntityHtmlRouteProvider",
  *     },
  *    "access" = "Drupal\entity\EntityAccessControlHandler",
- *    "permission_provider" = "Drupal\entity\EntityPermissionProvider"
+ *    "permission_provider" = "Drupal\entity\EntityPermissionProvider",
+ *    "required_services" = "Drupal\ad_entity\AdEntityServices"
  *   },
  *   config_prefix = "ad_entity",
  *   admin_permission = "administer ad_entity",
@@ -58,20 +63,6 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $label;
 
   /**
-   * The Advertising view manager.
-   *
-   * @var \Drupal\ad_entity\Plugin\AdViewManager
-   */
-  protected $viewManager;
-
-  /**
-   * The Advertising context manager.
-   *
-   * @var \Drupal\ad_entity\Plugin\AdContextManager
-   */
-  protected $contextManager;
-
-  /**
    * An instance of the view handler plugin.
    *
    * @var \Drupal\ad_entity\Plugin\AdViewInterface
@@ -86,17 +77,82 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $typePlugin;
 
   /**
-   * AdEntity constructor.
+   * The handler which delivers any required service.
    *
-   * @param array $values
-   *   The values as array.
-   * @param string $entity_type
-   *   The entity type as string.
+   * @var \Drupal\ad_entity\AdEntityServices
    */
-  public function __construct(array $values, $entity_type) {
-    parent::__construct($values, $entity_type);
-    $this->viewManager = \Drupal::service('ad_entity.view_manager');
-    $this->contextManager = \Drupal::service('ad_entity.context_manager');
+  protected $services;
+
+  /**
+   * Get the handler which delivers any required service.
+   *
+   * @return \Drupal\ad_entity\AdEntityServices
+   *   The services handler.
+   */
+  protected function services() {
+    if (!isset($this->services)) {
+      $this->services = $this->entityTypeManager()
+        ->getHandler($this->getEntityTypeId(), 'required_services');
+    }
+    return $this->services;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $this->cacheMaxAge = parent::getCacheMaxAge();
+
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->cacheMaxAge = Cache::mergeMaxAges($entity->getCacheMaxAge(), $this->cacheMaxAge);
+        }
+      }
+    }
+
+    return $this->cacheMaxAge;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $this->cacheContexts = parent::getCacheContexts();
+
+    $this->addCacheContexts(['url.path']);
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->addCacheContexts($entity->getCacheContexts());
+        }
+      }
+    }
+
+    return $this->cacheContexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $this->addCacheTags(['config:ad_entity.settings']);
+
+    $context_manager = $this->services()->getContextManager();
+    foreach ($context_manager->getInvolvedEntities() as $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      foreach ($entities as $entity) {
+        if ($entity !== $this) {
+          $this->addCacheTags($entity->getCacheTags());
+        }
+      }
+    }
+
+    return Cache::mergeTags(parent::getCacheTags(), $this->cacheTags);
   }
 
   /**
@@ -105,8 +161,9 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   public function getViewPlugin() {
     if (!isset($this->viewPlugin)) {
       $id = $this->get('view_plugin_id');
-      $this->viewPlugin = ($id && $this->viewManager->hasDefinition($id)) ?
-        $this->viewManager->createInstance($id) : NULL;
+      $view_manager = $this->services()->getViewManager();
+      $this->viewPlugin = ($id && $view_manager->hasDefinition($id)) ?
+        $view_manager->createInstance($id) : NULL;
     }
     return $this->viewPlugin;
   }
@@ -117,8 +174,7 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   public function getTypePlugin() {
     if (!isset($this->typePlugin)) {
       $id = $this->get('type_plugin_id');
-      // Use the type manager only when it's really needed.
-      $type_manager = \Drupal::service('ad_entity.type_manager');
+      $type_manager = $this->services()->getTypeManager();
       $this->typePlugin = ($id && $type_manager->hasDefinition($id)) ?
         $type_manager->createInstance($id) : NULL;
     }
@@ -133,8 +189,9 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     // The type plugin however usually provides third party settings,
     // which implies that its provider is already added as dependency.
     $view_id = $this->get('view_plugin_id');
-    if ($view_id && $this->viewManager->hasDefinition($view_id)) {
-      $definition = $this->viewManager->getDefinition($view_id);
+    $view_manager = $this->services()->getViewManager();
+    if ($view_id && $view_manager->hasDefinition($view_id)) {
+      $definition = $view_manager->getDefinition($view_id);
       if (!empty($definition['provider'])) {
         $this->addDependency('module', $definition['provider']);
       }
@@ -146,14 +203,16 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    * {@inheritdoc}
    */
   public function getContextData() {
-    return $this->contextManager->getContextDataForEntity($this->id());
+    return $this->services()->getContextManager()
+      ->getContextDataForEntity($this->id());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getContextDataForPlugin($plugin_id) {
-    return $this->contextManager->getContextDataForPluginAndEntity($plugin_id, $this->id());
+    return $this->services()->getContextManager()
+      ->getContextDataForPluginAndEntity($plugin_id, $this->id());
   }
 
   /**
@@ -161,7 +220,8 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    */
   public function getTargetingFromContextData() {
     $collection = new TargetingCollection();
-    $data = $this->contextManager->getContextDataForPluginAndEntity('targeting', $this->id());
+    $data = $this->services()->getContextManager()
+      ->getContextDataForPluginAndEntity('targeting', $this->id());
     foreach ($data as $settings) {
       $collection->collectFromCollection(new TargetingCollection($settings['targeting']));
     }
