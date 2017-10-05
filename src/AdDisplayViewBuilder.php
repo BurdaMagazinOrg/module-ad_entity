@@ -152,9 +152,19 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
     foreach ($entity->getVariantsForTheme($theme) as $id => $variant) {
       if ($ad_entity = $this->adEntityStorage->load($id)) {
         $view = $this->adEntityViewBuilder->view($ad_entity, $variant);
-        // Let the Display care for caching, not the single AdEntity.
-        unset($view['#cache']['keys']);
-        unset($view['#cache']['bin']);
+        if (!empty($view['#cache'])) {
+          // Let the Display care for caching, not the single AdEntity.
+          if (!empty($view['#cache']['tags'])) {
+            $build['#cache']['tags'] = Cache::mergeTags($build['#cache']['tags'], $view['#cache']['tags']);
+          }
+          if (!empty($view['#cache']['contexts'])) {
+            $build['#cache']['contexts'] = Cache::mergeContexts($build['#cache']['contexts'], $view['#cache']['contexts']);
+          }
+          if (!empty($view['#cache']['max-age'])) {
+            $build['#cache']['max-age'] = Cache::mergeMaxAges($build['#cache']['max-age'], $view['#cache']['max-age']);
+          }
+          unset($view['#cache']);
+        }
         if ($ad_entity->access('view')) {
           $build['#variants'][$ad_entity->id()] = $view;
         }
