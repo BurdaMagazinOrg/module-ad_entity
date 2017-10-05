@@ -32,7 +32,7 @@ function ad_entity_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_theme_suggestions_HOOK for Display configs for Advertisement.
+ * Implements hook_theme_suggestions_HOOK.
  */
 function ad_entity_theme_suggestions_ad_display($variables) {
   $suggestions = [];
@@ -43,7 +43,7 @@ function ad_entity_theme_suggestions_ad_display($variables) {
 }
 
 /**
- * Implements hook_theme_suggestions_HOOK for Advertising entities.
+ * Implements hook_theme_suggestions_HOOK.
  */
 function ad_entity_theme_suggestions_ad_entity($variables) {
   $suggestions = [];
