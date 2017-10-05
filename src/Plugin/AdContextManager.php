@@ -258,7 +258,6 @@ class AdContextManager extends DefaultPluginManager {
     // Reset the collected context data.
     $this->setContextData([]);
     $this->setInvolvedEntities([]);
-    \Drupal::logger('ad_entity')->info('Reset context data for ' . $entity->getEntityTypeId() . ' / ' . $entity->id());
     // Allow other modules to react on the reset of the context data.
     $this->moduleHandler->invokeAll('ad_context_data_reset', [$this, $entity]);
   }
