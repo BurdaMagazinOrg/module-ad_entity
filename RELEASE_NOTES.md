@@ -8,6 +8,7 @@
 - Prevent a double-reset when viewing entities via their main routes.
 - Created the service collection class AdEntityServices which offers
   any single service provided by the ad_entity module.
+This release is a candidate for the first beta release.
 
 8.x-1.0-alpha25:
 - Replaced Xss::filter with Html::escape to avoid a possibly broken
