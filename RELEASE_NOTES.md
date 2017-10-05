@@ -1,5 +1,10 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-alpha27:
+- Prevent double-caching when a block already holds the display config.
+
+This release is a candidate for the first beta release.
+
 8.x-1.0-alpha26:
 - AdBlocks have been refactored to AdDisplay configuration entities.
   This change includes a new configuration schema and permissions.
