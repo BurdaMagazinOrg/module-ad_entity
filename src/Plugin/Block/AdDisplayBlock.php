@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -84,9 +85,15 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
     $id = $this->getDerivativeId();
     $build = [];
     if ($ad_display = $this->adDisplayStorage->load($id)) {
+      $view = $this->adDisplayViewBuilder->view($ad_display, 'default');
+      if (!empty($view['#cache'])) {
+        // Let the Block alone care for caching.
+        unset($view['#cache']['keys']);
+        unset($view['#cache']['bin']);
+        $build[$id]['#cache'] = $view['#cache'];
+      }
       if ($ad_display->access('view')) {
-        $build[$ad_display->id()] = $this->adDisplayViewBuilder
-          ->view($ad_display, 'default');
+        $build[$id] = $view;
       }
     }
     return $build;
