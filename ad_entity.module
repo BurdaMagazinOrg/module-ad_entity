@@ -32,6 +32,28 @@ function ad_entity_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_theme_suggestions_HOOK for Display configs for Advertisement.
+ */
+function ad_entity_theme_suggestions_ad_display($variables) {
+  $suggestions = [];
+  if (!empty($variables['ad_display'])) {
+    $suggestions[] = 'ad_display__' . $variables['ad_display']->id();
+  }
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK for Advertising entities.
+ */
+function ad_entity_theme_suggestions_ad_entity($variables) {
+  $suggestions = [];
+  if (!empty($variables['ad_entity'])) {
+    $suggestions[] = 'ad_entity__' . $variables['ad_entity']->id();
+  }
+  return $suggestions;
+}
+
+/**
  * Implements hook_page_attachments().
  */
 function ad_entity_page_attachments(array &$page) {
