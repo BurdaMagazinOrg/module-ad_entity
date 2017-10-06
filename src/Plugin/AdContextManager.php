@@ -237,8 +237,12 @@ class AdContextManager extends DefaultPluginManager {
     foreach ($route_match->getParameters() as $param) {
       if ($param instanceof EntityInterface) {
         $this->resetContextDataForEntity($param);
+        return;
       }
     }
+
+    $this->setContextData([]);
+    $this->setInvolvedEntities([]);
   }
 
   /**

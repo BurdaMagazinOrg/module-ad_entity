@@ -64,46 +64,71 @@ function ad_entity_page_attachments(array &$page) {
 }
 
 /**
- * Implements hook_entity_view().
+ * Implements hook_entity_prepare_view().
  */
-function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  $type = $entity->getEntityTypeId();
+function ad_entity_entity_prepare_view($entity_type_id, array $entities, array $displays, $view_mode) {
+  $type = $entity_type_id;
   $to_reset = &drupal_static(__FUNCTION__, [$type => []]);
-  // Check whether the entity being shown defines its own context data.
-  // If so, reset the context data for this entity.
-  if (!isset($to_reset[$type][$view_mode])) {
-    $to_reset[$type][$view_mode] = FALSE;
-    if ($entity instanceof FieldableEntityInterface) {
-      /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
-      foreach ($entity->getFieldDefinitions() as $definition) {
-        if ($definition->getType() == 'ad_entity_context') {
-          $field_name = $definition->getName();
-          if ($display->getComponent($field_name)) {
-            $to_reset[$type][$view_mode] = TRUE;
+  $entities_for_reset = [];
+  /** @var \Drupal\Core\Entity\EntityInterface $entity */
+  foreach ($entities as $entity) {
+    $bundle = $entity->bundle();
+    // Check whether the entity being shown defines its own context data.
+    // If so, reset the context data for this entity.
+    if (!isset($to_reset[$type][$bundle][$view_mode])) {
+      $to_reset[$type][$bundle][$view_mode] = FALSE;
+      if ($entity instanceof FieldableEntityInterface) {
+        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+        foreach ($entity->getFieldDefinitions() as $definition) {
+          if ($definition->getType() == 'ad_entity_context') {
+            $field_name = $definition->getName();
+            $display = $displays[$bundle];
+            if ($display->getComponent($field_name)) {
+              $to_reset[$type][$bundle][$view_mode] = TRUE;
+              break;
+            }
           }
         }
       }
     }
+    if (!empty($to_reset[$type][$bundle][$view_mode])) {
+      $entities_for_reset[$entity->id()] = $entity;
+    }
   }
-  if (!empty($to_reset[$type][$view_mode]) && \Drupal::hasService('ad_entity.context_manager')) {
-    // Initialize the context manager already here, to ensure the context
-    // data has been reset for the current route.
+  if (!empty($entities_for_reset)) {
     /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
     $context_manager = \Drupal::service('ad_entity.context_manager');
-    if ($route_match = \Drupal::routeMatch()) {
-      // The context data has already been reset for the current route. In case
-      // the route belongs to the entity, it doesn't make sense to reset again.
-      foreach ($route_match->getParameters() as $param) {
-        if ($param === $entity) {
-          $to_reset[$type][$view_mode] = FALSE;
-          break;
-        }
+    // Due to the build process, multiple resets at once are not possible.
+    $entity = end($entities_for_reset);
+    if (count($entities_for_reset) === 1) {
+      $context_manager->resetContextDataForEntity($entity);
+    }
+    else {
+      // In case of multiple entities to view, a fallback needs to be provided.
+      // This fallback can only include the information by the route entity.
+      // TODO Find a proper way for list items defining their own context data.
+      $route_match = NULL;
+      try {
+        $route_match = \Drupal::routeMatch();
+      }
+      catch (\Exception $e) {}
+      if (!empty($route_match)) {
+        $context_manager->resetContextDataForRoute($route_match);
       }
     }
-    if (!empty($to_reset[$type][$view_mode])) {
-      $context_manager->resetContextDataForEntity($entity);
-      $build['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
-    }
+    // Mark this entity so that the previous context data can be restored.
+    $entity->__ad_entity_needs_previous_context = TRUE;
+  }
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if (!empty($entity->__ad_entity_needs_previous_context)) {
+    // Context data needs to be reset to the previous state.
+    $build['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
+    unset($entity->__ad_entity_needs_previous_context);
   }
 }
 
@@ -164,8 +189,7 @@ function ad_entity_ad_context_data_reset(AdContextManager $context_manager, Enti
  */
 function _ad_entity_reset_to_previous_context_data($markup) {
   /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
-  if ($context_manager = \Drupal::service('ad_entity.context_manager')) {
-    $context_manager->resetToPreviousContextData();
-  }
+  $context_manager = \Drupal::service('ad_entity.context_manager');
+  $context_manager->resetToPreviousContextData();
   return $markup;
 }
