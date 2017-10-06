@@ -1,5 +1,12 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-alpha28:
+- Added fallback for resetting context of multiple entities.
+  Resetting context data is still a problem in this version, see
+  https://github.com/BurdaMagazinOrg/module-ad_entity/issues/12.
+
+This release is a candidate for the first beta release.
+
 8.x-1.0-alpha27:
 - Prevent double-caching when a block already holds the display config.
 

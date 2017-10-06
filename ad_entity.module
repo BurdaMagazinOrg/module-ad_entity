@@ -111,7 +111,8 @@ function ad_entity_entity_prepare_view($entity_type_id, array $entities, array $
       try {
         $route_match = \Drupal::routeMatch();
       }
-      catch (\Exception $e) {}
+      catch (\Exception $e) {
+      }
       if (!empty($route_match)) {
         $context_manager->resetContextDataForRoute($route_match);
       }
