@@ -3,6 +3,9 @@
 8.x-1.0-beta:
 - Implement unit and web tests.
 - Fix all known major problems.
+  List of known major problems:
+    - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7
+    - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/12
 
 8.x-1.0-alpha:
 

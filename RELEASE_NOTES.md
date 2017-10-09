@@ -1,5 +1,13 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta1:
+- First beta release (same as 1.0-alpha29)
+
+8.x-1.0-alpha29:
+- Added in-memory caching for context data reset.
+
+This release is a candidate for the first beta release.
+
 8.x-1.0-alpha28:
 - Added fallback for resetting context of multiple entities.
   Resetting context data is still a problem in this version, see

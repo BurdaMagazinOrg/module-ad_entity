@@ -5,6 +5,7 @@ namespace Drupal\ad_entity\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -75,6 +76,28 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->adDisplayStorage = $ad_display_storage;
     $this->adDisplayViewBuilder = $ad_display_view_builder;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockForm($form, FormStateInterface $form_state) {
+    $form = parent::blockForm($form, $form_state);
+    $id = $this->getDerivativeId();
+
+    if ($ad_display = $this->adDisplayStorage->load($id)) {
+      $url = $ad_display->toUrl('edit-form')->toString();
+      $label = $ad_display->label();
+      $form['display_info'] = [
+        '#markup' => $this->t('<strong>Using display config: <a href=":url" target="_blank">@label</a></strong>', [':url' => $url, '@label' => $label]),
+        '#weight' => 10,
+      ];
+    }
+    else {
+      drupal_set_message($this->t('Stale reference: Failed to load corresponding Display configuration id @id.', ['@id' => $id]), 'error');
+    }
+
+    return $form;
   }
 
   /**
