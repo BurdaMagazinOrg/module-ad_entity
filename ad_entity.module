@@ -156,26 +156,40 @@ function ad_entity_ad_context_include(FieldItemListInterface $items, array $sett
  * Implements hook_ad_context_data_reset().
  */
 function ad_entity_ad_context_data_reset(AdContextManager $context_manager, EntityInterface $entity) {
-  if ($config = \Drupal::config('ad_entity.settings')) {
-    $behavior = $config->get('behavior_on_context_reset');
-    // When enabled, include elementary entity information for targeting.
-    if (!empty($behavior['include_entity_info'])) {
-      $info = [
-        'entitytype' => $entity->getEntityTypeId() . '/' . $entity->bundle(),
-        'entitylabel' => Html::escape($entity->label()),
-        'entityuuid' => $entity->uuid(),
-      ];
-      $context_manager
-        ->addContextData('targeting', ['targeting' => $info]);
-      $context_manager->addInvolvedEntity($entity);
-    }
-    // When enabled, collect context data from the context fields being
-    // enabled in the default view mode of this entity.
-    if (!empty($behavior['collect_default_data'])) {
-      if ($entity instanceof FieldableEntityInterface) {
-        $context_manager->collectContextDataFrom($entity);
+  $type = $entity->getEntityTypeId();
+  $id = $entity->id();
+  $cached_reset_data = &drupal_static(__FUNCTION__, []);
+  if (isset($cached_reset_data[$type][$id])) {
+    $reset = $cached_reset_data[$type][$id];
+    $context_manager->setInvolvedEntities($reset['involved']);
+    $context_manager->setContextData($reset['context']);
+  }
+  else {
+    $reset = ['involved' => [], 'context' => []];
+    if ($config = \Drupal::config('ad_entity.settings')) {
+      $behavior = $config->get('behavior_on_context_reset');
+      // When enabled, include elementary entity information for targeting.
+      if (!empty($behavior['include_entity_info'])) {
+        $info = [
+          'entitytype' => $type . '/' . $entity->bundle(),
+          'entitylabel' => Html::escape($entity->label()),
+          'entityuuid' => $entity->uuid(),
+        ];
+        $context_manager
+          ->addContextData('targeting', ['targeting' => $info]);
+        $context_manager->addInvolvedEntity($entity);
+      }
+      // When enabled, collect context data from the context fields being
+      // enabled in the default view mode of this entity.
+      if (!empty($behavior['collect_default_data'])) {
+        if ($entity instanceof FieldableEntityInterface) {
+          $context_manager->collectContextDataFrom($entity);
+        }
       }
     }
+    $reset['involved'] = $context_manager->getInvolvedEntities();
+    $reset['context'] = $context_manager->getContextData();
+    $cached_reset_data[$type][$id] = $reset;
   }
 }
 
