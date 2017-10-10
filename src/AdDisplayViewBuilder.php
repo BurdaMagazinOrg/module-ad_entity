@@ -167,7 +167,7 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
           unset($view['#cache']);
         }
         if ($ad_entity->access('view')) {
-          $build['#variants'][$ad_entity->id()] = $view;
+          $build['#variants'][$id] = $view;
         }
       }
     }

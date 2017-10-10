@@ -101,8 +101,6 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    $this->cacheMaxAge = parent::getCacheMaxAge();
-
     $context_manager = $this->services()->getContextManager();
     foreach ($context_manager->getInvolvedEntities() as $entities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
@@ -113,16 +111,15 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
       }
     }
 
-    return $this->cacheMaxAge;
+    return parent::getCacheMaxAge();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    $this->cacheContexts = parent::getCacheContexts();
-
     $this->addCacheContexts(['url.path']);
+
     $context_manager = $this->services()->getContextManager();
     foreach ($context_manager->getInvolvedEntities() as $entities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
@@ -133,7 +130,7 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
       }
     }
 
-    return $this->cacheContexts;
+    return parent::getCacheContexts();
   }
 
   /**
@@ -152,7 +149,7 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
       }
     }
 
-    return Cache::mergeTags(parent::getCacheTags(), $this->cacheTags);
+    return parent::getCacheTags();
   }
 
   /**

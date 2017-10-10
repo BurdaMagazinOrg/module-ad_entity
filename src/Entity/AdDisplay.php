@@ -82,6 +82,14 @@ class AdDisplay extends ConfigEntityBase implements AdDisplayInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCacheContexts() {
+    $this->addCacheContexts(['url.path']);
+    return parent::getCacheContexts();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getVariantsForTheme(ActiveTheme $theme) {
     $theme_name = $theme->getName();
     $variants = $this->get('variants') ?: [];

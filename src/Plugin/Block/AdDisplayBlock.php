@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -37,16 +38,6 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
-    return [
-      'module' => ['ad_entity'],
-      'config' => ['ad_entity.display.' . $this->getDerivativeId()],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $type_manager = $container->get('entity_type.manager');
     return new static(
@@ -76,6 +67,49 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->adDisplayStorage = $ad_display_storage;
     $this->adDisplayViewBuilder = $ad_display_view_builder;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    return [
+      'module' => ['ad_entity'],
+      'config' => ['ad_entity.display.' . $this->getDerivativeId()],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $id = $this->getDerivativeId();
+    if ($ad_display = $this->adDisplayStorage->load($id)) {
+      return Cache::mergeMaxAges(parent::getCacheMaxAge(), $ad_display->getCacheMaxAge());
+    }
+    return parent::getCacheMaxAge();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $id = $this->getDerivativeId();
+    if ($ad_display = $this->adDisplayStorage->load($id)) {
+      return Cache::mergeContexts(parent::getCacheContexts(), $ad_display->getCacheContexts());
+    }
+    return parent::getCacheContexts();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $id = $this->getDerivativeId();
+    if ($ad_display = $this->adDisplayStorage->load($id)) {
+      return Cache::mergeTags(parent::getCacheTags(), $ad_display->getCacheTags());
+    }
+    return parent::getCacheTags();
   }
 
   /**

@@ -21,6 +21,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
    * {@inheritdoc}
    */
   public function view(EntityInterface $entity, $view_mode = '["any"]', $langcode = NULL) {
+    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $entity */
     if ($view_mode == 'default' || $view_mode == 'full') {
       $view_mode = '["any"]';
     }
@@ -28,17 +29,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $view_mode = '["' . $view_mode . '"]';
     }
 
-    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $entity */
-    // Check whether a given context wants to turn off the advertisement.
-    $turnoff = $entity->getContextDataForPlugin('turnoff');
-    if (!empty($turnoff)) {
-      return [];
-    }
-
     $build = [
-      '#theme' => 'ad_entity',
-      '#ad_entity' => $entity,
-      '#variant' => $view_mode,
       '#cache' => [
         'keys' => ['entity_view', 'ad_entity', $entity->id(), $view_mode],
         'bin' => $this->cacheBin,
@@ -50,6 +41,18 @@ class AdEntityViewBuilder extends EntityViewBuilder {
     if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
       $build['#cache']['keys'][] = $entity->language()->getId();
     }
+
+    // Check whether a given context wants to turn off the advertisement.
+    $turnoff = $entity->getContextDataForPlugin('turnoff');
+    if (!empty($turnoff)) {
+      return $build;
+    }
+
+    $build += [
+      '#theme' => 'ad_entity',
+      '#ad_entity' => $entity,
+      '#variant' => $view_mode,
+    ];
 
     return $build;
   }
