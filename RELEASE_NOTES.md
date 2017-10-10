@@ -1,5 +1,8 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta2:
+- Bugfix: Block caching might break when ads have been turned off before.
+
 8.x-1.0-beta1:
 - First beta release (same as 1.0-alpha29)
 
