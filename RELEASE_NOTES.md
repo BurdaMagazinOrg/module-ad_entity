@@ -1,5 +1,9 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta3:
+- Bugfix: Context fields are not included on server-side collections
+  when their item list is empty.
+
 8.x-1.0-beta2:
 - Bugfix: Block caching might break when ads have been turned off before.
 
