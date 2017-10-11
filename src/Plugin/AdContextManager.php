@@ -318,9 +318,7 @@ class AdContextManager extends DefaultPluginManager {
           $formatter = $this->formatterManager
             ->createInstance($configured_options['type'], $configured_options);
           if (($item_list = $entity->get($field_name)) && ($language = $entity->language())) {
-            if (!$item_list->isEmpty()) {
-              $formatter->viewElements($item_list, $language->getId());
-            }
+            $formatter->viewElements($item_list, $language->getId());
           }
         }
       }
@@ -334,9 +332,7 @@ class AdContextManager extends DefaultPluginManager {
         $formatter = $this->formatterManager
           ->createInstance($display_options['type'], $display_options);
         if (($item_list = $entity->get($field_name)) && ($language = $entity->language())) {
-          if (!$item_list->isEmpty()) {
-            $formatter->viewElements($item_list, $language->getId());
-          }
+          $formatter->viewElements($item_list, $language->getId());
         }
       }
     }
