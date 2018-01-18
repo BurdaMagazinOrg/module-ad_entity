@@ -1,5 +1,10 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta4:
+- Omit cache records for Advertising entities, see
+  https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7
+  https://www.drupal.org/project/ad_entity/issues/2937615
+
 8.x-1.0-beta3:
 - Bugfix: Context fields are not included on server-side collections
   when their item list is empty.
