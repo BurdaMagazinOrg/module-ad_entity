@@ -5,7 +5,6 @@ namespace Drupal\ad_entity;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * Provides the view builder for Advertising entities.
@@ -29,18 +28,22 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       $view_mode = '["' . $view_mode . '"]';
     }
 
+    // No cache keys given, because rendered Advertising entity instances
+    // don't get their own cache records. The reason behind this is that
+    // once the cache entry of the parent render element is being invalidated,
+    // it's most likely that the cache record of this element here would be
+    // invalidated as well. This procedure is not worth the I/O overhead,
+    // plus rendering Advertising entities shouldn't be a resource breaker.
+    // Another plus is that one instance of an Advertising entity can be
+    // used more than once on a page. Regards the problem of reusable render
+    // components, @see
     $build = [
       '#cache' => [
-        'keys' => ['entity_view', 'ad_entity', $entity->id(), $view_mode],
-        'bin' => $this->cacheBin,
         'tags' => Cache::mergeTags($this->getCacheTags(), $entity->getCacheTags()),
         'contexts' => $entity->getCacheContexts(),
         'max-age' => $entity->getCacheMaxAge(),
       ],
     ];
-    if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
-      $build['#cache']['keys'][] = $entity->language()->getId();
-    }
 
     // Check whether a given context wants to turn off the advertisement.
     $turnoff = $entity->getContextDataForPlugin('turnoff');

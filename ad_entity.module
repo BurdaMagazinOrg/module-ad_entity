@@ -5,6 +5,7 @@
  * Advertising Entity module file.
  */
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -106,7 +107,7 @@ function ad_entity_entity_prepare_view($entity_type_id, array $entities, array $
     else {
       // In case of multiple entities to view, a fallback needs to be provided.
       // This fallback can only include the information by the route entity.
-      // TODO Find a proper way for list items defining their own context data.
+      // @todo Find a proper way for list items defining their own context data.
       $route_match = NULL;
       try {
         $route_match = \Drupal::routeMatch();
@@ -131,6 +132,14 @@ function ad_entity_entity_view(array &$build, EntityInterface $entity, EntityVie
     $build['#post_render'][] = '_ad_entity_reset_to_previous_context_data';
     unset($entity->__ad_entity_needs_previous_context);
   }
+}
+
+/**
+ * Implements hook_block_build_BASE_BLOCK_ID_alter() for ad_display blocks.
+ */
+function ad_entity_block_build_ad_display_alter(array &$build, BlockPluginInterface $block) {
+  // @see AdEntityViewBuilder::view() why no cache keys are being used.
+  unset($build['#cache']['keys']);
 }
 
 /**

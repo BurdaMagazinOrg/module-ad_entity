@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * Provides the view builder for Display configs for Advertisement.
@@ -133,39 +132,22 @@ class AdDisplayViewBuilder extends EntityViewBuilder {
    */
   public function view(EntityInterface $entity, $view_mode = 'default', $langcode = NULL) {
     /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $entity */
+    // @see AdEntityViewBuilder::view() why no cache keys are being used.
     $build = [
-      '#theme' => 'ad_display',
-      '#ad_display' => $entity,
-      '#variants' => [],
       '#cache' => [
-        'keys' => ['entity_view', 'ad_display', $entity->id(), $view_mode],
-        'bin' => $this->cacheBin,
         'tags' => Cache::mergeTags($this->getCacheTags(), $entity->getCacheTags()),
         'contexts' => $entity->getCacheContexts(),
         'max-age' => $entity->getCacheMaxAge(),
       ],
+      '#theme' => 'ad_display',
+      '#ad_display' => $entity,
+      '#variants' => [],
     ];
-    if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
-      $build['#cache']['keys'][] = $entity->language()->getId();
-    }
     // When given, load and view the assigned Advertisement.
     $theme = $this->themeManager->getActiveTheme();
     foreach ($entity->getVariantsForTheme($theme) as $id => $variant) {
       if ($ad_entity = $this->adEntityStorage->load($id)) {
         $view = $this->adEntityViewBuilder->view($ad_entity, $variant);
-        if (!empty($view['#cache'])) {
-          // Let the Display care for caching, not the single AdEntity.
-          if (!empty($view['#cache']['tags'])) {
-            $build['#cache']['tags'] = Cache::mergeTags($build['#cache']['tags'], $view['#cache']['tags']);
-          }
-          if (!empty($view['#cache']['contexts'])) {
-            $build['#cache']['contexts'] = Cache::mergeContexts($build['#cache']['contexts'], $view['#cache']['contexts']);
-          }
-          if (!empty($view['#cache']['max-age'])) {
-            $build['#cache']['max-age'] = Cache::mergeMaxAges($build['#cache']['max-age'], $view['#cache']['max-age']);
-          }
-          unset($view['#cache']);
-        }
         if ($ad_entity->access('view')) {
           $build['#variants'][$id] = $view;
         }

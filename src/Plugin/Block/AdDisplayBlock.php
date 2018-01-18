@@ -142,12 +142,6 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
     $build = [];
     if ($ad_display = $this->adDisplayStorage->load($id)) {
       $view = $this->adDisplayViewBuilder->view($ad_display, 'default');
-      if (!empty($view['#cache'])) {
-        // Let the Block alone care for caching.
-        unset($view['#cache']['keys']);
-        unset($view['#cache']['bin']);
-        $build[$id]['#cache'] = $view['#cache'];
-      }
       if ($ad_display->access('view')) {
         $build[$id] = $view;
       }
