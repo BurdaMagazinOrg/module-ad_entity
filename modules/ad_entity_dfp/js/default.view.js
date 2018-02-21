@@ -36,23 +36,19 @@
     defineAndDisplay: function (ad_tag, slotNumber, onPageLoad) {
       googletag.cmd.push(function () {
         var ad_id = ad_tag.attr('id');
-        var network_id = ad_tag.attr('data-dfp-network');
-        var unit_id = ad_tag.attr('data-dfp-unit');
-        var sizes = ad_tag.attr('data-dfp-sizes');
-        if (sizes) {
-          sizes = JSON.parse(sizes);
-        }
-        else {
+        var network_id = ad_tag.data('dfpNetwork');
+        var unit_id = ad_tag.data('dfpUnit');
+        var sizes = ad_tag.data('dfpSizes');
+        if (typeof sizes !== 'object') {
           sizes = [];
         }
 
         var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
-        var targeting = ad_tag.attr('data-ad-entity-targeting');
+        var targeting = ad_tag.data('adEntityTargeting');
 
         $window.trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
 
-        if (targeting) {
-          targeting = JSON.parse(targeting);
+        if (typeof targeting === 'object') {
           for (var key in targeting) {
             if (targeting.hasOwnProperty(key)) {
               slot.setTargeting(key, targeting[key]);
@@ -74,7 +70,8 @@
           if (event.slot.getSlotElementId() === ad_tag.attr('id')) {
             container.removeClass('not-initialized');
             container.addClass('initialized');
-            container.trigger('adEntity:initialized', [ad_tag]);
+            container.data('initialized', true);
+            container.trigger('adEntity:initialized', [ad_tag, container]);
           }
         }, false);
       });

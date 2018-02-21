@@ -27,9 +27,9 @@
             var container = containers[id];
             var ad_tag = $('.adtech-factory-ad', container[0]);
             var argument = {element: ad_tag[0]};
-            var targeting = ad_tag.attr('data-ad-entity-targeting');
-            if (targeting) {
-              argument.targeting = JSON.parse(targeting);
+            var targeting = ad_tag.data('adEntityTargeting');
+            if (typeof targeting === 'object') {
+              argument.targeting = targeting;
             }
             else {
               argument.targeting = {};
@@ -58,7 +58,8 @@
         if (event.element_id === ad_tag.attr('id')) {
           container.removeClass('not-initialized');
           container.addClass('initialized');
-          container.trigger('adEntity:initialized', [ad_tag]);
+          container.data('initialized', true);
+          container.trigger('adEntity:initialized', [ad_tag, container]);
         }
       }, false);
     },

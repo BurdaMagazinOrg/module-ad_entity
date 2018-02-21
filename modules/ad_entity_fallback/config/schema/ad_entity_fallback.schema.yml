@@ -1,0 +1,7 @@
+ad_entity.ad_entity.*.third_party_settings.ad_entity_fallback:
+  type: mapping
+  label: 'Entity config for fallback ads.'
+  mapping:
+    ad_entity_id:
+      type: string
+      label: 'The Advertising entity to use as fallback when the current entity is empty.'
