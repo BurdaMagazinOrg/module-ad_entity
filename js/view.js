@@ -33,7 +33,7 @@
     var collected = Drupal.ad_entity.adContainers;
     $('.ad-entity-container', context).each(function () {
       var id = this.id;
-      if (id === 'undefined') {
+      if (typeof id !== 'string' || !(id.length > 0)) {
         return;
       }
       if (collected.hasOwnProperty(id)) {
@@ -209,7 +209,7 @@
       // but keep them in mind for other view handlers to act on.
       $('.ad-entity-container', context).each(function () {
         var id = this.id;
-        if (id === 'undefined') {
+        if (typeof id !== 'string' || !(id.length > 0)) {
           return;
         }
         if (!collected.hasOwnProperty(id)) {

@@ -34,7 +34,7 @@
         // Fetch the original container.
         correlationId = container.data('fallbackContainer');
         if (typeof correlationId !== 'undefined') {
-          if (typeof correlated[correlationId] === 'undefined') {
+          if (!correlated.hasOwnProperty(correlationId)) {
             correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
           }
           correlated[correlationId].originalContainer = container;
@@ -43,7 +43,7 @@
           // Fetch the fallback container.
           correlationId = container.data('fallbackContainerFor');
           if (typeof correlationId !== 'undefined') {
-            if (typeof correlated[correlationId] === 'undefined') {
+            if (!correlated.hasOwnProperty(correlationId)) {
               correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
             }
             correlated[correlationId].fallbackContainer = container;

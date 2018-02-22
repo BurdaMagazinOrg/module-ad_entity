@@ -1,9 +1,12 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta7:
+- Minor bugfix: Check on exisiting id of Ad container with typeof instructor.
+
 8.x-1.0-beta6:
 - Bugfix: Make sure containers are being collected only once.
-  This bug caused multiple loadingd of ad slots in case the provider
-  doesn't sufficiently care whether their slots already have been loaded before.
+  This bug caused multiple loading of ad slots in case the provider
+  doesn't sufficiently care whether the slots already have been loaded before.
 - Removed Javascript behavior which created a new id for duplicate containers.
 
 8.x-1.0-beta5:
