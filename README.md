@@ -94,9 +94,9 @@ As an alternative way for adjusting the display and behavior of your ads,
 the Advertising implementations might provide events for you.
 
 Following events are provided in general:
- - When the container for an Advertising entity has been collected from context:
+ - When containers for Advertising entities have been collected from context:
    ```
-   container.trigger('adEntity:collected',
+   $window.trigger('adEntity:collected',
    [Drupal.ad_entity.adContainers, newcomers, context, settings]);
    ```
  - After Advertisement has been initialized inside the container:

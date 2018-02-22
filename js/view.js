@@ -49,9 +49,9 @@
         Drupal.ad_entity.adContainers[id] = container;
         newcomers[id] = container;
         container.data('id', id);
-        container.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
       }
     });
+    $window.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
     return newcomers;
   };
 
@@ -199,8 +199,8 @@
 
       // When responsive behavior is enabled,
       // re-apply scope restriction with initialization on breakpoint changes.
-      if (settings.hasOwnProperty('ad_entity_responsive')) {
-        if (settings.ad_entity_responsive === true) {
+      if (settings.hasOwnProperty('ad_entity') && settings.ad_entity.hasOwnProperty('responsive')) {
+        if (settings.ad_entity.responsive === true) {
           $window.on('themeBreakpoint:changed', function () {
             Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
           });

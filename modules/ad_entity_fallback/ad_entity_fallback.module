@@ -10,11 +10,19 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\ad_entity\Entity\AdEntityInterface;
 
 /**
+ * Implements hook_form_BASE_FORM_ID_alter() for ad_entity_settings.
+ */
+function ad_entity_fallback_form_ad_entity_settings_alter(array &$form, FormStateInterface $form_state) {
+  \Drupal::moduleHandler()->loadInclude('ad_entity_fallback', 'inc', 'ad_entity_fallback.admin');
+  _ad_entity_fallback_settings_form($form, $form_state);
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for ad_entity_form.
  */
 function ad_entity_fallback_form_ad_entity_form_alter(array &$form, FormStateInterface $form_state) {
-  \Drupal::moduleHandler()->loadInclude('ad_entity_fallback', 'inc', 'admin');
-  _ad_entity_fallback_form($form, $form_state);
+  \Drupal::moduleHandler()->loadInclude('ad_entity_fallback', 'inc', 'ad_entity_fallback.admin');
+  _ad_entity_fallback_entity_form($form, $form_state);
 }
 
 /**
@@ -47,4 +55,17 @@ function ad_entity_fallback_ad_entity_view_alter(array &$build, AdEntityInterfac
   $fallback_view['#attached']['library'][] = 'ad_entity_fallback/view';
 
   $build = [$build, $fallback_view];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function ad_entity_fallback_page_attachments(array &$page) {
+  $page['#attached']['drupalSettings']['ad_entity']['fallback_timeout'] = 500;
+  if ($config = \Drupal::config('ad_entity.settings')) {
+    $fallback_settings = $config->get('fallback');
+    if (!empty($fallback_settings['timeout'])) {
+      $page['#attached']['drupalSettings']['ad_entity']['fallback_timeout'] = $fallback_settings['timeout'];
+    }
+  }
 }

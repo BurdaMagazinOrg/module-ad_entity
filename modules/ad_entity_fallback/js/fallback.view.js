@@ -3,7 +3,7 @@
  * JS fallback view handler implementation.
  */
 
-(function ($, Drupal, window) {
+(function ($, Drupal, drupalSettings, window) {
 
   'use strict';
 
@@ -93,17 +93,48 @@
         var id = fallback.data('id');
         to_load[id] = fallback;
 
-        // Make sure that others won't try to
+        // Make sure that others won't accidentally try to
         // initialize the original container again.
         original.addClass('initialization-disabled');
         original.data('disabled', true);
         original.data('fallbackProcessed', true);
-        original.remove();
       }
     }
     if (Object.keys(to_load).length > 0) {
       Drupal.ad_entity.restrictAndInitialize(to_load, context, settings);
     }
+  };
+
+  /**
+   * Helper function to get the fallback container for the given Advertising container.
+   *
+   * @param {object} container
+   *   The Advertising container.
+   *
+   * @return {object}
+   *   The fallback when given, or undefined when not.
+   */
+  fallbacks.getFallbackContainerFor = function (container) {
+    var fallback = container.data('fallbackObject');
+    if (typeof fallback === 'undefined') {
+      var correlationId = container.data('fallbackContainer');
+      if (correlationId !== 'undefined') {
+        // Perform a complete lookup on all containers
+        // to fetch the corresponding fallback container.
+        var all_containers = Drupal.ad_entity.adContainers;
+        for (var id in all_containers) {
+          if (all_containers.hasOwnProperty(id)) {
+            var suspect = all_containers[id];
+            if (correlationId === suspect.data('fallbackContainerFor')) {
+              fallback = suspect;
+              container.data('fallbackObject', fallback);
+              break;
+            }
+          }
+        }
+      }
+    }
+    return fallback;
   };
 
   /**
@@ -122,48 +153,13 @@
    */
   fallbacks.onCollect = function (event, all_containers, newcomers, context, settings) {
     var processCallback = this.processFallbacks.bind(this, newcomers, context, settings);
-    // @todo Make defer-time configurable.
-    window.setTimeout(processCallback, 1000);
-  };
-
-  /**
-   * Event listener callback when an Advertising container has been initialized.
-   *
-   * @param {object} event
-   *   The corresponding event object.
-   * @param {object} ad_tag
-   *   The affected ad tag inside the Advertising container.
-   * @param {object} container
-   *   The Advertising container which has been initialized.
-   */
-  fallbacks.onInitialized = function (event, ad_tag, container) {
-    var correlationId = container.data('fallbackContainer');
-    if (typeof correlationId === 'undefined') {
-      return;
+    var timeout = 500;
+    if (drupalSettings.hasOwnProperty('ad_entity') && drupalSettings.ad_entity.hasOwnProperty('fallback_timeout')) {
+      timeout = drupalSettings.ad_entity.fallback_timeout;
     }
-    var fallback = container.data('fallbackObject');
-    if (typeof fallback === 'undefined') {
-      // Perform a complete lookup on all containers
-      // to fetch the corresponding fallback container.
-      var all_containers = Drupal.ad_entity.adContainers;
-      for (var id in all_containers) {
-        if (all_containers.hasOwnProperty(id)) {
-          var suspect = all_containers[id];
-          if (correlationId === suspect.data('fallbackContainerFor')) {
-            fallback = suspect;
-            break;
-          }
-        }
-      }
-    }
-    if (typeof fallback === 'undefined') {
-      return;
-    }
-    container.data('fallbackProcessed', true);
-    fallback.remove();
+    window.setTimeout(processCallback, timeout);
   };
 
   $window.on('adEntity:collected', fallbacks.onCollect.bind(fallbacks));
-  $window.on('adEntity:initialized', fallbacks.onInitialized.bind(fallbacks));
 
-}(jQuery, Drupal, window));
+}(jQuery, Drupal, drupalSettings, window));

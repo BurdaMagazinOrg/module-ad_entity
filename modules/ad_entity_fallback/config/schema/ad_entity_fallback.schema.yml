@@ -1,3 +1,11 @@
+ad_entity.settings.fallback:
+  type: mapping
+  label: 'Global settings for the Fallback module.'
+  mapping:
+    timeout:
+      type: integer
+      label: 'Microseconds to wait until a given fallback will be loaded instead of the original.'
+
 ad_entity.ad_entity.*.third_party_settings.ad_entity_fallback:
   type: mapping
   label: 'Entity config for fallback ads.'
