@@ -1,5 +1,13 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta5:
+- Javascript implementations have been refactored to improve load performance
+  and to be more accessible for extending or manipulating behaviors.
+- Added a sub-module which provides the ability to load fallback Advertisement.
+
+NOTE: Code changes might affect your extensions or modifications.
+Take care of it when updating your codebase.
+
 8.x-1.0-beta4:
 - Omit cache records for Advertising entities, see
   https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7
