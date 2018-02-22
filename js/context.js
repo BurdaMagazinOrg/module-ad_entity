@@ -44,7 +44,7 @@
           // on the Advertising container.
           var to_apply = true;
           if (context_object.hasOwnProperty('apply_on') && context_object.apply_on.length > 0) {
-            var ad_entity_id = container.attr('data-ad-entity');
+            var ad_entity_id = container.data('adEntity');
             if ($.inArray(ad_entity_id, context_object.apply_on) < 0) {
               to_apply = false;
             }

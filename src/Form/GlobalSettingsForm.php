@@ -60,11 +60,21 @@ class GlobalSettingsForm extends ConfigFormBase {
   }
 
   /**
+   * Get the mutable config object which belongs to this form.
+   *
+   * @return \Drupal\Core\Config\Config
+   *   The mutable config object.
+   */
+  public function getConfig() {
+    return $this->config('ad_entity.settings');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $config = $this->config('ad_entity.settings');
+    $config = $this->getConfig();
 
     $form['common'] = [
       '#type' => 'fieldset',
@@ -114,7 +124,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     $form['common']['behavior_on_context_reset']['collect_default_data'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enforce the collection of default Advertising context from the entity scope'),
-      '#description' => $this->t('When enabled, backend context data will be collected from the context fields, which are enabled in the default view mode for the entity.'),
+      '#description' => $this->t('When enabled, backend context data will be collected from the context fields, which are enabled in the <b>default view mode</b> for the entity.'),
       '#parents' => ['behavior_on_context_reset', 'collect_default_data'],
       '#default_value' => isset($behavior_reset['collect_default_data']) ? (int) $behavior_reset['collect_default_data'] : 1,
       '#weight' => 30,
@@ -151,7 +161,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
-    $config = $this->config('ad_entity.settings');
+    $config = $this->getConfig();
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {
@@ -166,7 +176,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
-    $config = $this->config('ad_entity.settings');
+    $config = $this->getConfig();
     $config->set('enable_responsive_behavior', (bool) $form_state->getValue('enable_responsive_behavior'));
     $config->set('behavior_on_context_reset', $form_state->getValue('behavior_on_context_reset'));
 

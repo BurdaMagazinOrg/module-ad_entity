@@ -36,7 +36,7 @@ class AdEntityViewBuilder extends EntityViewBuilder {
     // plus rendering Advertising entities shouldn't be a resource breaker.
     // Another plus is that one instance of an Advertising entity can be
     // used more than once on a page. Regards the problem of reusable render
-    // components, @see
+    // components, @see https://www.drupal.org/project/drupal/issues/2877045
     $build = [
       '#cache' => [
         'tags' => Cache::mergeTags($this->getCacheTags(), $entity->getCacheTags()),
@@ -56,6 +56,9 @@ class AdEntityViewBuilder extends EntityViewBuilder {
       '#ad_entity' => $entity,
       '#variant' => $view_mode,
     ];
+
+    // Allow modules to modify the render array.
+    $this->moduleHandler()->alter(['ad_entity_view'], $build, $entity);
 
     return $build;
   }

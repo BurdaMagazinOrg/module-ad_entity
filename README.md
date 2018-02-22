@@ -1,7 +1,7 @@
 # Advertising Entity
 
-A Drupal module which provides consolidated management for various types of
-advertising instances.
+A Drupal module which provides consolidated integration for various types of
+advertising instances (mainly advertisement).
 
 # Requirements
 
@@ -94,11 +94,15 @@ As an alternative way for adjusting the display and behavior of your ads,
 the Advertising implementations might provide events for you.
 
 Following events are provided in general:
- - When the container for an Advertising entity has been collected from context:
-   `container.trigger('adEntity:collected',
-   [Drupal.ad_entity.adContainers, newcomers, context, settings]);`
+ - When containers for Advertising entities have been collected from context:
+   ```
+   $window.trigger('adEntity:collected',
+   [Drupal.ad_entity.adContainers, newcomers, context, settings]);
+   ```
  - After Advertisement has been initialized inside the container:
-   `container.trigger('adEntity:initialized', [ad_tag]);`
+   ```
+   container.trigger('adEntity:initialized', [ad_tag, container]);
+   ```
 
 The AdTech implementation provides the window event <code>atf:BeforeLoad</code>
 which is being triggered right before <code>atf_lib.load_tags()</code>

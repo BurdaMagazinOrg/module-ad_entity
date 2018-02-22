@@ -7,6 +7,8 @@
 
   'use strict';
 
+  var $window = $(window);
+
   Drupal.ad_entity = Drupal.ad_entity || {};
 
   Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
@@ -30,7 +32,8 @@
     var newcomers = {};
     $('.ad-entity-container', context).each(function () {
       var container = $(this);
-      if (container.hasClass('not-initialized')) {
+      if (container.data('initialized') !== true) {
+        container.data('initialized', false);
         var id = container.attr('id');
         if (Drupal.ad_entity.adContainers.hasOwnProperty(id)) {
           // Guarantee uniqueness of the container and its children.
@@ -45,9 +48,10 @@
         }
         Drupal.ad_entity.adContainers[id] = container;
         newcomers[id] = container;
-        container.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
+        container.data('id', id);
       }
     });
+    $window.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
     return newcomers;
   };
 
@@ -74,22 +78,24 @@
     for (var id in containers) {
       if (containers.hasOwnProperty(id)) {
         var container = containers[id];
-        container.variant = container.variant || JSON.parse(container.attr('data-ad-entity-variant'));
-        for (var i = 0; i < container.variant.length; i++) {
-          if (!($.inArray(container.variant[i], scope) < 0)) {
+        var variant = container.data('adEntityVariant');
+        for (var i = 0; i < variant.length; i++) {
+          if (!($.inArray(variant[i], scope) < 0)) {
             in_scope[id] = container;
-            if (!container.hasClass('in-scope')) {
+            if (container.data('inScope') !== true) {
               container.addClass('in-scope');
               container.removeClass('out-of-scope');
               container.css('display', '');
+              container.data('inScope', true);
             }
             break;
           }
         }
-        if (!in_scope.hasOwnProperty(id) && !container.hasClass('out-of-scope')) {
+        if (!in_scope.hasOwnProperty(id) && container.data('inScope') !== false) {
           container.removeClass('in-scope');
           container.addClass('out-of-scope');
           container.css('display', 'none');
+          container.data('inScope', false);
         }
       }
     }
@@ -112,7 +118,7 @@
     for (var id in containers) {
       if (containers.hasOwnProperty(id)) {
         var container = containers[id];
-        handler_id = container.attr('data-ad-entity-view');
+        handler_id = container.data('adEntityView');
 
         if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
           var view_handler = Drupal.ad_entity.viewHandlers[handler_id];
@@ -140,13 +146,26 @@
 
     for (var id in to_initialize) {
       if (to_initialize.hasOwnProperty(id)) {
-        // Do not initialize disabled containers.
-        if (to_initialize[id].hasClass('initialization-disabled')) {
-          delete to_initialize[id];
+        var container = to_initialize[id];
+        var initialized = container.data('initialized');
+        if (typeof initialized !== 'boolean') {
+          initialized = !container.hasClass('not-initialized');
+          container.data('initialized', initialized);
         }
         // Prevent re-initialization of already initialized Advertisement.
-        else if (to_initialize[id].hasClass('initialized') || !to_initialize[id].hasClass('not-initialized')) {
+        if (initialized) {
           delete to_initialize[id];
+        }
+        else {
+          // Do not initialize disabled containers.
+          // As per documentation since beta status,
+          // the primary flag for disabling initialization
+          // is the class name.
+          var disabled = container.hasClass('initialization-disabled');
+          container.data('disabled', disabled);
+          if (disabled) {
+            delete to_initialize[id];
+          }
         }
       }
     }
@@ -180,9 +199,9 @@
 
       // When responsive behavior is enabled,
       // re-apply scope restriction with initialization on breakpoint changes.
-      if (settings.hasOwnProperty('ad_entity_responsive')) {
-        if (settings.ad_entity_responsive === true) {
-          $(window).on('themeBreakpoint:changed', function () {
+      if (settings.hasOwnProperty('ad_entity') && settings.ad_entity.hasOwnProperty('responsive')) {
+        if (settings.ad_entity.responsive === true) {
+          $window.on('themeBreakpoint:changed', function () {
             Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
           });
         }

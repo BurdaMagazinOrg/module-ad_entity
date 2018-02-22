@@ -58,8 +58,9 @@ function ad_entity_theme_suggestions_ad_entity($variables) {
  * Implements hook_page_attachments().
  */
 function ad_entity_page_attachments(array &$page) {
+  $page['#attached']['drupalSettings']['ad_entity']['responsive'] = FALSE;
   if ($config = \Drupal::config('ad_entity.settings')) {
-    $page['#attached']['drupalSettings']['ad_entity_responsive'] =
+    $page['#attached']['drupalSettings']['ad_entity']['responsive'] =
       $config->get('enable_responsive_behavior') ? TRUE : FALSE;
   }
 }

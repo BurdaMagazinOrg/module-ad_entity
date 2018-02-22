@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Advertising Entity: Fallback - install file.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ad_entity_fallback_install() {
+  // This module makes heavy changes in entity_view_alter(),
+  // which might be incompatible with alterations from others.
+  module_set_weight('ad_entity_fallback', 1100);
+}

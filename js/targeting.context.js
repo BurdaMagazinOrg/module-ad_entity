@@ -19,11 +19,8 @@
         if (context_targeting && targeting_element.length > 0) {
           // Make sure to operate only on one targeting element.
           targeting_element = targeting_element.first();
-          var targeting = targeting_element.attr('data-ad-entity-targeting');
-          if (targeting) {
-            targeting = JSON.parse(targeting);
-          }
-          else {
+          var targeting = targeting_element.data('adEntityTargeting');
+          if (typeof targeting !== 'object') {
             targeting = {};
           }
 
@@ -51,6 +48,7 @@
               }
             }
           }
+          targeting_element.data('adEntityTargeting', targeting);
           targeting_element.attr('data-ad-entity-targeting', JSON.stringify(targeting));
         }
       }

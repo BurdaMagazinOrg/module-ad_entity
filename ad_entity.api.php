@@ -11,6 +11,19 @@
  */
 
 /**
+ * Modify the render array of the given Advertising entity.
+ *
+ * @param array &$build
+ *   The render array of the given Advertising entity.
+ */
+function hook_ad_entity_view_alter(array &$build, \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity) {
+  if ($ad_entity->isNew()) {
+    // Class attributes will be merged during preprocessing.
+    $ad_entity->_attributes['class'][] = 'new';
+  }
+}
+
+/**
  * Act on the inclusion of Advertising context.
  *
  * @param \Drupal\Core\Field\FieldItemListInterface $items

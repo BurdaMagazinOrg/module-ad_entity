@@ -10,5 +10,6 @@ googletag.cmd.push(function () {
   'use strict';
   googletag.pubads().enableSingleRequest();
   googletag.pubads().disableInitialLoad();
+  googletag.pubads().collapseEmptyDivs();
   googletag.enableServices();
 });

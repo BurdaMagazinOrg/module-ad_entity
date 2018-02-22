@@ -66,7 +66,7 @@ ad_entity.display.*:
         use_base_theme:
           type: boolean
           label: 'Use the display settings of a base theme, if available.'
-        use_settings:from:
+        use_settings_from:
           type: string
           label: 'Use display settings of theme'
 

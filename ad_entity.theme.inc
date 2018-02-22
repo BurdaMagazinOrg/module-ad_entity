@@ -29,6 +29,19 @@ function template_preprocess_ad_entity(array &$variables) {
   $attributes->setAttribute('data-ad-entity', $ad_entity->id());
   $attributes->setAttribute('data-ad-entity-type', $ad_entity->get('type_plugin_id'));
   $attributes->setAttribute('data-ad-entity-view', $ad_entity->get('view_plugin_id'));
+
+  // Let attributes defined by other components
+  // add or override the generated ones.
+  if (!empty($ad_entity->_attributes)) {
+    foreach ($ad_entity->_attributes as $name => $value) {
+      if ($name == 'class') {
+        $attributes->addClass($value);
+      }
+      else {
+        $attributes->setAttribute($name, $value);
+      }
+    }
+  }
   $variables['attributes'] = $attributes;
 
   // Attach the fundamental JS implementation for viewing Advertising entities.

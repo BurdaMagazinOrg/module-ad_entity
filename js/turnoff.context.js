@@ -15,7 +15,7 @@
 
   Drupal.ad_entity.context.turnoff = {
     apply: function (container, context_settings, newcomers) {
-      var id = container.attr('id');
+      var id = container.data('id');
       // Remove the container from the DOM.
       container.remove();
       // Delete the container from the global collection.
