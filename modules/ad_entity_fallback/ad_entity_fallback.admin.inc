@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @param array &$form
  *   The form array of the ad_entity_settings form.
- * @param FormStateInterface $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The corresponding form state.
  */
 function _ad_entity_fallback_settings_form(array &$form, FormStateInterface $form_state) {
@@ -46,9 +46,9 @@ function _ad_entity_fallback_settings_form(array &$form, FormStateInterface $for
 /**
  * Submit handler for the fallback options in the ad_entity_settings form.
  *
- * @param array &$form
+ * @param array $form
  *   The form array of the ad_entity_settings form.
- * @param FormStateInterface $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The corresponding form state.
  */
 function _ad_entity_fallback_settings_form_submit(array $form, FormStateInterface $form_state) {
@@ -73,7 +73,7 @@ function _ad_entity_fallback_settings_form_submit(array $form, FormStateInterfac
  *
  * @param array &$form
  *   The form array of the Advertising entity form.
- * @param FormStateInterface $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The corresponding form state.
  */
 function _ad_entity_fallback_entity_form(array &$form, FormStateInterface $form_state) {
