@@ -23,6 +23,7 @@
     $('script[data-ad-entity-context]', dom).each(function () {
       var context_object = JSON.parse($(this).html());
       Drupal.ad_entity.contextObjects.push(context_object);
+      context_object.remove();
     });
   };
 

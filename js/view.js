@@ -30,28 +30,21 @@
    */
   Drupal.ad_entity.collectAdContainers = function (context, settings) {
     var newcomers = {};
+    var collected = Drupal.ad_entity.adContainers;
     $('.ad-entity-container', context).each(function () {
-      var container = $(this);
-      if (container.data('initialized') !== true) {
-        container.data('initialized', false);
-        var id = container.attr('id');
-        if (Drupal.ad_entity.adContainers.hasOwnProperty(id)) {
-          // Guarantee uniqueness of the container and its children.
-          var length = Object.keys(Drupal.ad_entity.adContainers).length;
-          id = id + '-' + length;
-          container.attr('id', id);
-          $('[id]', container[0]).each(function () {
-            var $this = $(this);
-            var new_id = $this.attr('id') + '-' + length;
-            $this.attr('id', new_id);
-          });
-        }
-        Drupal.ad_entity.adContainers[id] = container;
-        newcomers[id] = container;
-        container.data('id', id);
+      var id = this.id;
+      if (id === 'undefined') {
+        return;
       }
+      if (collected.hasOwnProperty(id)) {
+        return;
+      }
+      var container = $(this);
+      collected[id] = container;
+      newcomers[id] = container;
+      container.data('id', id);
     });
-    $window.trigger('adEntity:collected', [Drupal.ad_entity.adContainers, newcomers, context, settings]);
+    $window.trigger('adEntity:collected', [collected, newcomers, context, settings]);
     return newcomers;
   };
 
@@ -153,7 +146,7 @@
           container.data('initialized', initialized);
         }
         // Prevent re-initialization of already initialized Advertisement.
-        if (initialized) {
+        if (initialized === true) {
           delete to_initialize[id];
         }
         else {
@@ -210,13 +203,21 @@
     detach: function (context, settings) {
 
       var containers = {};
-      $('.ad-entity-container', context).each(function () {
-        var container = $(this);
-        var id = container.attr('id');
-        containers[id] = container;
+      var collected = Drupal.ad_entity.adContainers;
 
-        // Remove the detached container from the collection.
-        delete Drupal.ad_entity.adContainers[id];
+      // Remove the detached container from the collection,
+      // but keep them in mind for other view handlers to act on.
+      $('.ad-entity-container', context).each(function () {
+        var id = this.id;
+        if (id === 'undefined') {
+          return;
+        }
+        if (!collected.hasOwnProperty(id)) {
+          return;
+        }
+
+        containers[id] = collected[id];
+        delete collected[id];
       });
 
       // Let the view handlers act on detachment of their ads.
