@@ -1,5 +1,11 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta6:
+- Bugfix: Make sure containers are being collected only once.
+  This bug caused multiple loadingd of ad slots in case the provider
+  doesn't sufficiently care whether their slots already have been loaded before.
+- Removed Javascript behavior which created a new id for duplicate containers.
+
 8.x-1.0-beta5:
 - Javascript implementations have been refactored to improve load performance
   and to be more accessible for extending or manipulating behaviors.
