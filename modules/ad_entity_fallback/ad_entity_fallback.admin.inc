@@ -37,7 +37,7 @@ function _ad_entity_fallback_settings_form(array &$form, FormStateInterface $for
     '#title' => t('Timeout'),
     '#description' => t('Microseconds to wait until a given fallback will be loaded instead of the original.'),
     '#required' => TRUE,
-    '#default_value' => !empty($fallback_settings['timeout']) ? $fallback_settings['timeout'] : 500,
+    '#default_value' => !empty($fallback_settings['timeout']) ? $fallback_settings['timeout'] : 1000,
     '#weight' => 10,
   ];
   array_unshift($form['#submit'], '_ad_entity_fallback_settings_form_submit');
@@ -57,7 +57,7 @@ function _ad_entity_fallback_settings_form_submit(array $form, FormStateInterfac
   $config = $form_object->getConfig();
   $submitted = $form_state->getValue('fallback');
   $fallback_settings = [
-    'timeout' => 500,
+    'timeout' => 1000,
   ];
   if (!empty($submitted['timeout'])) {
     $timeout = (int) $submitted['timeout'];

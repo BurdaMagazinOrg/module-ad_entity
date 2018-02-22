@@ -153,7 +153,7 @@
    */
   fallbacks.onCollect = function (event, all_containers, newcomers, context, settings) {
     var processCallback = this.processFallbacks.bind(this, newcomers, context, settings);
-    var timeout = 500;
+    var timeout = 1000;
     if (drupalSettings.hasOwnProperty('ad_entity') && drupalSettings.ad_entity.hasOwnProperty('fallback_timeout')) {
       timeout = drupalSettings.ad_entity.fallback_timeout;
     }

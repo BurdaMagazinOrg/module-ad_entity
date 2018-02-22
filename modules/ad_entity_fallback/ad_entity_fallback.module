@@ -61,7 +61,7 @@ function ad_entity_fallback_ad_entity_view_alter(array &$build, AdEntityInterfac
  * Implements hook_page_attachments().
  */
 function ad_entity_fallback_page_attachments(array &$page) {
-  $page['#attached']['drupalSettings']['ad_entity']['fallback_timeout'] = 500;
+  $page['#attached']['drupalSettings']['ad_entity']['fallback_timeout'] = 1000;
   if ($config = \Drupal::config('ad_entity.settings')) {
     $fallback_settings = $config->get('fallback');
     if (!empty($fallback_settings['timeout'])) {
