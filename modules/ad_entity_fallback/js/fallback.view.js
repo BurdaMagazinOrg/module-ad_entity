@@ -35,7 +35,7 @@
         correlationId = container.data('fallbackContainer');
         if (typeof correlationId !== 'undefined') {
           if (typeof correlated[correlationId] === 'undefined') {
-            correlated[correlationId] = { originalContainer: null, fallbackContainer: null };
+            correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
           }
           correlated[correlationId].originalContainer = container;
         }
@@ -44,7 +44,7 @@
           correlationId = container.data('fallbackContainerFor');
           if (typeof correlationId !== 'undefined') {
             if (typeof correlated[correlationId] === 'undefined') {
-              correlated[correlationId] = { originalContainer: null, fallbackContainer: null };
+              correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
             }
             correlated[correlationId].fallbackContainer = container;
           }
