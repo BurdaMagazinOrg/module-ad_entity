@@ -21,9 +21,10 @@
    */
   Drupal.ad_entity.context.addFrom = function (dom) {
     $('script[data-ad-entity-context]', dom).each(function () {
-      var context_object = JSON.parse($(this).html());
+      var $this = $(this);
+      var context_object = JSON.parse($this.html());
       Drupal.ad_entity.contextObjects.push(context_object);
-      context_object.remove();
+      $this.remove();
     });
   };
 

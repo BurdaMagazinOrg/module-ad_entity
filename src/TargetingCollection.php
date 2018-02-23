@@ -190,7 +190,7 @@ class TargetingCollection {
    *   The collection as a JSON-encoded string.
    */
   public function toJson() {
-    return Json::encode($this->collected);
+    return json_encode($this->collected, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
   /**

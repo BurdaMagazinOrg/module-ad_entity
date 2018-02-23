@@ -96,7 +96,7 @@ class DFPType extends AdTypeBase {
       foreach ($size_pairs as $pair) {
         $pair = trim($pair);
         $parts = explode('x', $pair);
-        $sizes[] = [trim($parts[0]), trim($parts[1])];
+        $sizes[] = [(int) $parts[0], (int) $parts[1]];
       }
       $encoded = str_replace('"', '', Json::encode($sizes));
       $ad_entity->setThirdPartySetting($provider, 'sizes', $encoded);

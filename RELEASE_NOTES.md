@@ -1,5 +1,9 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta8:
+- Bugfix: "context_object.remove is not a function"
+- Changed JSON formatted output to unescaped unicode and slashes.
+
 8.x-1.0-beta7:
 - Minor bugfix: Check on exisiting id of Ad container with typeof instructor.
 
