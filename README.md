@@ -133,13 +133,6 @@ if (\Drupal::hasService('ad_entity.context_manager')) {
 }
 ```
 
-**Please note** the following if you want to render manually via `render()`
-or when you create additional templates for your custom ads:
-Some variables need to be rendered raw without any HTML sanitization.
-Typical variables are JSON-encoded strings. Template variables which
-output an Advertising entity should therefore be associated
-with the raw filter. Twig example: `{{ my_custom_ad|raw }}`
-
 ## Manually initializing ads
 
 Advertising entities have the option to disable automatic initalization.
