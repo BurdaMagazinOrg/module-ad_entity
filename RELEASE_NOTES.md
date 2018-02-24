@@ -1,5 +1,9 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta9:
+- Ensure proper access to context data.
+NOTE: This is a security release. All sites are advised to update.
+
 8.x-1.0-beta8:
 - Bugfix: "context_object.remove is not a function"
 - Changed JSON formatted output to unescaped unicode and slashes.
@@ -12,12 +16,13 @@
   This bug caused multiple loading of ad slots in case the provider
   doesn't sufficiently care whether the slots already have been loaded before.
 - Removed Javascript behavior which created a new id for duplicate containers.
+  This behavior is obsolete and should be avoided since Advertising containers
+  must have a unique id provided by the backend system.
 
 8.x-1.0-beta5:
 - Javascript implementations have been refactored to improve load performance
   and to be more accessible for extending or manipulating behaviors.
 - Added a sub-module which provides the ability to load fallback Advertisement.
-
 NOTE: Code changes might affect your extensions or modifications.
 Take care of it when updating your codebase.
 

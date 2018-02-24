@@ -73,6 +73,8 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    *   The module handler.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer service.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
    */
