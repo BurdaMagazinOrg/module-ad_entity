@@ -6,6 +6,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
@@ -44,12 +45,13 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
       $container->get('ad_entity.context_manager'),
       $container->get('module_handler'),
       $container->get('renderer'),
+      $container->get('current_user'),
       $container->get('entity_type.manager')->getStorage('taxonomy_term')
     );
   }
 
   /**
-   * Constructs a new AdContextFormatter object.
+   * Constructs a new TaxonomyContextFormatterBase object.
    *
    * @param string $plugin_id
    *   The plugin_id for the formatter.
@@ -74,8 +76,8 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer, TermStorageInterface $term_storage) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $context_manager, $module_handler, $renderer);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer, AccountInterface $current_user, TermStorageInterface $term_storage) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $context_manager, $module_handler, $renderer, $current_user);
     $this->termStorage = $term_storage;
     $this->nodeTerms = [];
   }
@@ -90,20 +92,21 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    *   The list as object when items were found, or an empty item list.
    */
   protected function getOverrideItems(FieldItemListInterface $items) {
-    if (!$items->isEmpty()) {
+    $term = $items->getEntity();
+    $accessible = $term->access('view', $this->currentUser);
+    if (!$items->isEmpty() && $accessible) {
       return $items;
     }
-    $term = $items->getEntity();
+
     $field_name = $items->getFieldDefinition()->get('field_name');
     $parents = $this->termStorage->loadParents($term->id());
     foreach ($parents as $parent) {
-      if ($parent_items = $parent->get($field_name)) {
-        if (!$parent_items->isEmpty()) {
-          return $parent_items;
-        }
-        return $this->getOverrideItems($parent_items);
+      $parent_items = $this->getOverrideItems($parent->get($field_name));
+      if (!$parent_items->isEmpty()) {
+        return $parent_items;
       }
     }
+
     return $items;
   }
 

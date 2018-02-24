@@ -47,13 +47,12 @@ class NodeWithTreeOverrideContextFormatter extends TaxonomyContextFormatterBase 
             $this->contextManager->addInvolvedEntity($parent);
           }
           $field_name = $definition->getName();
-          if ($term_items = $term->get($field_name)) {
-            $aggregated_items[] = $term_items;
-            if ($term_items->isEmpty()) {
-              $override_items = $this->getOverrideItems($term_items);
-              if (!$override_items->isEmpty()) {
-                $aggregated_items[] = $this->getOverrideItems($term_items);
-              }
+          $term_items = $term->get($field_name);
+          $aggregated_items[] = $term_items;
+          if ($term_items->isEmpty()) {
+            $override_items = $this->getOverrideItems($term_items);
+            if (!$override_items->isEmpty()) {
+              $aggregated_items[] = $override_items;
             }
           }
         }

@@ -36,12 +36,16 @@ class TreeAggregationContextFormatter extends TaxonomyContextFormatterBase {
     $element = [];
 
     $term = $items->getEntity();
+    $term_id = $term->id();
     $field_name = $items->getFieldDefinition()->get('field_name');
-    $aggregated_items = [];
+    $aggregated_items = [$items];
     // ::loadAllParents() already includes the term itself.
-    foreach ($this->termStorage->loadAllParents($term->id()) as $parent) {
+    $parents = $this->termStorage->loadAllParents($term_id);
+    unset($parents[$term_id]);
+    foreach ($parents as $parent) {
       $this->renderer->addCacheableDependency($element, $parent);
-      if ($parent_items = $parent->get($field_name)) {
+      $parent_items = $parent->get($field_name);
+      if (!$parent_items->isEmpty()) {
         $aggregated_items[] = $parent_items;
       }
     }

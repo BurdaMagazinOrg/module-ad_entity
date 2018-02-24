@@ -46,9 +46,8 @@ class NodeWithTreeAggregationContextFormatter extends TaxonomyContextFormatterBa
           $field_name = $definition->getName();
           foreach ($this->termStorage->loadAllParents($tid) as $parent) {
             $this->renderer->addCacheableDependency($element, $parent);
-            if ($parent_items = $parent->get($field_name)) {
-              $aggregated_items[] = $parent_items;
-            }
+            $parent_items = $parent->get($field_name);
+            $aggregated_items[] = $parent_items;
           }
         }
       }

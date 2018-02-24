@@ -10,6 +10,7 @@ use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\ad_entity\Plugin\AdContextManager;
 
@@ -40,6 +41,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected $renderer;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -53,12 +61,13 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       $configuration['third_party_settings'],
       $container->get('ad_entity.context_manager'),
       $container->get('module_handler'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('current_user')
     );
   }
 
   /**
-   * Constructs a new AdContextFormatter object.
+   * Constructs a new ContextFormatterBase object.
    *
    * @param string $plugin_id
    *   The plugin_id for the formatter.
@@ -80,12 +89,15 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    *   The module handler.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer service.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AdContextManager $context_manager, ModuleHandlerInterface $module_handler, Renderer $renderer, AccountInterface $current_user) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->contextManager = $context_manager;
     $this->moduleHandler = $module_handler;
     $this->renderer = $renderer;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -162,6 +174,7 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    */
   protected function includeForAppliance(FieldItemListInterface $items) {
     $element = [];
+
     $appliance_mode = $this->getSetting('appliance_mode');
     // Other components might want to manipulate the list,
     // which should be only valid in the scope of this function.
@@ -171,20 +184,25 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
     $this->moduleHandler
       ->invokeAll('ad_context_include', [$items, $this->getSettings()]);
 
-    if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
-      foreach ($items as $item) {
-        $element[] = $this->buildElementFromItem($item);
-      }
-    }
+    $entity = $items->getEntity();
+    $accessible = $entity->access('view', $this->currentUser);
 
-    if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
-      foreach ($items as $item) {
-        $this->addItemToContextData($item);
+    if ($accessible) {
+      if ($appliance_mode == 'frontend' || $appliance_mode == 'both') {
+        foreach ($items as $item) {
+          $element[] = $this->buildElementFromItem($item);
+        }
+      }
+
+      if ($appliance_mode == 'backend' || $appliance_mode == 'both') {
+        foreach ($items as $item) {
+          $this->addItemToContextData($item);
+        }
       }
     }
 
     // Inform the context manager that the entity could have provided context.
-    $this->contextManager->addInvolvedEntity($items->getEntity());
+    $this->contextManager->addInvolvedEntity($entity);
 
     return $element;
   }

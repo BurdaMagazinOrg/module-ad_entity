@@ -44,9 +44,8 @@ class NodeWithTermsContextFormatter extends TaxonomyContextFormatterBase {
         if ($definition->getType() == 'ad_entity_context') {
           $this->renderer->addCacheableDependency($element, $term);
           $field_name = $definition->getName();
-          if ($term_items = $term->get($field_name)) {
-            $aggregated_items[] = $term_items;
-          }
+          $term_items = $term->get($field_name);
+          $aggregated_items[] = $term_items;
         }
       }
     }
