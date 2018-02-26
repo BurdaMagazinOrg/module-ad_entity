@@ -37,7 +37,8 @@
                 if (!($.isArray(context_targeting[key]))) {
                   context_targeting[key] = [context_targeting[key]];
                 }
-                for (var i = 0; i < context_targeting[key].length; i++) {
+                var item_length = context_targeting[key].length;
+                for (var i = 0; i < item_length; i++) {
                   if ($.inArray(context_targeting[key][i], targeting[key]) < 0) {
                     targeting[key].push(context_targeting[key][i]);
                   }

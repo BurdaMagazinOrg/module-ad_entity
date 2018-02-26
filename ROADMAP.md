@@ -6,6 +6,7 @@
   List of known major problems:
     - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7 [fixed]
     - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/12
+    - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/17
 
 8.x-1.0-alpha:
 

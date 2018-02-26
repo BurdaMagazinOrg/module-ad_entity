@@ -72,7 +72,8 @@
       if (containers.hasOwnProperty(id)) {
         var container = containers[id];
         var variant = container.data('adEntityVariant');
-        for (var i = 0; i < variant.length; i++) {
+        var variant_length = variant.length;
+        for (var i = 0; i < variant_length; i++) {
           if (!($.inArray(variant[i], scope) < 0)) {
             in_scope[id] = container;
             if (container.data('inScope') !== true) {
