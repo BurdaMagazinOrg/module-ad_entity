@@ -6,10 +6,10 @@
  */
 
 /**
- * Implements template_preprocess_page().
+ * Implements hook_page_attachments().
  */
-function ad_entity_dfp_preprocess_page(&$variables) {
-  $variables['#attached']['library'][] = 'ad_entity_dfp/provider';
+function ad_entity_dfp_page_attachments(&$attachments) {
+  $attachments['#attached']['library'][] = 'ad_entity_dfp/provider';
 }
 
 /**

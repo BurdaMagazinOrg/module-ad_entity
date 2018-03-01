@@ -30,17 +30,17 @@ function ad_entity_adtech_library_info_build() {
 }
 
 /**
- * Implements template_preprocess_page().
+ * Implements hook_page_attachments().
  */
-function ad_entity_adtech_preprocess_page(&$variables) {
+function ad_entity_adtech_page_attachments(&$attachments) {
   if ($config = \Drupal::config('ad_entity.settings')) {
     $settings = $config->get('adtech_factory');
     if (!empty($settings['page_targeting'])) {
-      $variables['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
-      $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $settings['page_targeting'];
+      $attachments['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
+      $attachments['#attached']['drupalSettings']['adtech_page_targeting'] = $settings['page_targeting'];
     }
     else {
-      $variables['#attached']['library'][] = 'ad_entity_adtech/provider';
+      $attachments['#attached']['library'][] = 'ad_entity_adtech/provider';
     }
   }
 }
