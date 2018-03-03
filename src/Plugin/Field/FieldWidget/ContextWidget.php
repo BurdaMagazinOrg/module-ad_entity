@@ -148,7 +148,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
     // Build the settings form elements for the context plugins.
     $context_settings = [];
     foreach ($context_definitions as $id => $definition) {
-      $context_plugin = $this->contextManager->createInstance($id);
+      $context_plugin = $this->contextManager->loadContextPlugin($id);
       $item_settings = $context_item->get('context_settings')->getValue();
       $plugin_settings = !empty($item_settings[$id]) ? $item_settings[$id] : [];
       $context_settings[$id] = [
@@ -180,7 +180,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
         // Let the context plugin massage its settings for storage and output.
         $id = $value['context']['context_plugin_id'];
         if ($this->contextManager->hasDefinition($id)) {
-          $context_plugin = $this->contextManager->createInstance($id);
+          $context_plugin = $this->contextManager->loadContextPlugin($id);
           $plugin_settings = !empty($value['context']['context_settings'][$id]) ?
             $value['context']['context_settings'][$id] : [];
           $plugin_settings = $context_plugin->massageSettings($plugin_settings);

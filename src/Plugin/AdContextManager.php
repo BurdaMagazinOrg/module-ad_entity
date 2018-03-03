@@ -27,6 +27,13 @@ class AdContextManager extends DefaultPluginManager {
   protected $contextData;
 
   /**
+   * A list of instantiated context plugins.
+   *
+   * @var \Drupal\ad_entity\Plugin\AdContextInterface[]
+   */
+  protected $contextPlugins;
+
+  /**
    * An array holding previously collected context data.
    *
    * @var array
@@ -88,6 +95,32 @@ class AdContextManager extends DefaultPluginManager {
     $this->previouslyInvolvedEntities = [];
     $this->setContextData([]);
     $this->setInvolvedEntities([]);
+  }
+
+  /**
+   * Loads a context plugin instance.
+   *
+   * In contrast to ::createInstance(), this method
+   * makes use of in-memory caching for instances.
+   * Context plugins usually don't require configuration,
+   * so it should be fine to reuse already created instances.
+   *
+   * @param string $plugin_id
+   *   The ID of the context plugin.
+   * @param array $configuration
+   *   (Optional) Bypasses in-memory caching if not empty.
+   *
+   * @return \Drupal\ad_entity\Plugin\AdContextInterface
+   *   The instance of the context plugin.
+   */
+  public function loadContextPlugin($plugin_id, array $configuration = []) {
+    if (empty($configuration)) {
+      if (!isset($this->contextPlugins[$plugin_id])) {
+        $this->contextPlugins[$plugin_id] = $this->createInstance($plugin_id);
+      }
+      return $this->contextPlugins[$plugin_id];
+    }
+    return $this->createInstance($plugin_id, $configuration);
   }
 
   /**
