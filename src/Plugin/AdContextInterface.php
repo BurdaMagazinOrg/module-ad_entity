@@ -47,6 +47,7 @@ interface AdContextInterface extends PluginInspectionInterface {
    *
    * @param array $context_data
    *   The context data array to serialize.
+   *
    * @return string
    *   A JSON-encoded string representation of the context data.
    */
@@ -57,6 +58,7 @@ interface AdContextInterface extends PluginInspectionInterface {
    *
    * @param string $context_data
    *   The JSON-encoded context data to deserialize.
+   *
    * @return array|null
    *   The decoded context data.
    */
