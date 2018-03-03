@@ -99,7 +99,7 @@ class AdContextManager extends DefaultPluginManager {
    *   (Optional) An array of corresponding settings for the context.
    * @param array $apply_on
    *   (Optional) An array of Advertising entity ids where to apply the context.
-   *   When empty, the context may be applied on all available ads.
+   *   When empty, the context can be applied on all available ads.
    */
   public function addContextData($plugin_id, array $settings = [], array $apply_on = []) {
     $this->contextData[$plugin_id][] = [
@@ -140,6 +140,10 @@ class AdContextManager extends DefaultPluginManager {
   /**
    * Returns a list of backend context data for the given Advertising entity id.
    *
+   * The result does not include data of third party providers.
+   * If you want to have third party settings included,
+   * use AdEntity::getContextData() instead.
+   *
    * @param string $ad_entity_id
    *   The id (machine name) of the Advertising entity.
    *
@@ -178,6 +182,10 @@ class AdContextManager extends DefaultPluginManager {
 
   /**
    * Returns a list of context data for given plugin and Advertising entity id.
+   *
+   * The result does not include data of third party providers.
+   * If you want to have third party settings included,
+   * use AdEntity::getContextDataForPlugin() instead.
    *
    * @param string $plugin_id
    *   The context plugin id.

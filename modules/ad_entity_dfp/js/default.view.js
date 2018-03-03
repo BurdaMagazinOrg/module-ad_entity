@@ -27,13 +27,13 @@
           this.numberOfAds++;
           var container = containers[id];
           var ad_tag = $('.google-dfp-ad', container[0]);
-          this.defineAndDisplay(ad_tag, this.numberOfAds.toString(), onPageLoad);
+          this.defineAndDisplay(ad_tag, this.numberOfAds.toString(), onPageLoad, container);
           this.addEventsFor(ad_tag, container);
         }
       }
     },
     detach: function (containers, context, settings) {},
-    defineAndDisplay: function (ad_tag, slotNumber, onPageLoad) {
+    defineAndDisplay: function (ad_tag, slotNumber, onPageLoad, container) {
       googletag.cmd.push(function () {
         var ad_id = ad_tag.attr('id');
         var network_id = ad_tag.data('dfpNetwork');
@@ -44,7 +44,7 @@
         }
 
         var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
-        var targeting = ad_tag.data('adEntityTargeting');
+        var targeting = container.data('adEntityTargeting');
 
         $window.trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
 

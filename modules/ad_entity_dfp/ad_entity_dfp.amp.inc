@@ -50,9 +50,8 @@ function template_preprocess_dfp_amp(array &$variables) {
   if (!empty($settings['amp']['same_domain_rendering'])) {
     $json['useSameDomainRenderingUntilDeprecated'] = 1;
   }
+  // Insert targeting from backend context data.
   $targeting_collection = $ad_entity->getTargetingFromContextData();
-  // Merge the targeting.
-  $targeting_collection->collectFromJson($settings['targeting']);
   if (!$targeting_collection->isEmpty()) {
     $json['targeting'] = $targeting_collection->toArray();
   }

@@ -2,7 +2,6 @@
 
 namespace Drupal\ad_entity;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 
 /**
@@ -22,7 +21,7 @@ class TargetingCollection {
       $this->collected = $info;
     }
     elseif (is_string($info)) {
-      $this->collected = Json::decode($info);
+      $this->collected = json_decode($info, TRUE);
     }
     else {
       $this->collected = [];
@@ -190,6 +189,7 @@ class TargetingCollection {
    *   The collection as a JSON-encoded string.
    */
   public function toJson() {
+    // Encoding must be the same as TargetingContext::getJsonString().
     return json_encode($this->collected, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 

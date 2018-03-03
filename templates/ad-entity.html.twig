@@ -1,5 +1,5 @@
 {% if container == "html" %}
-  <div{{ attributes }} data-ad-entity-variant='{{ variant|raw }}'>{{ content }}</div>
+  <div{{ attributes }} data-ad-entity-variant='{{ variant|raw }}' data-ad-entity-targeting='{{ targeting|raw }}'>{{ content }}</div>
 {% elseif container == "fia" %}
   <figure class="op-ad">{{ content }}</figure>
 {% else %}

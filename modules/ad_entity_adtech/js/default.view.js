@@ -27,7 +27,7 @@
             var container = containers[id];
             var ad_tag = $('.adtech-factory-ad', container[0]);
             var argument = {element: ad_tag[0]};
-            var targeting = ad_tag.data('adEntityTargeting');
+            var targeting = container.data('adEntityTargeting');
             if (typeof targeting === 'object') {
               argument.targeting = targeting;
             }

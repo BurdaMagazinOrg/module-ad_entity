@@ -35,13 +35,10 @@ function template_preprocess_adtech_iframe(array &$variables) {
   if (!empty($settings['iframe'])) {
     $variables['iframe'] = $settings['iframe'];
   }
+
+  // Insert targeting from backend context data.
   $targeting_collection = $ad_entity->getTargetingFromContextData();
-  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
-    $variables['targeting'] = $settings['targeting'];
-  }
-  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
-    // Merge the targeting.
-    $targeting_collection->collectFromJson($settings['targeting']);
+  if (!$targeting_collection->isEmpty()) {
     $variables['targeting'] = $targeting_collection->toJson();
   }
   else {

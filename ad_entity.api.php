@@ -55,7 +55,7 @@ function hook_ad_context_include(\Drupal\Core\Field\FieldItemListInterface $item
  * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
  *   The manager for Advertising context plugins and backend context data.
  * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for which the context data has been reset.
+ *   The entity, e.g. a node, for which the context data has been reset.
  */
 function hook_ad_context_data_reset(\Drupal\ad_entity\Plugin\AdContextManager $context_manager, \Drupal\Core\Entity\EntityInterface $entity) {
   $context_manager

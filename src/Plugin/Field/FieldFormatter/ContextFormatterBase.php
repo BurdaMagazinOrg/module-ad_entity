@@ -224,6 +224,7 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
           '#theme' => 'ad_entity_context',
           '#item' => $context_item,
           '#definition' => $this->contextManager->getDefinition($id),
+          '#plugin' => $this->contextManager->createInstance($id),
         ];
       }
     }

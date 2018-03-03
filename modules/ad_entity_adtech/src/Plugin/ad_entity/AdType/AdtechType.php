@@ -4,6 +4,7 @@ namespace Drupal\ad_entity_adtech\Plugin\ad_entity\AdType;
 
 use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdTypeBase;
+use Drupal\ad_entity\Plugin\ad_entity\AdContext\TargetingContext;
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -119,13 +120,18 @@ class AdtechType extends AdTypeBase {
       '#required' => TRUE,
     ];
 
-    $targeting = !empty($settings['targeting']) && !$ad_entity->isNew() ?
-      new TargetingCollection($settings['targeting']) : $this->defaultTargeting();
+    $context = !empty($settings['targeting']) ?
+      TargetingContext::getJsonDecode($settings['targeting']) : [];
+    $targeting = isset($context['targeting']) ?
+      new TargetingCollection($context['targeting']) : NULL;
+    if (!isset($targeting) && $ad_entity->isNew()) {
+      $targeting = $this->defaultTargeting();
+    }
     $element['targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Default targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the ad tag. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
-      '#default_value' => $targeting->toUserOutput(),
+      '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
     ];
 
     return $element;
@@ -138,14 +144,20 @@ class AdtechType extends AdTypeBase {
     $provider = $this->getPluginDefinition()['provider'];
     $values = $form_state->getValue(['third_party_settings', $provider]);
 
-    if (!empty($values['targeting'])) {
-      // Convert the targeting to a JSON-encoded string.
+    $targeting_empty = TRUE;
+    $targeting_value = trim($values['targeting']);
+    if (!empty($targeting_value)) {
+      // Serialize the default targeting as context data.
       $targeting = new TargetingCollection();
-      $targeting->collectFromUserInput($values['targeting']);
-      $ad_entity->setThirdPartySetting($provider, 'targeting', $targeting->toJson());
+      $targeting->collectFromUserInput($targeting_value);
+      if (!$targeting->isEmpty()) {
+        $context_data = TargetingContext::getJsonEncode(['targeting' => $targeting->toArray()]);
+        $ad_entity->setThirdPartySetting($provider, 'targeting', $context_data);
+        $targeting_empty = FALSE;
+      }
     }
-    else {
-      $ad_entity->setThirdPartySetting($provider, 'targeting', '{}');
+    if ($targeting_empty) {
+      $ad_entity->setThirdPartySetting($provider, 'targeting', NULL);
     }
   }
 

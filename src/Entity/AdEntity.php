@@ -84,6 +84,13 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
   protected $services;
 
   /**
+   * A list of third party context data.
+   *
+   * @var array
+   */
+  protected $thirdPartyContext;
+
+  /**
    * Get the handler which delivers any required service.
    *
    * @return \Drupal\ad_entity\AdEntityServices
@@ -200,16 +207,39 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    * {@inheritdoc}
    */
   public function getContextData() {
-    return $this->services()->getContextManager()
+    $context_data = $this->services()->getContextManager()
       ->getContextDataForEntity($this->id());
+
+    // Also include context data by third party providers.
+    foreach ($this->getThirdPartyContextData() as $third_party_data) {
+      foreach ($third_party_data as $plugin_id => $settings) {
+        if (isset($context_data[$plugin_id])) {
+          $context_data[$plugin_id] = array_merge($context_data[$plugin_id], $settings);
+        }
+        else {
+          $context_data[$plugin_id] = $settings;
+        }
+      }
+    }
+
+    return $context_data;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getContextDataForPlugin($plugin_id) {
-    return $this->services()->getContextManager()
+    $context_data = $this->services()->getContextManager()
       ->getContextDataForPluginAndEntity($plugin_id, $this->id());
+
+    // Also include plugin data by third party providers.
+    foreach ($this->getThirdPartyContextData() as $third_party_data) {
+      if (isset($third_party_data[$plugin_id])) {
+        $context_data = array_merge($context_data, $third_party_data[$plugin_id]);
+      }
+    }
+
+    return $context_data;
   }
 
   /**
@@ -217,12 +247,59 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
    */
   public function getTargetingFromContextData() {
     $collection = new TargetingCollection();
-    $data = $this->services()->getContextManager()
-      ->getContextDataForPluginAndEntity('targeting', $this->id());
+    $data = $this->getContextDataForPlugin('targeting');
     foreach ($data as $settings) {
       $collection->collectFromCollection(new TargetingCollection($settings['targeting']));
     }
     return $collection;
+  }
+
+  /**
+   * Get context data by third party providers.
+   *
+   * @return array
+   *   The backend context data, grouped by module provider.
+   */
+  public function getThirdPartyContextData() {
+    if (!isset($this->thirdPartyContext)) {
+      $context_data = [];
+      $context_manager = $this->services()->getContextManager();
+      $context_plugins = $context_manager->getDefinitions();
+      if (!empty($context_plugins)) {
+        foreach ($this->getThirdPartyProviders() as $provider) {
+          $settings = $this->getThirdPartySettings($provider);
+          if (empty($settings) || !is_array($settings)) {
+            continue;
+          }
+          foreach ($settings as $key => $value) {
+            if (!isset($context_plugins[$key]) || empty($value)) {
+              continue;
+            }
+            if (!is_array($value)) {
+              $decoder = $context_plugins[$key]['class'] . '::getJsonDecode';
+              $value = call_user_func($decoder, $value);
+            }
+            if (empty($value)) {
+              $value = [];
+            }
+            $context_data[$provider][$key][] = $value;
+          }
+        }
+      }
+      $this->thirdPartyContext = $context_data;
+    }
+
+    return $this->thirdPartyContext;
+  }
+
+  /**
+   * Set third party context data.
+   *
+   * @param array $context_data
+   *   An array to be set as third party context data.
+   */
+  public function setThirdPartyContextData(array $context_data) {
+    $this->thirdPartyContext = $context_data;
   }
 
 }

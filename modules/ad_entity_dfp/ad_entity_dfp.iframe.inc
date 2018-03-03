@@ -28,13 +28,9 @@ function template_preprocess_dfp_iframe(array &$variables) {
 
   $variables['slot_id'] = '/' . $settings['network_id'] . '/' . $settings['unit_id'];
 
+  // Insert targeting from backend context data.
   $targeting_collection = $ad_entity->getTargetingFromContextData();
-  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
-    $variables['targeting'] = $settings['targeting'];
-  }
-  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
-    // Merge the targeting.
-    $targeting_collection->collectFromJson($settings['targeting']);
+  if (!$targeting_collection->isEmpty()) {
     $variables['targeting'] = $targeting_collection->toJson();
   }
   else {

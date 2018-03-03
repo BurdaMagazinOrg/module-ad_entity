@@ -28,6 +28,9 @@ interface AdEntityInterface extends ConfigEntityInterface {
   /**
    * Get a list of backend context data for this Advertising entity.
    *
+   * In contrast to AdContextManager::getContextDataForEntity(),
+   * this method also includes context data from third party providers.
+   *
    * @return array
    *   The list of available backend context data for the Advertising entity.
    */
@@ -35,6 +38,9 @@ interface AdEntityInterface extends ConfigEntityInterface {
 
   /**
    * Get a list of backend context data for a given plugin id and this entity.
+   *
+   * In contrast to AdContextManager::getContextDataForPluginAndEntity(),
+   * this method also includes context data from third party providers.
    *
    * @param string $plugin_id
    *   The context plugin id.

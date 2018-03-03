@@ -1,1 +1,1 @@
-<script type="application/json" data-ad-entity-context="{{ context_id }}">{{ context|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+<script type="application/json" data-ad-entity-context="{{ context_id }}">{{ plugin.JsonEncode(context)|raw }}</script>

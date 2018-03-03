@@ -17,6 +17,25 @@ use Drupal\Component\Utility\Crypt;
 function template_preprocess_ad_entity(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
   $ad_entity = $variables['ad_entity'];
+  $view_handler = $ad_entity->getViewPlugin();
+
+  if (empty($view_handler)) {
+    // Without a view handler, there's no output definition.
+    return;
+  }
+
+  $definition = $view_handler->getPluginDefinition();
+  // Pass through information about which container to use.
+  $variables['container'] = $definition['container'];
+
+  // Let the assigned view handler build the content.
+  $variables['content'] = $view_handler->build($ad_entity);
+
+  // It only makes sense to generate attributes and assets
+  // when the ad container is being rendered as Html.
+  if ($variables['container'] !== 'html') {
+    return;
+  }
 
   // Generate attributes.
   $id = 'ad-entity-' . Crypt::randomBytesBase64(8);
@@ -44,19 +63,20 @@ function template_preprocess_ad_entity(array &$variables) {
   }
   $variables['attributes'] = $attributes;
 
+  // Insert targeting from backend context data.
+  $targeting_collection = $ad_entity->getTargetingFromContextData();
+  if (!$targeting_collection->isEmpty()) {
+    $variables['targeting'] = $targeting_collection->toJson();
+  }
+  else {
+    $variables['targeting'] = '{}';
+  }
+
   // Attach the fundamental JS implementation for viewing Advertising entities.
   $variables['#attached']['library'][] = 'ad_entity/view';
-
-  if ($view_handler = $ad_entity->getViewPlugin()) {
-    $definition = $view_handler->getPluginDefinition();
-    // Pass through information about which container to use.
-    $variables['container'] = $definition['container'];
-    // Let the assigned view handler build the content.
-    $variables['content'] = $view_handler->build($ad_entity);
-    // Attach the JS implementation for the view handler.
-    if (!empty($definition['library'])) {
-      $variables['#attached']['library'][] = $definition['library'];
-    }
+  // Attach the JS implementation for the view handler.
+  if (!empty($definition['library'])) {
+    $variables['#attached']['library'][] = $definition['library'];
   }
 }
 

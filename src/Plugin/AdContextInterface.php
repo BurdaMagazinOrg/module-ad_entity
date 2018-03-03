@@ -42,4 +42,24 @@ interface AdContextInterface extends PluginInspectionInterface {
    */
   public function massageSettings(array $plugin_settings);
 
+  /**
+   * Handles proper JSON encoding on the given context data.
+   *
+   * @param array $context_data
+   *   The context data array to serialize.
+   * @return string
+   *   A JSON-encoded string representation of the context data.
+   */
+  public static function getJsonEncode(array $context_data);
+
+  /**
+   * Handles proper JSON decoding on the given context data.
+   *
+   * @param string $context_data
+   *   The JSON-encoded context data to deserialize.
+   * @return array|null
+   *   The decoded context data.
+   */
+  public static function getJsonDecode($context_data);
+
 }

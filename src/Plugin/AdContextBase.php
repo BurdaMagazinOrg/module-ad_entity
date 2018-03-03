@@ -24,6 +24,26 @@ abstract class AdContextBase extends PluginBase implements AdContextInterface, C
   /**
    * {@inheritdoc}
    */
+  public static function getJsonEncode(array $context_data) {
+    return json_encode($context_data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getJsonDecode($context_data) {
+    $context_data = json_decode($context_data, TRUE);
+    if (is_array($context_data)) {
+      return $context_data;
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,

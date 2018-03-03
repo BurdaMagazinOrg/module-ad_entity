@@ -26,7 +26,11 @@ function ad_entity_theme($existing, $type, $theme, $path) {
       'file' => 'ad_entity.theme.inc',
     ],
     'ad_entity_context' => [
-      'variables' => ['item' => NULL, 'definition' => []],
+      'variables' => [
+        'item' => NULL,
+        'definition' => [],
+        'plugin' => NULL,
+      ],
       'file' => 'ad_entity.theme.inc',
     ],
   ];
@@ -109,6 +113,7 @@ function ad_entity_entity_prepare_view($entity_type_id, array $entities, array $
       // In case of multiple entities to view, a fallback needs to be provided.
       // This fallback can only include the information by the route entity.
       // @todo Find a proper way for list items defining their own context data.
+      // @see https://www.drupal.org/project/ad_entity/issues/2947877
       $route_match = NULL;
       try {
         $route_match = \Drupal::routeMatch();

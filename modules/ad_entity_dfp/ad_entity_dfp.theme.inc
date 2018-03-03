@@ -28,19 +28,6 @@ function template_preprocess_dfp_default(array &$variables) {
   $attributes->setAttribute('data-dfp-unit', $settings['unit_id']);
   $variables['attributes'] = $attributes;
 
-  $targeting_collection = $ad_entity->getTargetingFromContextData();
-  if (!empty($settings['targeting']) && $targeting_collection->isEmpty()) {
-    $variables['targeting'] = $settings['targeting'];
-  }
-  elseif (!empty($settings['targeting']) && !$targeting_collection->isEmpty()) {
-    // Merge the targeting.
-    $targeting_collection->collectFromJson($settings['targeting']);
-    $variables['targeting'] = $targeting_collection->toJson();
-  }
-  else {
-    $variables['targeting'] = '{}';
-  }
-
   if (!empty($settings['sizes'])) {
     $variables['sizes'] = $settings['sizes'];
   }
