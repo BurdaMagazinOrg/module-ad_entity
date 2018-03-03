@@ -26,6 +26,8 @@ function template_preprocess_dfp_default(array &$variables) {
   $attributes->addClass('dfp-default-view');
   $attributes->setAttribute('data-dfp-network', $settings['network_id']);
   $attributes->setAttribute('data-dfp-unit', $settings['unit_id']);
+  $out_of_page = !empty($settings['out_of_page']) ? 'true' : 'false';
+  $attributes->setAttribute('data-dfp-out-of-page', $out_of_page);
   $variables['attributes'] = $attributes;
 
   if (!empty($settings['sizes'])) {

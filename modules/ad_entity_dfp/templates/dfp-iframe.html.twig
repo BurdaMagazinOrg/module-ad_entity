@@ -8,7 +8,11 @@
       var googletag = googletag || {};
       googletag.cmd = googletag.cmd || [];
       googletag.cmd.push(function () {
+      {% if out_of_page %}
+        var slot = googletag.defineOutOfPageSlot("{{- slot_id -}}", "{{- attributes.id -}}");
+      {% else %}
         var slot = googletag.defineSlot("{{- slot_id -}}", {{ sizes|raw }}, "{{- attributes.id -}}");
+      {% endif %}
         slot.addService(googletag.pubads());
         var targeting = {{ targeting|raw }};
         for (var key in targeting) {

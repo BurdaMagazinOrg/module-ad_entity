@@ -43,6 +43,13 @@ class DFPType extends AdTypeBase {
       '#required' => TRUE,
     ];
 
+    $element['out_of_page'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->stringTranslation->translate("Define as out of page slot"),
+      '#description' => $this->stringTranslation->translate("Out of page slots don't require or use any ad size formats. <strong>Not supported</strong> on Accelerated Mobile Pages. Click <a href='@url' target='_blank' rel='noopener noreferrer'>here</a> to find out more about out of page slots.", ['@url' => 'https://support.google.com/dfp_premium/answer/6088046?hl=en']),
+      '#default_value' => !empty($settings['out_of_page']) ? 1 : 0,
+    ];
+
     // Convert sizes settings to user-input format.
     $sizes_default = [];
     if (!empty($settings['sizes'])) {
@@ -55,10 +62,14 @@ class DFPType extends AdTypeBase {
     $element['sizes'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Ad size formats"),
-      '#description' => $this->stringTranslation->translate("Example: <strong>300x600,300x250</strong>. For Out Of Page slots, use 0x0"),
+      '#description' => $this->stringTranslation->translate("Separate multiple sizes with comma. Example: <strong>300x600,300x250</strong>."),
       '#default_value' => $sizes_default,
-      '#sizes' => 40,
-      '#required' => TRUE,
+      '#size' => 40,
+      '#states' => [
+        'disabled' => [
+          'input[data-drupal-selector="edit-third-party-settings-ad-entity-dfp-out-of-page"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $context = !empty($settings['targeting']) ?
@@ -98,9 +109,10 @@ class DFPType extends AdTypeBase {
       $ad_entity->setThirdPartySetting($provider, 'targeting', NULL);
     }
 
-    if (!empty($values['sizes'])) {
+    $sizes_value = trim($values['sizes']);
+    if (!empty($sizes_value)) {
       // Convert the user-input of sizes to a proper format.
-      $size_pairs = explode(',', $values['sizes']);
+      $size_pairs = explode(',', $sizes_value);
       $sizes = [];
       foreach ($size_pairs as $pair) {
         $pair = trim($pair);
@@ -110,6 +122,11 @@ class DFPType extends AdTypeBase {
       $encoded = str_replace('"', '', Json::encode($sizes));
       $ad_entity->setThirdPartySetting($provider, 'sizes', $encoded);
     }
+    else {
+      $ad_entity->setThirdPartySetting($provider, 'sizes', NULL);
+    }
+
+    $ad_entity->setThirdPartySetting($provider, 'out_of_page', !empty($values['out_of_page']));
   }
 
 }

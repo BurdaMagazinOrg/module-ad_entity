@@ -26,6 +26,8 @@ function template_preprocess_dfp_iframe(array &$variables) {
   $attributes->addClass('dfp-iframe-view');
   $variables['attributes'] = $attributes;
 
+  $variables['out_of_page'] = !empty($settings['out_of_page']);
+
   $variables['slot_id'] = '/' . $settings['network_id'] . '/' . $settings['unit_id'];
 
   // Insert targeting from backend context data.

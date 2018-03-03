@@ -38,21 +38,30 @@
         var ad_id = ad_tag.attr('id');
         var network_id = ad_tag.data('dfpNetwork');
         var unit_id = ad_tag.data('dfpUnit');
-        var sizes = ad_tag.data('dfpSizes');
-        if (typeof sizes !== 'object') {
-          sizes = [];
+        var out_of_page = ad_tag.data('dfpOutOfPage');
+
+        var slot;
+        if (out_of_page === true) {
+          slot = googletag.defineOutOfPageSlot('/' + network_id + '/' + unit_id, ad_id);
+        }
+        else {
+          var sizes = ad_tag.data('dfpSizes');
+          if (typeof sizes !== 'object') {
+            sizes = [];
+          }
+          slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
         }
 
-        var slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
         var targeting = container.data('adEntityTargeting');
+        if (typeof targeting !== 'object') {
+          targeting = {};
+        }
 
         $window.trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
 
-        if (typeof targeting === 'object') {
-          for (var key in targeting) {
-            if (targeting.hasOwnProperty(key)) {
-              slot.setTargeting(key, targeting[key]);
-            }
+        for (var key in targeting) {
+          if (targeting.hasOwnProperty(key)) {
+            slot.setTargeting(key, targeting[key]);
           }
         }
         slot.setTargeting('slotNumber', slotNumber);
