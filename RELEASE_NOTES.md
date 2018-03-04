@@ -1,5 +1,16 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta10:
+- Fixed #2949411 by Cecilina: Js Missing Out of Page Ads define
+- Fixed #2947876 - Processing of targeting currently requires
+  at least one DOM query on each container element. This has been solved
+  by moving targeting handling into the Advertising container.
+- Optimization: Added in-memory caching of context plugins.
+- Third party providers are now able to define context data.
+NOTE: Contains API changes, which might affect your extensions or modifications.
+Take care of it when updating your codebase. Export your configuration after
+running database updates.
+
 8.x-1.0-beta9:
 - Ensure proper access to context data.
 NOTE: This is a security release. All sites are advised to update.
