@@ -2,15 +2,13 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\ad_entity\Form\AdContextElement;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Component\Utility\Crypt;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\ad_entity\Plugin\AdContextManager;
 
 /**
  * Plugin implementation of the 'ad_entity_context' field widget.
@@ -26,36 +24,29 @@ use Drupal\ad_entity\Plugin\AdContextManager;
 class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The Advertising context manager.
+   * The context form element builder.
    *
-   * @var \Drupal\ad_entity\Plugin\AdContextManager
+   * @var \Drupal\ad_entity\Form\AdContextElement
    */
-  protected $contextManager;
-
-  /**
-   * The storage for Advertising entities.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $adEntityStorage;
+  protected $elementBuilder;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $context_element_builder = AdContextElement::create($container);
     return new static(
       $plugin_id,
       $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('ad_entity.context_manager'),
-      $container->get('entity_type.manager')->getStorage('ad_entity')
+      $context_element_builder
     );
   }
 
   /**
-   * Constructs a AdContextWidget object.
+   * Constructs an AdContextWidget object.
    *
    * @param string $plugin_id
    *   The plugin_id for the widget.
@@ -67,15 +58,12 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\ad_entity\Plugin\AdContextManager $context_manager
-   *   The Advertising context manager.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $ad_storage
-   *   The storage for Advertising entities.
+   * @param \Drupal\ad_entity\Form\AdContextElement $context_element_builder
+   *   The context element builder.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextManager $context_manager, EntityStorageInterface $ad_storage) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextElement $context_element_builder) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $this->contextManager = $context_manager;
-    $this->adEntityStorage = $ad_storage;
+    $this->elementBuilder = $context_element_builder;
   }
 
   /**
@@ -93,78 +81,19 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $context_item = $items->get($delta)->get('context');
+    $value_plugin_id = $context_item->get('context_plugin_id')->getValue();
+    $value_settings = $context_item->get('context_settings')->getValue();
+    $value_apply_on = $context_item->get('apply_on')->getValue();
 
-    $context_definitions = $this->contextManager->getDefinitions();
-    $options = [];
-    foreach ($context_definitions as $id => $definition) {
-      $options[$id] = $definition['label'];
+    $this->elementBuilder->setContextPluginValue($value_plugin_id);
+    $this->elementBuilder->setContextApplyOnValue($value_apply_on);
+    if (!empty($value_settings)) {
+      foreach ($value_settings as $plugin_id => $settings) {
+        $this->elementBuilder->setContextSettingsValue($plugin_id, $settings);
+      }
     }
-    $selector = Crypt::randomBytesBase64(2);
-    $element['context']['context_plugin_id'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Context type'),
-      '#required' => FALSE,
-      '#options' => $options,
-      '#empty_value' => '',
-      '#attributes' => ['data-context-selector' => $selector],
-      '#default_value' => $context_item->get('context_plugin_id')->getValue(),
-      '#weight' => 10,
-    ];
 
-    $element['context']['context_settings'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['ad-entity-context-settings']],
-      '#states' => [
-        'invisible' => [
-          'select[data-context-selector="' . $selector . '"]' => ['value' => ''],
-        ],
-      ],
-      '#weight' => 20,
-    ];
-
-    /** @var \Drupal\ad_entity\Entity\AdEntityInterface[] $entities */
-    $entities = $this->adEntityStorage->loadMultiple();
-    $options = [];
-    foreach ($entities as $entity) {
-      $options[$entity->id()] = $entity->label();
-    }
-    $element['context']['apply_on'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Apply on ads'),
-      '#description' => $this->t('Choose none to apply this context on any ad which would appear.'),
-      '#required' => FALSE,
-      '#multiple' => TRUE,
-      '#options' => $options,
-      '#empty_value' => '',
-      '#default_value' => $context_item->get('apply_on')->getValue(),
-      '#weight' => 30,
-      '#states' => [
-        'invisible' => [
-          'select[data-context-selector="' . $selector . '"]' => ['value' => ''],
-        ],
-      ],
-    ];
-
-    // Build the settings form elements for the context plugins.
-    $context_settings = [];
-    foreach ($context_definitions as $id => $definition) {
-      $context_plugin = $this->contextManager->loadContextPlugin($id);
-      $item_settings = $context_item->get('context_settings')->getValue();
-      $plugin_settings = !empty($item_settings[$id]) ? $item_settings[$id] : [];
-      $context_settings[$id] = [
-        '#type' => 'container',
-        '#attributes' => ['class' => ['ad-entity-context-' . $id]],
-        '#states' => [
-          'visible' => [
-            'select[data-context-selector="' . $selector . '"]' => ['value' => $id],
-          ],
-        ],
-      ];
-      $context_settings[$id] += $context_plugin->settingsForm($plugin_settings, $context_item, $form, $form_state);
-    }
-    $element['context']['context_settings'] += $context_settings;
-
-    return $element;
+    return $this->elementBuilder->buildElement($element, $form, $form_state);
   }
 
   /**
@@ -177,15 +106,8 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
         unset($values[$index]);
       }
       else {
-        // Let the context plugin massage its settings for storage and output.
-        $id = $value['context']['context_plugin_id'];
-        if ($this->contextManager->hasDefinition($id)) {
-          $context_plugin = $this->contextManager->loadContextPlugin($id);
-          $plugin_settings = !empty($value['context']['context_settings'][$id]) ?
-            $value['context']['context_settings'][$id] : [];
-          $plugin_settings = $context_plugin->massageSettings($plugin_settings);
-          $value['context']['context_settings'] = [$id => $plugin_settings];
-        }
+        // Let the element builder massage the form values
+        $value = $this->elementBuilder->massageFormValues($value);
       }
     }
     return parent::massageFormValues($values, $form, $form_state);

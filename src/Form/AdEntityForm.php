@@ -10,7 +10,7 @@ use Drupal\ad_entity\Plugin\AdTypeManager;
 use Drupal\ad_entity\Plugin\AdViewManager;
 
 /**
- * Class AdEntityForm.
+ * Advertising entity form.
  *
  * @package Drupal\ad_entity\Form
  */

@@ -10,7 +10,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
 
 /**
- * Class AdDisplayForm.
+ * Advertising display configuration form.
  *
  * @package Drupal\ad_entity\Form
  */

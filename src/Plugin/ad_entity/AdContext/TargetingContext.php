@@ -3,7 +3,6 @@
 namespace Drupal\ad_entity\Plugin\ad_entity\AdContext;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\ad_entity\Plugin\AdContextBase;
 use Drupal\ad_entity\TargetingCollection;
 
@@ -21,11 +20,11 @@ class TargetingContext extends AdContextBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $plugin_settings, Map $context_item, array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $settings, array $form, FormStateInterface $form_state) {
     $element = [];
 
-    $targeting = !empty($plugin_settings['targeting']) ?
-      new TargetingCollection($plugin_settings['targeting']) : NULL;
+    $targeting = !empty($settings['targeting']) ?
+      new TargetingCollection($settings['targeting']) : NULL;
     $element['targeting'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Targeting"),
@@ -39,13 +38,13 @@ class TargetingContext extends AdContextBase {
   /**
    * {@inheritdoc}
    */
-  public function massageSettings(array $plugin_settings) {
-    if (!empty($plugin_settings['targeting'])) {
+  public function massageSettings(array $settings) {
+    if (!empty($settings['targeting'])) {
       $targeting = new TargetingCollection();
-      $targeting->collectFromUserInput($plugin_settings['targeting']);
-      $plugin_settings['targeting'] = $targeting->toArray();
+      $targeting->collectFromUserInput($settings['targeting']);
+      $settings['targeting'] = $targeting->toArray();
     }
-    return parent::massageSettings($plugin_settings);
+    return parent::massageSettings($settings);
   }
 
 }

@@ -3,7 +3,6 @@
 namespace Drupal\ad_entity\Plugin;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Component\Plugin\PluginBase;
@@ -73,15 +72,15 @@ abstract class AdContextBase extends PluginBase implements AdContextInterface, C
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $plugin_settings, Map $context_item, array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $settings, array $form, FormStateInterface $form_state) {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function massageSettings(array $plugin_settings) {
-    return $plugin_settings;
+  public function massageSettings(array $settings) {
+    return $settings;
   }
 
 }
