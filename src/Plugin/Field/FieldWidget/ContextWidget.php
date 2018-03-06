@@ -106,7 +106,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
         unset($values[$index]);
       }
       else {
-        // Let the element builder massage the form values
+        // Let the element builder massage the form values.
         $value = $this->elementBuilder->massageFormValues($value);
       }
     }

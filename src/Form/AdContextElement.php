@@ -31,6 +31,8 @@ class AdContextElement {
   protected $contextValues;
 
   /**
+   * The Advertising context manager.
+   *
    * @var \Drupal\ad_entity\Plugin\AdContextManager
    */
   protected $contextManager;
@@ -45,10 +47,10 @@ class AdContextElement {
   /**
    * Creates a new instance of the element builder.
    *
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    *
-   * @return AdContextElement
+   * @return \Drupal\ad_entity\Form\AdContextElement
    *   The instance of the element builder.
    */
   public static function create(ContainerInterface $container) {
@@ -58,9 +60,9 @@ class AdContextElement {
   /**
    * AdContextElement constructor.
    *
-   * @param EntityStorageInterface $ad_entity_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $ad_entity_storage
    *   The storage of Advertising entities.
-   * @param AdContextManager $ad_context_manager
+   * @param \Drupal\ad_entity\Plugin\AdContextManager $ad_context_manager
    *   The Advertising context manager.
    */
   public function __construct(EntityStorageInterface $ad_entity_storage, AdContextManager $ad_context_manager) {
@@ -75,7 +77,7 @@ class AdContextElement {
    *   The form element array.
    * @param array &$form
    *   The form array where the context is being configured.
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
    * @return array
