@@ -173,7 +173,7 @@ class AdContextElement {
   /**
    * Set the settings value for a certain context.
    *
-   * @param $plugin_id
+   * @param string $plugin_id
    *   The context plugin id the settings belong to.
    * @param array $settings
    *   The settings for the context plugin.
