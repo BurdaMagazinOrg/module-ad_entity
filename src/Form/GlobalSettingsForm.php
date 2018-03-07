@@ -153,7 +153,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     $form['common']['site_wide_context']['info'] = [
       '#prefix' => '<div class="description">',
       '#suffix' => '</div>',
-      '#markup' => $this->t('Advertising context, which has been defined here, will be applied on every Advertising entity being displayed on the website.'),
+      '#markup' => $this->t('Advertising context, which has been defined here, will be included anywhere on the website.'),
       '#weight' => 10,
     ];
     $context_values = $form_state->getValue('site_wide_context', []);
