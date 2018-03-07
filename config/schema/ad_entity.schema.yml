@@ -15,6 +15,12 @@ ad_entity.settings:
         collect_default_data:
           type: boolean
           label: 'Enforce the collection of default Advertising context from the entity scope'
+    site_wide_context:
+      type: sequence
+      label: 'Site wide context'
+      sequence:
+        type: ignore
+        label: 'Context data'
 
 ad_entity.ad_entity.*:
   type: config_entity

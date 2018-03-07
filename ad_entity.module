@@ -182,6 +182,14 @@ function ad_entity_ad_context_data_reset(AdContextManager $context_manager, Enti
   else {
     $reset = ['involved' => [], 'context' => []];
     if ($config = \Drupal::config('ad_entity.settings')) {
+      // When given, include site wide context data.
+      $site_wide_context = $config->get('site_wide_context');
+      if (!empty($site_wide_context)) {
+        foreach ($site_wide_context as $data) {
+          $context_manager->addContextData($data['plugin_id'], $data['settings'], $data['apply_on']);
+        }
+      }
+
       $behavior = $config->get('behavior_on_context_reset');
       // When enabled, include elementary entity information for targeting.
       if (!empty($behavior['include_entity_info'])) {

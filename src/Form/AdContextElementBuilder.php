@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Form;
 
 use Drupal\ad_entity\Plugin\AdContextManager;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Crypt;
@@ -19,9 +20,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * or to configuration like the global settings for Advertising entities.
  * This element class does nothing regards attaching the data.
  */
-class AdContextElement {
+class AdContextElementBuilder {
 
   use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * Contains the current values of user-defined context data.
@@ -50,7 +52,7 @@ class AdContextElement {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    *
-   * @return \Drupal\ad_entity\Form\AdContextElement
+   * @return \Drupal\ad_entity\Form\AdContextElementBuilder
    *   The instance of the element builder.
    */
   public static function create(ContainerInterface $container) {
@@ -58,7 +60,7 @@ class AdContextElement {
   }
 
   /**
-   * AdContextElement constructor.
+   * AdContextElementBuilder constructor.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $ad_entity_storage
    *   The storage of Advertising entities.
@@ -68,6 +70,7 @@ class AdContextElement {
   public function __construct(EntityStorageInterface $ad_entity_storage, AdContextManager $ad_context_manager) {
     $this->adEntityStorage = $ad_entity_storage;
     $this->contextManager = $ad_context_manager;
+    $this->clearValues();
   }
 
   /**
@@ -90,7 +93,7 @@ class AdContextElement {
       $options[$id] = $definition['label'];
     }
     $selector = Crypt::randomBytesBase64(2);
-    $element['context'] = ['#tree' => TRUE];
+    $element['#tree'] = TRUE;
     $element['context']['context_plugin_id'] = [
       '#type' => 'select',
       '#title' => $this->t('Context type'),
@@ -162,7 +165,7 @@ class AdContextElement {
    * @param string $plugin_id
    *   The context plugin is to set.
    *
-   * @return \Drupal\ad_entity\Form\AdContextElement
+   * @return \Drupal\ad_entity\Form\AdContextElementBuilder
    *   The element builder itself.
    */
   public function setContextPluginValue($plugin_id) {
@@ -175,13 +178,17 @@ class AdContextElement {
    *
    * @param string $plugin_id
    *   The context plugin id the settings belong to.
-   * @param array $settings
-   *   The settings for the context plugin.
+   * @param string|array $settings
+   *   The encoded or decoded settings for the context plugin.
    *
-   * @return \Drupal\ad_entity\Form\AdContextElement
+   * @return \Drupal\ad_entity\Form\AdContextElementBuilder
    *   The element builder itself.
    */
-  public function setContextSettingsValue($plugin_id, array $settings) {
+  public function setContextSettingsValue($plugin_id, $settings) {
+    if (is_string($settings)) {
+      $plugin = $this->contextManager->loadContextPlugin($plugin_id);
+      $settings = $plugin::getJsonDecode($settings);
+    }
     $this->contextValues['settings'][$plugin_id] = $settings;
     return $this;
   }
@@ -192,11 +199,22 @@ class AdContextElement {
    * @param array $apply_on
    *   The Advertising entity ids to apply the context on.
    *
-   * @return \Drupal\ad_entity\Form\AdContextElement
+   * @return \Drupal\ad_entity\Form\AdContextElementBuilder
    *   The element builder itself.
    */
   public function setContextApplyOnValue(array $apply_on) {
     $this->contextValues['apply_on'] = $apply_on;
+    return $this;
+  }
+
+  /**
+   * Resets the form submission values.
+   *
+   * @return \Drupal\ad_entity\Form\AdContextElementBuilder
+   *   The element builder itself.
+   */
+  public function clearValues() {
+    $this->contextValues = [];
     return $this;
   }
 

@@ -2,13 +2,13 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldWidget;
 
-use Drupal\ad_entity\Form\AdContextElement;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\ad_entity\Form\AdContextElementBuilder;
 
 /**
  * Plugin implementation of the 'ad_entity_context' field widget.
@@ -26,7 +26,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
   /**
    * The context form element builder.
    *
-   * @var \Drupal\ad_entity\Form\AdContextElement
+   * @var \Drupal\ad_entity\Form\AdContextElementBuilder
    */
   protected $elementBuilder;
 
@@ -34,7 +34,7 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $context_element_builder = AdContextElement::create($container);
+    $context_element_builder = AdContextElementBuilder::create($container);
     return new static(
       $plugin_id,
       $plugin_definition,
@@ -58,10 +58,10 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\ad_entity\Form\AdContextElement $context_element_builder
+   * @param \Drupal\ad_entity\Form\AdContextElementBuilder $context_element_builder
    *   The context element builder.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextElement $context_element_builder) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AdContextElementBuilder $context_element_builder) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->elementBuilder = $context_element_builder;
   }
@@ -85,8 +85,9 @@ class ContextWidget extends WidgetBase implements ContainerFactoryPluginInterfac
     $value_settings = $context_item->get('context_settings')->getValue();
     $value_apply_on = $context_item->get('apply_on')->getValue();
 
-    $this->elementBuilder->setContextPluginValue($value_plugin_id);
-    $this->elementBuilder->setContextApplyOnValue($value_apply_on);
+    $this->elementBuilder->clearValues()
+      ->setContextPluginValue($value_plugin_id)
+      ->setContextApplyOnValue($value_apply_on);
     if (!empty($value_settings)) {
       foreach ($value_settings as $plugin_id => $settings) {
         $this->elementBuilder->setContextSettingsValue($plugin_id, $settings);

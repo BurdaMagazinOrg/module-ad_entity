@@ -177,3 +177,16 @@ function ad_entity_update_8004(&$sandbox) {
   }
   $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
 }
+
+/**
+ * Add site wide context property to global settings.
+ */
+function ad_entity_update_8005() {
+  if ($config = \Drupal::configFactory()->getEditable('ad_entity.settings')) {
+    $context_settings = $config->get('site_wide_context');
+    if (empty($context_settings)) {
+      $config->set('site_wide_context', []);
+      $config->save();
+    }
+  }
+}

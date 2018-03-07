@@ -58,6 +58,7 @@ class TargetingCollection {
    */
   public function set($key, $value) {
     $this->collected[$key] = $value;
+    $this->unique($key);
   }
 
   /**
@@ -70,20 +71,21 @@ class TargetingCollection {
    */
   public function add($key, $value) {
     if (!empty($this->collected[$key])) {
-      if (!is_array($this->collected[$key])) {
-        $this->collected[$key] = [$this->collected[$key]];
+      $having = $this->collected[$key];
+      if (!is_array($having)) {
+        $having = [$having];
       }
       if (is_array($value)) {
-        $this->collected[$key] = array_merge($this->collected[$key], $value);
+        $this->collected[$key] = array_merge($having, $value);
       }
       else {
-        $this->collected[$key] = array_merge($this->collected[$key], [$value]);
+        $this->collected[$key] = array_merge($having, [$value]);
       }
-      $this->collected[$key] = array_unique($this->collected[$key]);
     }
     else {
       $this->collected[$key] = $value;
     }
+    $this->unique($key);
   }
 
   /**
@@ -116,6 +118,29 @@ class TargetingCollection {
     else {
       unset($this->collected[$key]);
     }
+  }
+
+  /**
+   * Ensures that the targeting key only contains unique values.
+   *
+   * In case the key only contains one value, the type
+   * of it is set to a scalar. Otherwise, it's an array.
+   *
+   * @param string $key
+   *   The targeting key.
+   */
+  protected function unique($key) {
+    if (!isset($this->collected[$key])) {
+      return;
+    }
+    $value = $this->collected[$key];
+    if (is_array($value)) {
+      $value = array_unique($value);
+      if (count($value) === 1) {
+        $value = reset($value);
+      }
+    }
+    $this->collected[$key] = $value;
   }
 
   /**
