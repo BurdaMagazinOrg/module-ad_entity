@@ -282,7 +282,7 @@ class GlobalSettingsForm extends ConfigFormBase {
 
     $context_values = $form_state->getValue('site_wide_context');
     $context_data = [];
-    foreach ($context_values as $i => $context_value) {
+    foreach ($context_values as $context_value) {
       $context_value = $this->contextElementBuilder->massageFormValues($context_value);
       if (!empty($context_value['context']['context_plugin_id'])) {
         $plugin_id = $context_value['context']['context_plugin_id'];
