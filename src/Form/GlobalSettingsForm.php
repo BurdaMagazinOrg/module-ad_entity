@@ -36,7 +36,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    *   The configuration factory.
    * @param \Drupal\ad_entity\Plugin\AdTypeManager $ad_type_manager
    *   The Advertising type manager.
-   * @param \Drupal\ad_entity\Form\AdContextElementBuilder
+   * @param \Drupal\ad_entity\Form\AdContextElementBuilder $context_element_builder
    *   The context form element builder.
    */
   public function __construct(ConfigFactoryInterface $config_factory, AdTypeManager $ad_type_manager, AdContextElementBuilder $context_element_builder) {
