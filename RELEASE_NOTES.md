@@ -1,5 +1,12 @@
 # Advertising Entity: Release notes
 
+8.x-1.0-beta11:
+- New feature: Site wide context
+- Refactored DFP Javascript implementation
+NOTE: Contains API changes, which might affect your extensions or modifications.
+Take care of it when updating your codebase. Export your configuration after
+running database updates.
+
 8.x-1.0-beta10:
 - Fixed #2949411 by Cecilina: Js Missing Out of Page Ads define
 - Fixed #2947876 - Processing of targeting currently requires
