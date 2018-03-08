@@ -4,7 +4,6 @@ namespace Drupal\ad_entity_adtech\Plugin\ad_entity\AdType;
 
 use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdTypeBase;
-use Drupal\ad_entity\Plugin\ad_entity\AdContext\TargetingContext;
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -120,8 +119,7 @@ class AdtechType extends AdTypeBase {
       '#required' => TRUE,
     ];
 
-    $context = !empty($settings['targeting']) ?
-      TargetingContext::getJsonDecode($settings['targeting']) : [];
+    $context = !empty($settings['targeting']) ? $settings['targeting'] : [];
     $targeting = isset($context['targeting']) ?
       new TargetingCollection($context['targeting']) : NULL;
     if (!isset($targeting) && $ad_entity->isNew()) {
@@ -147,11 +145,11 @@ class AdtechType extends AdTypeBase {
     $targeting_empty = TRUE;
     $targeting_value = trim($values['targeting']);
     if (!empty($targeting_value)) {
-      // Serialize the default targeting as context data.
+      // Set the default targeting as context settings.
       $targeting = new TargetingCollection();
       $targeting->collectFromUserInput($targeting_value);
       if (!$targeting->isEmpty()) {
-        $context_data = TargetingContext::getJsonEncode(['targeting' => $targeting->toArray()]);
+        $context_data = ['targeting' => $targeting->toArray()];
         $ad_entity->setThirdPartySetting($provider, 'targeting', $context_data);
         $targeting_empty = FALSE;
       }

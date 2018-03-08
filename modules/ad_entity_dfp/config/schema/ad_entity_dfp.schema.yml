@@ -15,7 +15,7 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
       type: boolean
       label: 'Define as out of page slot'
     targeting:
-      type: string
+      type: ignore
       label: 'Default pairs of key-values for targeting on the ad tag'
     iframe:
       type: mapping
