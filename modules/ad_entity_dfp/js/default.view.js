@@ -7,14 +7,17 @@
 
   'use strict';
 
-  Drupal.ad_entity = Drupal.ad_entity || {};
-
-  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
-
-  var googletag = window.googletag || {};
+  if (typeof window.googletag === 'undefined') {
+    window.googletag = {};
+  }
+  var googletag = window.googletag;
   googletag.cmd = googletag.cmd || [];
 
   var $window = $(window);
+
+  Drupal.ad_entity = Drupal.ad_entity || {};
+
+  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
   Drupal.ad_entity.viewHandlers.dfp_default = Drupal.ad_entity.viewHandlers.dfp_default || {
     initialize: function (containers, context, settings) {
@@ -22,20 +25,24 @@
       if (this.numberOfAds > 0) {
         onPageLoad = 'false';
       }
+      var ad_tags = [];
       for (var id in containers) {
         if (containers.hasOwnProperty(id)) {
           this.numberOfAds++;
           var container = containers[id];
           var ad_tag = $('.google-dfp-ad', container[0]);
-          this.defineAndDisplay(ad_tag, this.numberOfAds.toString(), onPageLoad, container);
+          ad_tag.data('id', ad_tag.attr('id'));
+          this.define(ad_tag, this.numberOfAds.toString(), onPageLoad, container);
           this.addEventsFor(ad_tag, container);
+          ad_tags.push(ad_tag);
         }
       }
+      this.display(ad_tags);
     },
     detach: function (containers, context, settings) {},
-    defineAndDisplay: function (ad_tag, slotNumber, onPageLoad, container) {
+    define: function (ad_tag, slotNumber, onPageLoad, container) {
       googletag.cmd.push(function () {
-        var ad_id = ad_tag.attr('id');
+        var ad_id = ad_tag.data('id');
         var network_id = ad_tag.data('dfpNetwork');
         var unit_id = ad_tag.data('dfpUnit');
         var out_of_page = ad_tag.data('dfpOutOfPage');
@@ -51,6 +58,8 @@
           }
           slot = googletag.defineSlot('/' + network_id + '/' + unit_id, sizes, ad_id);
         }
+
+        ad_tag.data('slot', slot);
 
         var targeting = container.data('adEntityTargeting');
         if (typeof targeting !== 'object') {
@@ -68,15 +77,31 @@
         slot.setTargeting('onPageLoad', onPageLoad);
 
         slot.addService(googletag.pubads());
-        googletag.display(ad_id);
-        googletag.pubads().refresh([slot]);
+      });
+    },
+    display: function (ad_tags) {
+      googletag.cmd.push(function () {
+        var slots = [];
+        for (var i in ad_tags) {
+          if (ad_tags.hasOwnProperty(i)) {
+            var ad_tag = ad_tags[i];
+            var slot = ad_tag.data('slot');
+            if (typeof slot === 'object') {
+              googletag.display(ad_tag[0]);
+              slots.push(slot);
+            }
+          }
+        }
+        if (slots.length > 0) {
+          googletag.pubads().refresh(slots);
+        }
       });
     },
     addEventsFor: function (ad_tag, container) {
       googletag.cmd.push(function () {
         // Mark container as initialized once advertisement has been loaded.
         googletag.pubads().addEventListener('slotRenderEnded', function (event) {
-          if (event.slot.getSlotElementId() === ad_tag.attr('id')) {
+          if (event.slot.getSlotElementId() === ad_tag.data('id')) {
             container.removeClass('not-initialized');
             container.addClass('initialized');
             container.data('initialized', true);
