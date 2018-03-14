@@ -133,8 +133,10 @@
           container.data('initialized', true);
           if (event.isEmpty === true) {
             container.addClass('empty');
+            container.removeClass('not-empty');
           }
           else {
+            container.addClass('not-empty');
             container.removeClass('empty');
           }
           container.trigger('adEntity:initialized', [ad_tag, container]);
