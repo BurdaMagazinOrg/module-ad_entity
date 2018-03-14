@@ -77,19 +77,51 @@
       slot.addService(window.googletag.pubads());
     },
     display: function (ad_tags) {
-      var slots = [];
-      for (var i in ad_tags) {
-        if (ad_tags.hasOwnProperty(i)) {
-          var ad_tag = ad_tags[i];
-          var slot = ad_tag.data('slot');
-          if (typeof slot === 'object') {
-            window.googletag.display(ad_tag.data('id'));
-            slots.push(slot);
+      // When possible, load multiple slots at once to support roadblocks.
+      // Slots with the same ad unit path wouldn't be refreshed
+      // more than one time though, thus they're being split up.
+      var slots = [[]];
+      var slots_length;
+      var slots_list;
+      var i;
+
+      var ad_tags_length = ad_tags.length;
+      for (i = 0; i < ad_tags_length; i++) {
+        var ad_tag = ad_tags[i];
+        var slot = ad_tag.data('slot');
+
+        if (typeof slot === 'object') {
+          window.googletag.display(ad_tag.data('id'));
+
+          var unit_path = slot.getAdUnitPath();
+          slots_length = slots.length;
+          for (var j = 0; j < slots_length; j++) {
+            var exists = false;
+            slots_list = slots[j];
+            var slots_list_length = slots_list.length;
+            for (var k = 0; k < slots_list_length; k++) {
+              if (unit_path === slots_list[k].getAdUnitPath()) {
+                exists = true;
+                break;
+              }
+            }
+            if (exists === false) {
+              slots_list.push(slot);
+              break;
+            }
+            if ((j + 1) === slots.length) {
+              slots.push([slot]);
+            }
           }
         }
       }
-      if (slots.length > 0) {
-        window.googletag.pubads().refresh(slots);
+
+      slots_length = slots.length;
+      for (i = 0; i < slots_length; i++) {
+        slots_list = slots[i];
+        if (slots_list.length > 0) {
+          window.googletag.pubads().refresh(slots_list);
+        }
       }
     },
     addEventsFor: function (ad_tag, container) {

@@ -2,7 +2,8 @@
 
 8.x-1.0-beta12:
 - Bugfix by @milkovsky: Fix DFP display.
-- Added CSS class "empty" for empty DFP slots.
+- DFP: Added CSS class "empty" for empty slots.
+- DFP: Added support for Roadblocks.
 
 8.x-1.0-beta11:
 - New feature: Site wide context
