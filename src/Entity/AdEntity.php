@@ -249,7 +249,9 @@ class AdEntity extends ConfigEntityBase implements AdEntityInterface {
     $collection = new TargetingCollection();
     $data = $this->getContextDataForPlugin('targeting');
     foreach ($data as $settings) {
-      $collection->collectFromCollection(new TargetingCollection($settings['targeting']));
+      if (isset($settings['targeting'])) {
+        $collection->collectFromCollection(new TargetingCollection($settings['targeting']));
+      }
     }
     return $collection;
   }
