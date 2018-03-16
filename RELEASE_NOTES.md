@@ -1,10 +1,14 @@
 # Advertising Entity: Release notes
 
-8.x-1.0-beta13:
-- Fixed #2953257 by Insasse: Notice undefined index AdEntity.php
 Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
+
+8.x-1.0-beta14:
+- DFP: Support native ads (#22)
+
+8.x-1.0-beta13:
+- Fixed #2953257 by Insasse: Notice undefined index AdEntity.php
 
 8.x-1.0-beta12:
 - Bugfix by @milkovsky: Fix DFP display.

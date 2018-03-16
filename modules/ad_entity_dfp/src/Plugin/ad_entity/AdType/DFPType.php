@@ -151,7 +151,7 @@ class DFPType extends AdTypeBase {
    * @param string $size
    *   The named size to check for.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the given parameter is a valid named size, FALSE otherwise.
    */
   public static function isValidNamedSize($size) {
