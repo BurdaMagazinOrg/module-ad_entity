@@ -23,7 +23,7 @@ class DFPType extends AdTypeBase {
    *
    * @var array
    */
-  static public $validNamedSizes = ['fluid'];
+  static protected $validNamedSizes = ['fluid'];
 
   /**
    * {@inheritdoc}
@@ -131,7 +131,7 @@ class DFPType extends AdTypeBase {
         if ((count($parts) === 2) && (is_numeric($parts[0])) && (is_numeric($parts[1]))) {
           $sizes[] = [(int) $parts[0], (int) $parts[1]];
         }
-        elseif ((count($parts) === 1) && in_array($parts[0], static::$validNamedSizes)) {
+        elseif ((count($parts) === 1) && static::isValidNamedSize($parts[0])) {
           $sizes[] = $parts[0];
         }
       }
@@ -143,6 +143,19 @@ class DFPType extends AdTypeBase {
     }
 
     $ad_entity->setThirdPartySetting($provider, 'out_of_page', !empty($values['out_of_page']));
+  }
+
+  /**
+   * Checks whether the given parameter is a valid named size.
+   *
+   * @param string $size
+   *   The named size to check for.
+   *
+   * @return boolean
+   *   TRUE if the given parameter is a valid named size, FALSE otherwise.
+   */
+  public static function isValidNamedSize($size) {
+    return in_array($size, static::$validNamedSizes);
   }
 
 }
