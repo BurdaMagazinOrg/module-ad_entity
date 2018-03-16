@@ -19,6 +19,13 @@ use Drupal\Component\Serialization\Json;
 class DFPType extends AdTypeBase {
 
   /**
+   * A list of valid named sizes.
+   *
+   * @var array
+   */
+  static public $validNamedSizes = ['fluid'];
+
+  /**
    * {@inheritdoc}
    */
   public function entityConfigForm(array $form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {
@@ -54,14 +61,19 @@ class DFPType extends AdTypeBase {
     if (!empty($settings['sizes'])) {
       $decoded = Json::decode($settings['sizes']);
       foreach ($decoded as $size) {
-        $sizes_default[] = $size[0] . 'x' . $size[1];
+        if (is_array($size)) {
+          $sizes_default[] = $size[0] . 'x' . $size[1];
+        }
+        else {
+          $sizes_default[] = $size;
+        }
       }
     }
     $sizes_default = implode(',', $sizes_default);
     $element['sizes'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Ad size formats"),
-      '#description' => $this->stringTranslation->translate("Separate multiple sizes with comma. Example: <strong>300x600,300x250</strong>."),
+      '#description' => $this->stringTranslation->translate("Separate multiple sizes with comma. Example: <strong>300x600,300x250</strong>. Also may include <strong>fluid</strong> to display <a href='@url' target='_blank' rel='noopener noreferrer'>native ads</a> (currently not supported on Accelerated Mobile Pages).", ['@url' => 'https://support.google.com/dfp_premium/answer/6366905']),
       '#default_value' => $sizes_default,
       '#size' => 40,
       '#states' => [
@@ -115,9 +127,15 @@ class DFPType extends AdTypeBase {
       foreach ($size_pairs as $pair) {
         $pair = trim($pair);
         $parts = explode('x', $pair);
-        $sizes[] = [(int) $parts[0], (int) $parts[1]];
+        $parts[0] = trim($parts[0]);
+        if ((count($parts) === 2) && (is_numeric($parts[0])) && (is_numeric($parts[1]))) {
+          $sizes[] = [(int) $parts[0], (int) $parts[1]];
+        }
+        elseif ((count($parts) === 1) && in_array($parts[0], static::$validNamedSizes)) {
+          $sizes[] = $parts[0];
+        }
       }
-      $encoded = str_replace('"', '', Json::encode($sizes));
+      $encoded = Json::encode($sizes);
       $ad_entity->setThirdPartySetting($provider, 'sizes', $encoded);
     }
     else {

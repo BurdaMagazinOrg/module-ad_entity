@@ -30,7 +30,12 @@ function template_preprocess_dfp_amp(array &$variables) {
     $sizes = [];
     $decoded = Json::decode($settings['sizes']);
     foreach ($decoded as $size) {
-      $sizes[] = $size[0] . 'x' . $size[1];
+      // Currently, fluid is not a valid size here.
+      // Validation would say: Invalid multi-size data format 'fluid'.
+      // TODO Find a proper way to support native ads on AMP pages.
+      if (is_array($size)) {
+        $sizes[] = $size[0] . 'x' . $size[1];
+      }
     }
     $sizes = implode(',', $sizes);
     $attributes->setAttribute('data-multi-size', $sizes);
