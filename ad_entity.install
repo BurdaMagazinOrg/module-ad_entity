@@ -30,6 +30,10 @@ function ad_entity_update_8002(&$sandbox) {
   if (!isset($sandbox['total'])) {
     $sandbox['total'] = $storage->getQuery()->count()->execute();
     $sandbox['current'] = 0;
+    if (empty($sandbox['total'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
   }
 
   $query = $storage->getQuery();
@@ -88,6 +92,10 @@ function ad_entity_update_8003(&$sandbox) {
   if (!isset($sandbox['total'])) {
     $sandbox['total'] = $block_storage->getQuery()->count()->execute();
     $sandbox['current'] = 0;
+    if (empty($sandbox['total'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
   }
 
   $query = $block_storage->getQuery();
@@ -151,6 +159,10 @@ function ad_entity_update_8004(&$sandbox) {
   if (!isset($sandbox['total'])) {
     $sandbox['total'] = $ad_storage->getQuery()->count()->execute();
     $sandbox['current'] = 0;
+    if (empty($sandbox['total'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
   }
   $query = $ad_storage->getQuery();
   $query->range($sandbox['current'], 20);
@@ -200,6 +212,10 @@ function ad_entity_update_8006(&$sandbox) {
     drupal_flush_all_caches();
     $sandbox['total'] = $ad_storage->getQuery()->count()->execute();
     $sandbox['current'] = 0;
+    if (empty($sandbox['total'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
   }
   $query = $ad_storage->getQuery();
   $query->range($sandbox['current'], 20);
