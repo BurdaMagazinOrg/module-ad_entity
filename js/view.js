@@ -1,6 +1,6 @@
 /**
  * @file
- * Fundamental JS implementation for viewing Advertising entities.
+ * Initial JS for viewing Advertising entities.
  */
 
 (function ($, Drupal, window) {
@@ -180,31 +180,38 @@
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
-      var containers = Drupal.ad_entity.collectAdContainers(context, settings);
+      var ad_entity = Drupal.ad_entity;
+      var containers = ad_entity.collectAdContainers(context, settings);
+
+      // No need to proceed in case no new containers have been found.
+      if ($.isEmptyObject(containers)) {
+        return;
+      }
 
       // Apply Advertising contexts, if available.
-      if (!($.isEmptyObject(Drupal.ad_entity.context))) {
-        Drupal.ad_entity.context.addFrom(context);
-        Drupal.ad_entity.context.applyOn(containers);
+      if (!($.isEmptyObject(ad_entity.context))) {
+        ad_entity.context.addFrom(context);
+        ad_entity.context.applyOn(containers);
       }
 
       // Apply initial scope restriction and initialization on given Advertisement.
-      Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
+      ad_entity.restrictAndInitialize(containers, context, settings);
 
       // When responsive behavior is enabled,
       // re-apply scope restriction with initialization on breakpoint changes.
       if (settings.hasOwnProperty('ad_entity') && settings.ad_entity.hasOwnProperty('responsive')) {
         if (settings.ad_entity.responsive === true) {
           $window.on('themeBreakpoint:changed', function () {
-            Drupal.ad_entity.restrictAndInitialize(containers, context, settings);
+            ad_entity.restrictAndInitialize(containers, context, settings);
           });
         }
       }
     },
     detach: function (context, settings) {
 
+      var ad_entity = Drupal.ad_entity;
       var containers = {};
-      var collected = Drupal.ad_entity.adContainers;
+      var collected = ad_entity.adContainers;
 
       // Remove the detached container from the collection,
       // but keep them in mind for other view handlers to act on.
@@ -222,9 +229,9 @@
       });
 
       // Let the view handlers act on detachment of their ads.
-      var correlation = Drupal.ad_entity.correlate(containers);
-      for (var handler_id in Drupal.ad_entity.viewHandlers) {
-        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+      var correlation = ad_entity.correlate(containers);
+      for (var handler_id in ad_entity.viewHandlers) {
+        if (ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
           if (correlation.hasOwnProperty(handler_id)) {
             correlation[handler_id].handler.detach(correlation[handler_id].containers, context, settings);
           }

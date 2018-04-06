@@ -13,6 +13,7 @@ use Drupal\ad_entity\Plugin\AdViewBase;
  *   id = "adtech_default",
  *   label = "Default HTML view for an AdTech Factory tag",
  *   library = "ad_entity_adtech/default_view",
+ *   requiresDomready = false,
  *   container = "html",
  *   allowedTypes = {
  *     "adtech_factory"

@@ -37,6 +37,13 @@ class AdView extends Plugin {
   public $library;
 
   /**
+   * Whether the JS handler requires the document to be ready before execution.
+   *
+   * @var bool
+   */
+  public $requiresDomready;
+
+  /**
    * A container which wraps or holds the output of this view handler.
    *
    * For regular HTML ads, the value 'html' can be used.
@@ -44,7 +51,7 @@ class AdView extends Plugin {
    * incompatible with the 'html' container.
    * In that case, use a value of your choice,
    * which can be used and identified later during theme processing.
-   * You might need to override the template ad-entity.html.twig as well.
+   * You might need to override the template ad-entity.html.twig too.
    *
    * @var string
    */

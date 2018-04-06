@@ -100,7 +100,7 @@
         original.data('fallbackProcessed', true);
       }
     }
-    if (Object.keys(to_load).length > 0) {
+    if (!($.isEmptyObject(to_load))) {
       Drupal.ad_entity.restrictAndInitialize(to_load, context, settings);
     }
   };

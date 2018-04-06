@@ -72,11 +72,15 @@ function template_preprocess_ad_entity(array &$variables) {
     $variables['targeting'] = '{}';
   }
 
-  // Attach the fundamental JS implementation for viewing Advertising entities.
+  // Attach the initial JS for viewing Advertising entities.
   $variables['#attached']['library'][] = 'ad_entity/view';
   // Attach the JS implementation for the view handler.
   if (!empty($definition['library'])) {
     $variables['#attached']['library'][] = $definition['library'];
+    // If it makes sense, also attach the viewready.js library.
+    if (isset($definition['requiresDomready']) && ($definition['requiresDomready'] === FALSE)) {
+      $variables['#attached']['library'][] = 'ad_entity/viewready';
+    }
   }
 }
 
