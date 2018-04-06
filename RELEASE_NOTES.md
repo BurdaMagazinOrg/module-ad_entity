@@ -4,6 +4,12 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta15:
+- Performance: Added viewready.js handler for being able to load
+  ads before document is ready on first page load.
+- Fixed #2957766 by ashutoshsngh: Update hook running into infinite
+  loop if module is enabled and there are no Ads.
+
 8.x-1.0-beta14:
 - DFP: Support native ads (#22)
 
