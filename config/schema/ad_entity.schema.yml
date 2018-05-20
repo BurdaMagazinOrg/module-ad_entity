@@ -31,7 +31,7 @@ ad_entity.settings:
                   label: 'Cookie value operator'
                 value:
                   type: string
-                  label: 'Value of consent cookie'
+                  label: 'Value(s) of consent cookie'
     behavior_on_context_reset:
       type: mapping
       label: 'Behavior when backend context has been reset to the scope of an entity'

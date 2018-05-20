@@ -289,7 +289,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Method'),
       '#options' => $this->getConsentAwarenessMethods(),
-      '#default_value' => !empty($default_personalization['content_awareness']['method']) ? $default_personalization['content_awareness']['method'] : 'opt_in',
+      '#default_value' => !empty($default_personalization['consent_awareness']['method']) ? $default_personalization['consent_awareness']['method'] : 'opt_in',
       '#weight' => 10,
     ];
     $form['personalization']['consent_awareness']['cookie'] = [
@@ -327,7 +327,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     }
     $form['personalization']['consent_awareness']['cookie']['value'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Value of consent cookie'),
+      '#title' => $this->t('Value(s) of consent cookie'),
       '#default_value' => $default_cookie_consent_value,
       '#description' => $this->t('Enter multiple values separated with comma. Example: <b>1,2</b>'),
       '#weight' => 30,
@@ -416,38 +416,44 @@ class GlobalSettingsForm extends ConfigFormBase {
     $personalization = [];
     $personalization_values = $form_state->getValue('personalization');
     $personalization['enabled'] = !empty($personalization_values['enabled']);
-    $consent_awareness_methods = array_keys($this->getConsentAwarenessMethods());
-    $cookie_operators = array_keys($this->getCookieOperators());
-    $personalization['consent_awareness'] = [
-      'method' => !empty($personalization_values['content_awareness']['method']) && in_array($personalization_values['content_awareness']['method'], $consent_awareness_methods) ? $personalization_values['content_awareness']['method'] : 'opt_in',
-    ];
-    $cookie_consent_value = '';
-    if (!empty($personalization_values['consent_awareness']['cookie']['value'])) {
-      $user_cookie_value = $personalization_values['consent_awareness']['cookie']['value'];
-      if (strpos($user_cookie_value, ',') !== FALSE) {
-        $cookie_values = explode(',', $user_cookie_value);
-      }
-      else {
-        $cookie_values = [$user_cookie_value];
-      }
-      foreach ($cookie_values as &$cookie_value) {
-        $cookie_value = trim($cookie_value);
-        if (is_numeric($cookie_value)) {
-          if (strpos($cookie_value, '.') !== FALSE) {
-            $cookie_value = (float) $cookie_value;
+    if ($personalization['enabled']) {
+      $consent_awareness_methods = array_keys($this->getConsentAwarenessMethods());
+      $cookie_operators = array_keys($this->getCookieOperators());
+      $personalization['consent_awareness'] = [
+        'method' => !empty($personalization_values['consent_awareness']['method']) && in_array($personalization_values['consent_awareness']['method'], $consent_awareness_methods) ?
+          $personalization_values['consent_awareness']['method'] : 'opt_in',
+      ];
+      $without_cookie_settings = ['eu_cookie_compliance', 'disabled'];
+      if (!in_array($personalization['consent_awareness']['method'], $without_cookie_settings)) {
+        $cookie_consent_value = '';
+        if (!empty($personalization_values['consent_awareness']['cookie']['value'])) {
+          $user_cookie_value = $personalization_values['consent_awareness']['cookie']['value'];
+          if (strpos($user_cookie_value, ',') !== FALSE) {
+            $cookie_values = explode(',', $user_cookie_value);
           }
           else {
-            $cookie_value = (int) $cookie_value;
+            $cookie_values = [$user_cookie_value];
           }
+          foreach ($cookie_values as &$cookie_value) {
+            $cookie_value = trim($cookie_value);
+            if (is_numeric($cookie_value)) {
+              if (strpos($cookie_value, '.') !== FALSE) {
+                $cookie_value = (float) $cookie_value;
+              }
+              else {
+                $cookie_value = (int) $cookie_value;
+              }
+            }
+          }
+          $cookie_consent_value = json_encode($cookie_values, JSON_UNESCAPED_UNICODE);
         }
+        $personalization['consent_awareness']['cookie'] = [
+          'name' => !empty($personalization_values['consent_awareness']['cookie']['name']) ? $personalization_values['consent_awareness']['cookie']['name'] : 'cookie-agreed',
+          'operator' => !empty($personalization_values['consent_awareness']['cookie']['operator']) && in_array($personalization_values['consent_awareness']['cookie']['operator'], $cookie_operators) ? $personalization_values['consent_awareness']['cookie']['operator'] : '===',
+          'value' => $cookie_consent_value,
+        ];
       }
-      $cookie_consent_value = json_encode($cookie_values, JSON_UNESCAPED_UNICODE);
     }
-    $personalization['consent_awareness']['cookie'] = [
-      'name' => !empty($personalization_values['consent_awareness']['cookie']['name']) ? $personalization_values['consent_awareness']['cookie']['name'] : 'cookie-agreed',
-      'operator' => !empty($personalization_values['consent_awareness']['cookie']['operator']) && in_array($personalization_values['consent_awareness']['cookie']['operator'], $cookie_operators) ? $personalization_values['consent_awareness']['cookie']['operator'] : '===',
-      'value' => $cookie_consent_value,
-    ];
 
     $config->set('personalization', $personalization);
 

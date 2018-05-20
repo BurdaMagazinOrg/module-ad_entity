@@ -9,6 +9,8 @@ view:
 consent:
   js:
     js/consent.js: {}
+  dependencies:
+    - core/drupal
 
 context:
   js:

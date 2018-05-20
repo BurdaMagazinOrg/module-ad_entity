@@ -78,6 +78,21 @@ function ad_entity_library_info_build() {
 }
 
 /**
+ * Implements hook_library_info_alter().
+ */
+function ad_entity_library_info_alter(&$libraries, $extension) {
+  if (('ad_entity' === $extension) && !empty($libraries['view'])
+    && ($config = \Drupal::config('ad_entity.settings'))) {
+
+    $personalization = $config->get('personalization');
+    if (!empty($personalization['enabled'])) {
+      // Include consent.js when personalization is enabled.
+      $libraries['view']['dependencies'][] = 'ad_entity/consent';
+    }
+  }
+}
+
+/**
  * Implements hook_theme_suggestions_HOOK().
  */
 function ad_entity_theme_suggestions_ad_display($variables) {
@@ -97,17 +112,6 @@ function ad_entity_theme_suggestions_ad_entity($variables) {
     $suggestions[] = 'ad_entity__' . $variables['ad_entity']->id();
   }
   return $suggestions;
-}
-
-/**
- * Implements hook_page_attachments().
- */
-function ad_entity_page_attachments(array &$page) {
-  $page['#attached']['drupalSettings']['ad_entity']['responsive'] = FALSE;
-  if ($config = \Drupal::config('ad_entity.settings')) {
-    $page['#attached']['drupalSettings']['ad_entity']['responsive'] =
-      $config->get('enable_responsive_behavior') ? TRUE : FALSE;
-  }
 }
 
 /**

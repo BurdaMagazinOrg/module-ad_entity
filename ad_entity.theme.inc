@@ -82,6 +82,8 @@ function template_preprocess_ad_entity(array &$variables) {
       $variables['#attached']['library'][] = 'ad_entity/viewready';
     }
   }
+  // Attach JS settings, based on the given configuration.
+  $variables['#attached']['drupalSettings']['ad_entity'] = ad_entity_build_js_settings();
 }
 
 /**
@@ -111,4 +113,59 @@ function template_preprocess_ad_entity_context(array &$variables) {
   $variables['#attached']['library'][] = 'ad_entity/context';
   // Attach the JS implementation for the context plugin.
   $variables['#attached']['library'][] = $definition['library'];
+}
+
+/**
+ * Builds the JS settings regards viewing Advertising entities.
+ *
+ * @return array
+ *   The JS settings array.
+ */
+function ad_entity_build_js_settings() {
+  $settings = &drupal_static(__FUNCTION__, []);
+  if (empty($settings)) {
+    $settings['responsive'] = FALSE;
+    if ($config = \Drupal::config('ad_entity.settings')) {
+      $settings['responsive'] = $config->get('enable_responsive_behavior') ? TRUE : FALSE;
+
+      // Include consent awareness settings regards personalization.
+      $personalization = $config->get('personalization');
+      if (!empty($personalization['enabled']) && !empty($personalization['consent_awareness'])) {
+        $consent_awareness = $personalization['consent_awareness'];
+        if (!empty($consent_awareness['method'])
+          && ('eu_cookie_compliance' === $consent_awareness['method'])
+          && (\Drupal::moduleHandler()->moduleExists('eu_cookie_compliance'))
+          && ($eu_cc_config = \Drupal::config('eu_cookie_compliance.settings'))) {
+
+          // Adapt the configured method and cookie
+          // from the eu_cookie_compliance module.
+          $supported_methods = ['opt_in', 'opt_out'];
+          $settings['consent'] = [
+            'method' => in_array($eu_cc_config->get('method'), $supported_methods) ?
+              $eu_cc_config->get('method') : 'opt_in',
+            'cookie' => [
+              'name' => !empty($eu_cc_config->get('cookie_name')) ?
+                $eu_cc_config->get('cookie_name') : 'cookie-agreed',
+              'operator' => '===',
+              'value' => [1, 2],
+            ],
+          ];
+        }
+        else {
+          $settings['consent'] = [
+            'method' => !empty($consent_awareness['method']) ? $consent_awareness['method'] : 'opt_in',
+            'cookie' => [
+              'name' => !empty($consent_awareness['cookie']['name']) ?
+                $consent_awareness['cookie']['name'] : 'cookie-agreed',
+              'operator' => !empty($consent_awareness['cookie']['operator']) ?
+                $consent_awareness['cookie']['operator'] : '===',
+              'value' => !empty($consent_awareness['cookie']['value']) ?
+                json_decode($consent_awareness['cookie']['value'], TRUE) : '',
+            ],
+          ];
+        }
+      }
+    }
+  }
+  return $settings;
 }

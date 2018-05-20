@@ -3,8 +3,16 @@
  * Consent awareness for Advertising entities.
  */
 
-(function (document) {
+// @todo This would not work for header.
+//       Need a script including settings which can be run inside header,
+//       but without the need of putting all Drupal and drupalSettings
+//       into the header too. init_provider.js is run inside header and
+//       would need this script.
+(function (document, Drupal, settings) {
 
+  Drupal.ad_entity = Drupal.ad_entity || {};
+
+  Drupal.ad_entity.consent = {};
 
   function getCookie(name) {
     var nameEQ = name + "=";
@@ -19,4 +27,4 @@
     return null;
   }
 
-}(window.document));
+}(window.document, Drupal, drupalSettings));
