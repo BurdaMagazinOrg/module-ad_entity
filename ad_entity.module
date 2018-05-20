@@ -272,3 +272,19 @@ function _ad_entity_reset_to_previous_context_data($markup) {
   $context_manager->resetToPreviousContextData();
   return $markup;
 }
+
+/**
+ * Returns the information of ad integration modules.
+ *
+ * @return array
+ *   The module information, keyed my module name.
+ */
+function ad_entity_get_module_info() {
+  $module_info = [];
+  $module_handler = \Drupal::moduleHandler();
+  $hook = 'ad_entity_module_info';
+  foreach ($module_handler->getImplementations($hook) as $module) {
+    $module_info[$module] = $module_handler->invoke($module, $hook);
+  }
+  return $module_info;
+}

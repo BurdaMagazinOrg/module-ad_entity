@@ -11,6 +11,38 @@
  */
 
 /**
+ * Tells the ad_entity module what this integration is capable of.
+ *
+ * Modules which implement ad integrations using ad_entity
+ * should implement this hook.
+ *
+ * Following keys should be returned:
+ * - personalization: TRUE in case ads can be personalized,
+ *   e.g. via cookie-based re-targeting, FALSE otherwise.
+ * - consent_aware: TRUE in case this integration is consent
+ *   aware, i.e. personalization would be disabled in case
+ *   no consent exists or when the user declined a consent.
+ *   The ad_entity module provides a generic way to determine
+ *   whether a consent exists. To adapt it, have a look at
+ *   the global settings and the consent.js implementation.
+ *   Set FALSE if this module does not use ad_entity functions
+ *   regards consent awareness and/or disabling personalization.
+ *
+ * Ad integrations which use personalization, but don't support
+ * consent awareness via ad_entity functionality, must take care
+ * on their own to be compliant with existing privacy protection laws.
+ *
+ * @return array
+ *   The module info as associative array.
+ */
+function hook_ad_entity_module_info() {
+  return [
+    'personalization' => TRUE,
+    'consent_aware' => TRUE,
+  ];
+}
+
+/**
  * Modify the render array of the given Advertising entity.
  *
  * @param array &$build

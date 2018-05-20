@@ -6,6 +6,10 @@ view:
     - core/jquery
     - theme_breakpoints_js/breakpointsLoader
 
+consent:
+  js:
+    js/consent.js: {}
+
 context:
   js:
     js/context.js: {}
