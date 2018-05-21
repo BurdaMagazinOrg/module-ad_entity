@@ -1,16 +1,14 @@
+init:
+  js:
+    js/init.js: {}
+
 view:
   js:
     js/view.js: {}
   dependencies:
+    - ad_entity/init
     - core/drupal
     - core/jquery
-    - theme_breakpoints_js/breakpointsLoader
-
-consent:
-  js:
-    js/consent.js: {}
-  dependencies:
-    - core/drupal
 
 context:
   js:

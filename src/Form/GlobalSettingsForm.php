@@ -238,7 +238,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#weight' => 20,
       '#tree' => TRUE,
     ];
-    if ($module_info = ad_entity_get_module_info()) {
+    if ($module_info = _ad_entity_get_module_info()) {
       $ok = [];
       $warning = [];
       foreach ($module_info as $module => $info) {
@@ -320,17 +320,34 @@ class GlobalSettingsForm extends ConfigFormBase {
         $default_personalization['consent_awareness']['cookie']['operator'] : '===',
       '#weight' => 20,
     ];
-    $default_cookie_consent_value = '';
+    $default_consent_value = '';
     if (!empty($default_personalization['consent_awareness']['cookie']['value'])) {
-      $default_cookie_consent_value = json_decode($default_personalization['consent_awareness']['cookie']['value'], TRUE);
-      $default_cookie_consent_value = implode(',', $default_cookie_consent_value);
+      $default_consent_value = json_decode($default_personalization['consent_awareness']['cookie']['value'], TRUE);
+      $default_consent_value = implode(',', $default_consent_value);
     }
-    $form['personalization']['consent_awareness']['cookie']['value'] = [
+    $form['personalization']['consent_awareness']['cookie']['value_accept'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Value(s) of consent cookie'),
-      '#default_value' => $default_cookie_consent_value,
+      '#title' => $this->t('Value(s) of cookie when user accepted consent'),
+      '#default_value' => $default_consent_value,
       '#description' => $this->t('Enter multiple values separated with comma. Example: <b>1,2</b>'),
       '#weight' => 30,
+      '#states' => [
+        'visible' => [
+          'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_in'],
+        ],
+      ],
+    ];
+    $form['personalization']['consent_awareness']['cookie']['value_decline'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Value(s) of cookie when user declined consent'),
+      '#default_value' => $default_consent_value,
+      '#description' => $this->t('Enter multiple values separated with comma. Example: <b>1,2</b>'),
+      '#weight' => 40,
+      '#states' => [
+        'visible' => [
+          'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_out'],
+        ],
+      ],
     ];
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
@@ -423,11 +440,17 @@ class GlobalSettingsForm extends ConfigFormBase {
         'method' => !empty($personalization_values['consent_awareness']['method']) && in_array($personalization_values['consent_awareness']['method'], $consent_awareness_methods) ?
           $personalization_values['consent_awareness']['method'] : 'opt_in',
       ];
-      $without_cookie_settings = ['eu_cookie_compliance', 'disabled'];
-      if (!in_array($personalization['consent_awareness']['method'], $without_cookie_settings)) {
+      $with_cookie_settings = ['opt_in', 'opt_out'];
+      if (in_array($personalization['consent_awareness']['method'], $with_cookie_settings)) {
+        if ('opt_in' === $personalization['consent_awareness']['method']) {
+          $consent_value_input_name = 'value_accept';
+        }
+        else {
+          $consent_value_input_name = 'value_decline';
+        }
         $cookie_consent_value = '';
-        if (!empty($personalization_values['consent_awareness']['cookie']['value'])) {
-          $user_cookie_value = $personalization_values['consent_awareness']['cookie']['value'];
+        if (!empty($personalization_values['consent_awareness']['cookie'][$consent_value_input_name])) {
+          $user_cookie_value = $personalization_values['consent_awareness']['cookie'][$consent_value_input_name];
           if (strpos($user_cookie_value, ',') !== FALSE) {
             $cookie_values = explode(',', $user_cookie_value);
           }

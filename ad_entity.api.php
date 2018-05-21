@@ -24,7 +24,7 @@
  *   no consent exists or when the user declined a consent.
  *   The ad_entity module provides a generic way to determine
  *   whether a consent exists. To adapt it, have a look at
- *   the global settings and the consent.js implementation.
+ *   the global settings and the ad_entity/init library.
  *   Set FALSE if this module does not use ad_entity functions
  *   regards consent awareness and/or disabling personalization.
  *
