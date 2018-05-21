@@ -7,6 +7,8 @@
 
   window.adEntity = window.adEntity || {};
 
+  // @todo Theme Breakpoints JS should be a library too.
+
   window.adEntity.getCookie = function (name) {
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');

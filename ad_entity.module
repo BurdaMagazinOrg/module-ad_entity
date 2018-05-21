@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
@@ -381,7 +382,7 @@ function _ad_entity_attach_js_settings_head(array &$variables) {
   $variables['#attached']['html_head'][] = [
     [
       '#tag' => 'script',
-      '#value' => Json::encode($settings),
+      '#value' => Markup::create(Json::encode($settings)),
       '#attributes' => new Attribute($attributes),
       '#weight' => -80,
     ],
