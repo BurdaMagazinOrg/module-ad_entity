@@ -521,7 +521,8 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   protected function getCookieOperators() {
     return [
-      '===' => $this->t('Equals'),
+      '===' => $this->t('Strict equals'),
+      '==' => $this->t('Equals'),
       '>' => $this->t('Greater than'),
       '<' => $this->t('Less than'),
     ];

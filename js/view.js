@@ -5,11 +5,9 @@
 
 (function ($, Drupal, window) {
 
-  'use strict';
-
   var $window = $(window);
 
-  Drupal.ad_entity = Drupal.ad_entity || {};
+  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
 
   Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
 

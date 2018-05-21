@@ -14,6 +14,7 @@ context:
   js:
     js/context.js: {}
   dependencies:
+    - ad_entity/view
     - core/drupal
     - core/jquery
 

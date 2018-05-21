@@ -310,7 +310,8 @@ function _ad_entity_build_js_settings() {
 
       // Include consent awareness settings regards personalization.
       $personalization = $config->get('personalization');
-      if (!empty($personalization['enabled']) && !empty($personalization['consent_awareness'])) {
+      $settings['p13n'] = !empty($personalization['enabled']);
+      if ($settings['p13n'] && !empty($personalization['consent_awareness'])) {
         $consent_awareness = $personalization['consent_awareness'];
         if (!empty($consent_awareness['method'])
           && ('eu_cookie_compliance' === $consent_awareness['method'])
@@ -337,15 +338,19 @@ function _ad_entity_build_js_settings() {
         else {
           $settings['consent'] = [
             'method' => !empty($consent_awareness['method']) ? $consent_awareness['method'] : 'opt_in',
-            'cookie' => [
-              'name' => !empty($consent_awareness['cookie']['name']) ?
-                $consent_awareness['cookie']['name'] : 'cookie-agreed',
-              'operator' => !empty($consent_awareness['cookie']['operator']) ?
-                $consent_awareness['cookie']['operator'] : '===',
-              'value' => !empty($consent_awareness['cookie']['value']) ?
-                json_decode($consent_awareness['cookie']['value'], TRUE) : '',
-            ],
           ];
+          if ('disabled' !== $settings['consent']['method']) {
+            $settings['consent'] += [
+              'cookie' => [
+                'name' => !empty($consent_awareness['cookie']['name']) ?
+                  $consent_awareness['cookie']['name'] : 'cookie-agreed',
+                'operator' => !empty($consent_awareness['cookie']['operator']) ?
+                  $consent_awareness['cookie']['operator'] : '===',
+                'value' => !empty($consent_awareness['cookie']['value']) ?
+                  json_decode($consent_awareness['cookie']['value'], TRUE) : '',
+              ],
+            ];
+          }
         }
       }
     }

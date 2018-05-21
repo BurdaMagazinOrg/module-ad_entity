@@ -5,8 +5,6 @@
 
 (function ($, ad_entity, behavior, settings, window) {
 
-  'use strict';
-
   // Run attachment on first page load,
   // without waiting for other Drupal behaviors.
   if (!($.isEmptyObject(ad_entity.viewHandlers))) {

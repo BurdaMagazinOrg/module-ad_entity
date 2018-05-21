@@ -5,12 +5,10 @@
 
 (function ($, Drupal, window) {
 
-  'use strict';
-
   window.googletag = window.googletag || {};
   window.googletag.cmd = window.googletag.cmd || [];
 
-  Drupal.ad_entity = Drupal.ad_entity || {};
+  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 

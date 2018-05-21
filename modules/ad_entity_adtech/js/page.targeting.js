@@ -5,8 +5,6 @@
 
 (function (drupalSettings, window) {
 
-  'use strict';
-
   if (drupalSettings.hasOwnProperty('adtech_page_targeting')) {
     if (typeof window.atf_lib !== 'undefined') {
       var page_targeting = JSON.parse(drupalSettings['adtech_page_targeting']);
