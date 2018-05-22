@@ -20,11 +20,11 @@
  * - personalization: TRUE in case ads can be personalized,
  *   e.g. via cookie-based re-targeting, FALSE otherwise.
  * - consent_aware: TRUE in case this integration is consent
- *   aware, i.e. personalization would be disabled in case
+ *   aware, i.e. personalization would be disabled when
  *   no consent exists or when the user declined a consent.
  *   The ad_entity module provides a generic way to determine
  *   whether a consent exists. To adapt it, have a look at
- *   the global settings and the ad_entity/init library.
+ *   the global settings and the ad_entity/base library.
  *   Set FALSE if this module does not use ad_entity functions
  *   regards consent awareness and/or disabling personalization.
  *

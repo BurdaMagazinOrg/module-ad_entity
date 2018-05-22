@@ -389,6 +389,26 @@ function _ad_entity_build_js_settings() {
 }
 
 /**
+ * Get a render array for the ad_entity JS settings tag.
+ *
+ * @return array
+ *   The render array for the ad_entity JS settings tag.
+ */
+function _ad_entity_js_settings_tag() {
+  $settings = _ad_entity_build_js_settings();
+  $attributes = [
+    'id' => 'ad-entity-settings',
+    'type' => 'application/json',
+  ];
+  return [
+    '#type' => 'html_tag',
+    '#tag' => 'script',
+    '#value' => Markup::create(Json::encode($settings)),
+    '#attributes' => new Attribute($attributes),
+  ];
+}
+
+/**
  * Attaches JS settings for ad_entity into the HTML head once.
  *
  * This module needs these settings as soon as possible,
@@ -409,18 +429,39 @@ function _ad_entity_attach_js_settings_head(array &$variables) {
   }
   $attached = TRUE;
 
-  $settings = _ad_entity_build_js_settings();
-  $attributes = [
-    'id' => 'ad-entity-settings',
-    'type' => 'application/json',
-  ];
   $variables['#attached']['html_head'][] = [
-    [
-      '#tag' => 'script',
-      '#value' => Markup::create(Json::encode($settings)),
-      '#attributes' => new Attribute($attributes),
+    _ad_entity_js_settings_tag() + [
       '#weight' => -80,
     ],
     'ad_entity_settings',
+  ];
+}
+
+/**
+ * Returns a render array for embedding the ad_entity/base library inline.
+ *
+ * This might be useful for elements like iframes, which
+ * need to include the base functionality for ad_entity Javascript.
+ *
+ * @return array
+ *   The render array for inline JS regards the ad_entity/base library.
+ */
+function _ad_entity_js_base_inline() {
+  /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
+  $library_discovery = \Drupal::service('library.discovery');
+  $script = '';
+  if ($base_library = $library_discovery->getLibraryByName('ad_entity', 'base')) {
+    if (!empty($base_library['js'])) {
+      foreach ($base_library['js'] as $js_file) {
+        if (!empty($js_file['data']) && file_exists($js_file['data'])) {
+          $script .= file_get_contents($js_file['data']) . "\n";
+        }
+      }
+    }
+  }
+  $script = '<script type="text/javascript">' . str_replace("'", '"', $script) . '</script>';
+  return [
+    'settings' => _ad_entity_js_settings_tag(),
+    'script' => ['#markup' => Markup::create($script)]
   ];
 }

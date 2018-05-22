@@ -19,7 +19,11 @@ function ad_entity_dfp_ad_entity_module_info() {
  * Implements hook_page_attachments().
  */
 function ad_entity_dfp_page_attachments(&$attachments) {
-  $attachments['#attached']['library'][] = 'ad_entity_dfp/provider';
+  // Make sure the provider is always present.
+  // We cannot foresee whether or not the provider is being used,
+  // e.g. via Drupal attach behaviors and AJAX,
+  // but it must be placed into the HTML head.
+  $attachments['#attached']['library'][] = 'ad_entity/provider.googletag';
 }
 
 /**

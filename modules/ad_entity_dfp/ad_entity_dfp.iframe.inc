@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
+use Drupal\ad_entity\Render\Markup;
 
 /**
  * Preprocess implementation for a DFP tag as iFrame.
@@ -18,6 +19,11 @@ function template_preprocess_dfp_iframe(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
   $ad_entity = $variables['ad_entity'];
   $settings = $ad_entity->getThirdPartySettings('ad_entity_dfp');
+
+  // Insert the base library into the iframe, for being able
+  // to include custom configurations and consent awareness.
+  // Therefore, load its JS library files and embed them inline.
+  $variables['ad_entity_base'] = _ad_entity_js_base_inline();
 
   // Generate attributes.
   $id = 'google-dfp-' . Crypt::randomBytesBase64(8);

@@ -3,8 +3,10 @@
   <html>
   <head>
     <meta charset="utf-8">
+    {{ ad_entity_base }}
     <script src="https://www.googletagservices.com/tag/js/gpt.js" type="text/javascript" async="async"></script>
     <script type="text/javascript">
+      var usePersonalization = window.adEntity.usePersonalization;
       var googletag = googletag || {};
       googletag.cmd = googletag.cmd || [];
       googletag.cmd.push(function () {
@@ -22,8 +24,12 @@
         }
         googletag.pubads().enableSingleRequest();
         googletag.pubads().collapseEmptyDivs();
-        // @todo Respect configuration, include base and consent.js.
-        gpt.pubads().setRequestNonPersonalizedAds(1);
+        if ((typeof usePersonalization === "function") && (usePersonalization() === true)) {
+          googletag.pubads().setRequestNonPersonalizedAds(0);
+        }
+        else {
+          googletag.pubads().setRequestNonPersonalizedAds(1);
+        }
         googletag.enableServices();
       });
     </script>
