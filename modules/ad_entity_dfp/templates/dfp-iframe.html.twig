@@ -22,6 +22,8 @@
         }
         googletag.pubads().enableSingleRequest();
         googletag.pubads().collapseEmptyDivs();
+        // @todo Respect configuration, include base and consent.js.
+        gpt.pubads().setRequestNonPersonalizedAds(1);
         googletag.enableServices();
       });
     </script>
