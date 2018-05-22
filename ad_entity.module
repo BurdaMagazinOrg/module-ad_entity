@@ -11,11 +11,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\ad_entity\Plugin\AdContextManager;
+use Drupal\ad_entity\Render\Markup;
 
 /**
  * Implements hook_theme().
