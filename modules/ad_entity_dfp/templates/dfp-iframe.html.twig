@@ -6,7 +6,6 @@
     {{ ad_entity_base }}
     <script src="https://www.googletagservices.com/tag/js/gpt.js" type="text/javascript" async="async"></script>
     <script type="text/javascript">
-      var usePersonalization = window.adEntity.usePersonalization;
       var googletag = googletag || {};
       googletag.cmd = googletag.cmd || [];
       googletag.cmd.push(function () {
@@ -24,7 +23,7 @@
         }
         googletag.pubads().enableSingleRequest();
         googletag.pubads().collapseEmptyDivs();
-        if ((typeof usePersonalization === "function") && (usePersonalization() === true)) {
+        if ((typeof adEntity.usePersonalization === "function") && (adEntity.usePersonalization() === true)) {
           googletag.pubads().setRequestNonPersonalizedAds(0);
         }
         else {

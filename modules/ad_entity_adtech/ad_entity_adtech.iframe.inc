@@ -19,6 +19,11 @@ function template_preprocess_adtech_iframe(array &$variables) {
   $ad_entity = $variables['ad_entity'];
   $settings = $ad_entity->getThirdPartySettings('ad_entity_adtech');
 
+  // Insert the base library into the iframe, for being able
+  // to include custom configurations and consent awareness.
+  // Therefore, load its JS library files and embed them inline.
+  $variables['ad_entity_base'] = _ad_entity_js_base_inline();
+
   // Generate attributes.
   $id = 'adtech-' . Crypt::randomBytesBase64(8);
   $attributes = new Attribute(['id' => $id]);
