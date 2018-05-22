@@ -197,8 +197,8 @@
 
       // When responsive behavior is enabled,
       // re-apply scope restriction with initialization on breakpoint changes.
-      if (settings.hasOwnProperty('ad_entity') && settings.ad_entity.hasOwnProperty('responsive')) {
-        if (settings.ad_entity.responsive === true) {
+      if (ad_entity.hasOwnProperty('settings') && ad_entity.settings.hasOwnProperty('responsive')) {
+        if (ad_entity.settings.responsive === true) {
           $window.on('themeBreakpoint:changed', function () {
             ad_entity.restrictAndInitialize(containers, context, settings);
           });

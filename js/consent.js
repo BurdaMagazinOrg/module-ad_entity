@@ -1,24 +1,12 @@
 /**
  * @file
- * Initialization script for Advertising entities.
+ * Consent awareness for Advertising entities.
  */
 
-// @todo Care for drupalSettings: Either replace by ad-entity-settings
-//       or also attach ad_entity settings to drupalSettings via #attached.
-// @todo Theme Breakpoints JS should be a library too.
+(function (adEntity, document) {
 
-(function (window, document) {
-
-  var settingsElement = document.getElementById('ad-entity-settings');
-
-  window.adEntity = {};
-
-  if (settingsElement !== null) {
-    window.adEntity.settings = JSON.parse(settingsElement.textContent);
-  }
-
-  window.adEntity.usePersonalization = function () {
-    var settings = window.adEntity.settings;
+  adEntity.usePersonalization = function () {
+    var settings = adEntity.settings;
     var consent;
     var cookie;
     var current_value;
@@ -50,15 +38,10 @@
     }
     length = cookie.value.length;
 
-    current_value = window.adEntity.getCookie(cookie.name);
+    current_value = adEntity.getCookie(cookie.name);
     if (!(current_value === null)) {
       for (i = 0; i < length; i++) {
         switch (cookie.operator) {
-          case '===':
-            if (current_value === cookie.value[i]) {
-              matched = true;
-            }
-            break;
           case '==':
             /* eslint eqeqeq: [0, "always"] */
             if (current_value == cookie.value[i]) {
@@ -81,7 +64,6 @@
         }
       }
     }
-
     switch (consent.method) {
       case 'opt_in':
         return matched;
@@ -92,7 +74,7 @@
     }
   };
 
-  window.adEntity.getCookie = function (name) {
+  adEntity.getCookie = function (name) {
     var nameEQ = name + '=';
     var ca = document.cookie.split(';');
     var i;
@@ -109,4 +91,4 @@
     return null;
   };
 
-}(window, window.document));
+}(window.adEntity, window.document));

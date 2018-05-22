@@ -8,5 +8,5 @@ personalization:
     method: opt_in
     cookie:
       name: cookie-agreed
-      operator: '==='
+      operator: '=='
       value: '[1,2]'

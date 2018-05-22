@@ -1,12 +1,13 @@
-init:
+base:
   js:
-    js/init.js: {}
+    js/base.js: {}
+    js/consent.js: {}
 
 view:
   js:
     js/view.js: {}
   dependencies:
-    - ad_entity/init
+    - ad_entity/base
     - core/drupal
     - core/jquery
 
@@ -29,3 +30,16 @@ targeting_context:
     js/targeting.context.js: {}
   dependencies:
     - ad_entity/context
+
+common.googletag.init:
+  js:
+    js/common/googletag/gpt-init.js: {}
+  dependencies:
+    - ad_entity/base
+
+provider.googletag:
+  header: true
+  js:
+    //www.googletagservices.com/tag/js/gpt.js: { type: external, attributes: { async: async } }
+  dependencies:
+    - ad_entity/common.googletag.init

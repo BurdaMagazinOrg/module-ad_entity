@@ -43,6 +43,22 @@ function hook_ad_entity_module_info() {
 }
 
 /**
+ * Alter the ad_entity Javascript settings.
+ *
+ * This might be helpful if you need to add further settings
+ * for Javascript which runs very early, e.g. when directly using
+ * ad_entity/base before any ad_entity/view is being run.
+ *
+ * @param array &$settings
+ *   The JS settings array.
+ * @param array &$cache_tags
+ *   The cache tags for caching the settings.
+ */
+function hook_ad_entity_js_settings_alter(array &$settings, array &$cache_tags) {
+  $settings['foo'] = 'bar';
+}
+
+/**
  * Modify the render array of the given Advertising entity.
  *
  * @param array &$build

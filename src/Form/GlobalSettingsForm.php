@@ -317,7 +317,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Cookie value operator'),
       '#options' => $this->getCookieOperators(),
       '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['operator']) ?
-        $default_personalization['consent_awareness']['cookie']['operator'] : '===',
+        $default_personalization['consent_awareness']['cookie']['operator'] : '==',
       '#weight' => 20,
     ];
     $default_consent_value = '';
@@ -459,20 +459,12 @@ class GlobalSettingsForm extends ConfigFormBase {
           }
           foreach ($cookie_values as &$cookie_value) {
             $cookie_value = trim($cookie_value);
-            if (is_numeric($cookie_value)) {
-              if (strpos($cookie_value, '.') !== FALSE) {
-                $cookie_value = (float) $cookie_value;
-              }
-              else {
-                $cookie_value = (int) $cookie_value;
-              }
-            }
           }
           $cookie_consent_value = json_encode($cookie_values, JSON_UNESCAPED_UNICODE);
         }
         $personalization['consent_awareness']['cookie'] = [
           'name' => !empty($personalization_values['consent_awareness']['cookie']['name']) ? $personalization_values['consent_awareness']['cookie']['name'] : 'cookie-agreed',
-          'operator' => !empty($personalization_values['consent_awareness']['cookie']['operator']) && in_array($personalization_values['consent_awareness']['cookie']['operator'], $cookie_operators) ? $personalization_values['consent_awareness']['cookie']['operator'] : '===',
+          'operator' => !empty($personalization_values['consent_awareness']['cookie']['operator']) && in_array($personalization_values['consent_awareness']['cookie']['operator'], $cookie_operators) ? $personalization_values['consent_awareness']['cookie']['operator'] : '==',
           'value' => $cookie_consent_value,
         ];
       }
@@ -521,7 +513,6 @@ class GlobalSettingsForm extends ConfigFormBase {
    */
   protected function getCookieOperators() {
     return [
-      '===' => $this->t('Strict equals'),
       '==' => $this->t('Equals'),
       '>' => $this->t('Greater than'),
       '<' => $this->t('Less than'),
