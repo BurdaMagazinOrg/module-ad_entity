@@ -4,7 +4,6 @@
   <head>
     <meta charset="utf-8">
     {{ ad_entity_base }}
-    <title>{{ iframe.title }}</title>
     <script type="text/javascript">
       var googletag = googletag || {};
       googletag.cmd = googletag.cmd || [];
@@ -17,6 +16,7 @@
         }
       });
     </script>
+    <title>{{ iframe.title }}</title>
     <script src="{{ library_source }}" type="text/javascript"></script>
     <script type="text/javascript">
       var page_targeting = {{ page_targeting|raw }};
