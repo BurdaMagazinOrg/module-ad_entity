@@ -351,11 +351,9 @@ function _ad_entity_build_js_settings() {
         // from the eu_cookie_compliance module.
         $supported_methods = ['opt_in', 'opt_out'];
         $settings['consent'] = [
-          'method' => in_array($eu_cc_config->get('method'), $supported_methods) ?
-            $eu_cc_config->get('method') : 'opt_in',
+          'method' => in_array($eu_cc_config->get('method'), $supported_methods) ? $eu_cc_config->get('method') : 'opt_in',
           'cookie' => [
-            'name' => !empty($eu_cc_config->get('cookie_name')) ?
-              $eu_cc_config->get('cookie_name') : 'cookie-agreed',
+            'name' => !empty($eu_cc_config->get('cookie_name')) ? $eu_cc_config->get('cookie_name') : 'cookie-agreed',
             'operator' => '==',
             'value' => ['1', '2'],
           ],
@@ -371,12 +369,9 @@ function _ad_entity_build_js_settings() {
         if ('disabled' !== $settings['consent']['method']) {
           $settings['consent'] += [
             'cookie' => [
-              'name' => !empty($consent_awareness['cookie']['name']) ?
-                $consent_awareness['cookie']['name'] : 'cookie-agreed',
-              'operator' => !empty($consent_awareness['cookie']['operator']) ?
-                $consent_awareness['cookie']['operator'] : '==',
-              'value' => !empty($consent_awareness['cookie']['value']) ?
-                json_decode($consent_awareness['cookie']['value'], TRUE) : '',
+              'name' => !empty($consent_awareness['cookie']['name']) ? $consent_awareness['cookie']['name'] : 'cookie-agreed',
+              'operator' => !empty($consent_awareness['cookie']['operator']) ? $consent_awareness['cookie']['operator'] : '==',
+              'value' => !empty($consent_awareness['cookie']['value']) ? json_decode($consent_awareness['cookie']['value'], TRUE) : '',
             ],
           ];
         }
@@ -462,6 +457,6 @@ function _ad_entity_js_base_inline() {
   $script = '<script type="text/javascript">' . str_replace("'", '"', $script) . '</script>';
   return [
     'settings' => _ad_entity_js_settings_tag(),
-    'script' => ['#markup' => Markup::create($script)]
+    'script' => ['#markup' => Markup::create($script)],
   ];
 }

@@ -46,7 +46,7 @@ class GlobalSettingsForm extends ConfigFormBase {
    *   The Advertising type manager.
    * @param \Drupal\ad_entity\Form\AdContextElementBuilder $context_element_builder
    *   The context form element builder.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(ConfigFactoryInterface $config_factory, AdTypeManager $ad_type_manager, AdContextElementBuilder $context_element_builder, ModuleHandlerInterface $module_handler) {
@@ -262,7 +262,7 @@ class GlobalSettingsForm extends ConfigFormBase {
         $form['personalization']['info'] = [
           '#theme' => 'item_list',
           '#items' => $consent_info,
-          '#weight' => 10
+          '#weight' => 10,
         ];
       }
     }
@@ -309,16 +309,14 @@ class GlobalSettingsForm extends ConfigFormBase {
     $form['personalization']['consent_awareness']['cookie']['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name of consent cookie'),
-      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['name']) ?
-        $default_personalization['consent_awareness']['cookie']['name'] : 'cookie-agreed',
+      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['name']) ? $default_personalization['consent_awareness']['cookie']['name'] : 'cookie-agreed',
       '#weight' => 10,
     ];
     $form['personalization']['consent_awareness']['cookie']['operator'] = [
       '#type' => 'select',
       '#title' => $this->t('Cookie value operator'),
       '#options' => $this->getCookieOperators(),
-      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['operator']) ?
-        $default_personalization['consent_awareness']['cookie']['operator'] : '==',
+      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['operator']) ? $default_personalization['consent_awareness']['cookie']['operator'] : '==',
       '#weight' => 20,
     ];
     $default_consent_value = '';
@@ -438,8 +436,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       $consent_awareness_methods = array_keys($this->getConsentAwarenessMethods());
       $cookie_operators = array_keys($this->getCookieOperators());
       $personalization['consent_awareness'] = [
-        'method' => !empty($personalization_values['consent_awareness']['method']) && in_array($personalization_values['consent_awareness']['method'], $consent_awareness_methods) ?
-          $personalization_values['consent_awareness']['method'] : 'opt_in',
+        'method' => !empty($personalization_values['consent_awareness']['method']) && in_array($personalization_values['consent_awareness']['method'], $consent_awareness_methods) ? $personalization_values['consent_awareness']['method'] : 'opt_in',
       ];
       $with_cookie_settings = ['opt_in', 'opt_out'];
       if (in_array($personalization['consent_awareness']['method'], $with_cookie_settings)) {
