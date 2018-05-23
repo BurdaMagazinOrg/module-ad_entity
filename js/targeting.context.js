@@ -5,9 +5,7 @@
 
 (function ($, Drupal, window) {
 
-  'use strict';
-
-  Drupal.ad_entity = Drupal.ad_entity || {};
+  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
 
   Drupal.ad_entity.context = Drupal.ad_entity.context || {};
 

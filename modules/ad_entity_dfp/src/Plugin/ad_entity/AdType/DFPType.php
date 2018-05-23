@@ -2,11 +2,12 @@
 
 namespace Drupal\ad_entity_dfp\Plugin\ad_entity\AdType;
 
+use Drupal\Core\Config\Config;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Serialization\Json;
 use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdTypeBase;
 use Drupal\ad_entity\TargetingCollection;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Serialization\Json;
 
 /**
  * Type plugin for DFP advertisement.
@@ -24,6 +25,38 @@ class DFPType extends AdTypeBase {
    * @var array
    */
   static protected $validNamedSizes = ['fluid'];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function globalSettingsForm(array $form, FormStateInterface $form_state, Config $config) {
+    $element = [];
+
+    $settings = $config->get($this->getPluginDefinition()['id']);
+
+    $element['order_info'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->stringTranslation->translate('Include targeting information about the slot loading order'),
+      '#description' => $this->stringTranslation->translate('When enabled, the targeting includes the following: Slot order will be numbered (targeting key <em>slotNumber</em>) and whether the slot was loaded during initial page load (targeting key <em>onPageLoad</em>).'),
+      '#default_value' => isset($settings['order_info']) ? (int) $settings['order_info'] : 1,
+      '#weight' => 10,
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function globalSettingsSubmit(array &$form, FormStateInterface $form_state, Config $config) {
+    $id = $this->getPluginDefinition()['id'];
+    $values = $form_state->getValue($id);
+
+    if (isset($values['order_info'])) {
+      // Make sure the value is being stored as boolean.
+      $config->set($id . '.order_info', (bool) $values['order_info']);
+    }
+  }
 
   /**
    * {@inheritdoc}

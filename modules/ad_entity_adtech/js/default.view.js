@@ -5,15 +5,13 @@
 
 (function ($, Drupal, window) {
 
-  'use strict';
-
-  Drupal.ad_entity = Drupal.ad_entity || {};
+  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
   var $window = $(window);
 
-  Drupal.ad_entity.viewHandlers.adtech_default = Drupal.ad_entity.viewHandlers.adtech_default || {
+  Drupal.ad_entity.viewHandlers.adtech_default = {
     initialize: function (containers, context, settings) {
       if (typeof window.atf_lib !== 'undefined') {
         var load_arguments = [];

@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Form;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -30,6 +31,13 @@ class GlobalSettingsForm extends ConfigFormBase {
   protected $contextElementBuilder;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructor method.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -38,11 +46,14 @@ class GlobalSettingsForm extends ConfigFormBase {
    *   The Advertising type manager.
    * @param \Drupal\ad_entity\Form\AdContextElementBuilder $context_element_builder
    *   The context form element builder.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AdTypeManager $ad_type_manager, AdContextElementBuilder $context_element_builder) {
+  public function __construct(ConfigFactoryInterface $config_factory, AdTypeManager $ad_type_manager, AdContextElementBuilder $context_element_builder, ModuleHandlerInterface $module_handler) {
     parent::__construct($config_factory);
     $this->typeManager = $ad_type_manager;
     $this->contextElementBuilder = $context_element_builder;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -53,7 +64,8 @@ class GlobalSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('ad_entity.type_manager'),
-      $context_element_builder
+      $context_element_builder,
+      $container->get('module_handler')
     );
   }
 
@@ -112,6 +124,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#default_value' => $default_behavior,
       '#weight' => 10,
     ];
+
     $behavior_reset = $config->get('behavior_on_context_reset');
     $form['common']['behavior_on_context_reset'] = [
       '#type' => 'fieldset',
@@ -216,12 +229,132 @@ class GlobalSettingsForm extends ConfigFormBase {
       ],
     ];
 
+    $default_personalization = $config->get('personalization') ? $config->get('personalization') : [];
+    $form['personalization'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Personalization'),
+      '#weight' => 20,
+      '#tree' => TRUE,
+    ];
+    if ($module_info = _ad_entity_get_module_info()) {
+      $ok = [];
+      $warning = [];
+      foreach ($module_info as $module => $info) {
+        if (!empty($info['personalization']) && !empty($info['consent_aware'])) {
+          $ok[] = $module;
+        }
+        else {
+          $warning[] = $module;
+        }
+      }
+      $consent_info = [];
+      $consent_info[] = $this->t('At this time, this module feature does <strong>not support Accelerated Mobile Pages (AMP)</strong>.<br />You need to make sure on your own, that any ads on AMP pages are compliant with existing privacy protection laws.<br /> Read more about it at Google DFP documentation <a href="@url" target="_blank" rel="noopener nofollow">Ads personalization settings for AMP pages</a>.', ['@url' => 'https://support.google.com/dfp_premium/answer/7678538?hl=en']);
+      if (!empty($ok)) {
+        $consent_info[] = $this->t('Following modules support personalized ads and support consent awareness: <em>@ok</em>.', ['@ok' => implode(', ', $ok)]);
+      }
+      if (!empty($warning)) {
+        $consent_info[] = $this->t('Following modules might use personalized ads, <strong>regardless whether personalization is disabled here</strong>, and it is not known whether or how they are consent aware: <em>@warning</em>.<br/><strong>You need to make sure on your own that these integrations are compliant with existing privacy protection laws.</strong>', ['@warning' => implode(', ', $warning)]);
+      }
+
+      if (!empty($consent_info)) {
+        $form['personalization']['info'] = [
+          '#theme' => 'item_list',
+          '#items' => $consent_info,
+          '#weight' => 10,
+        ];
+      }
+    }
+    $form['personalization']['enabled'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Personalized ads'),
+      '#options' => [0 => $this->t("Disabled"), 1 => $this->t("Enabled")],
+      '#description' => $this->t("When enabling personalized ads, make sure to setup your ads compliant to existing privacy protection laws."),
+      '#default_value' => !empty($default_personalization['enabled']) ? (int) $default_personalization['enabled'] : 0,
+      '#weight' => 20,
+    ];
+    $form['personalization']['consent_awareness'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Consent awareness'),
+      '#weight' => 30,
+      '#states' => [
+        'visible' => [
+          'input[name="personalization[enabled]"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['personalization']['consent_awareness']['method'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Method'),
+      '#options' => $this->getConsentAwarenessMethods(),
+      '#default_value' => !empty($default_personalization['consent_awareness']['method']) ? $default_personalization['consent_awareness']['method'] : 'opt_in',
+      '#weight' => 10,
+    ];
+    $form['personalization']['consent_awareness']['cookie'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('Consent cookie'),
+      '#description' => $this->t('These settings only define which cookie to check for. This module does not create or set the cookie. This is the job of other modules like the <a href="https://drupal.org/project/eu_cookie_compliance" target="_blank" rel="noopener nofollow">EU Cookie compliance</a> module.'),
+      '#weight' => 20,
+      '#states' => [
+        'visible' => [
+          'select[name="personalization[consent_awareness][method]"]' => [['value' => 'opt_in'], ['value' => 'opt_out']],
+        ],
+      ],
+    ];
+    $form['personalization']['consent_awareness']['cookie']['name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Name of consent cookie'),
+      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['name']) ? $default_personalization['consent_awareness']['cookie']['name'] : 'cookie-agreed',
+      '#weight' => 10,
+    ];
+    $form['personalization']['consent_awareness']['cookie']['operator'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Cookie value operator'),
+      '#options' => $this->getCookieOperators(),
+      '#default_value' => !empty($default_personalization['consent_awareness']['cookie']['operator']) ? $default_personalization['consent_awareness']['cookie']['operator'] : '==',
+      '#weight' => 20,
+    ];
+    $default_consent_value = '';
+    if (!empty($default_personalization['consent_awareness']['cookie']['value'])) {
+      $default_consent_value = json_decode($default_personalization['consent_awareness']['cookie']['value'], TRUE);
+      $default_consent_value = implode(',', $default_consent_value);
+    }
+    $form['personalization']['consent_awareness']['cookie']['value_accept'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Value(s) of cookie when user accepted consent'),
+      '#default_value' => $default_consent_value,
+      '#description' => $this->t('Enter multiple values separated with comma. Example: <b>1,2</b>'),
+      '#weight' => 30,
+      '#states' => [
+        'visible' => [
+          'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_in'],
+        ],
+      ],
+    ];
+    $form['personalization']['consent_awareness']['cookie']['value_decline'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Value(s) of cookie when user declined consent'),
+      '#default_value' => $default_consent_value,
+      '#description' => $this->t('Enter multiple values separated with comma. Example: <b>1,2</b>'),
+      '#weight' => 40,
+      '#states' => [
+        'visible' => [
+          'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_out'],
+        ],
+      ],
+    ];
+
     $type_ids = array_keys($this->typeManager->getDefinitions());
     if (!empty($type_ids)) {
       $form['settings_tabs'] = [
         '#type' => 'vertical_tabs',
         '#default_tab' => 'edit-' . key($type_ids),
-        '#weight' => 20,
+        '#weight' => 30,
       ];
 
       foreach ($type_ids as $type_id) {
@@ -296,6 +429,47 @@ class GlobalSettingsForm extends ConfigFormBase {
     }
     $config->set('site_wide_context', $context_data);
 
+    $personalization = [];
+    $personalization_values = $form_state->getValue('personalization');
+    $personalization['enabled'] = !empty($personalization_values['enabled']);
+    if ($personalization['enabled']) {
+      $consent_awareness_methods = array_keys($this->getConsentAwarenessMethods());
+      $cookie_operators = array_keys($this->getCookieOperators());
+      $personalization['consent_awareness'] = [
+        'method' => !empty($personalization_values['consent_awareness']['method']) && in_array($personalization_values['consent_awareness']['method'], $consent_awareness_methods) ? $personalization_values['consent_awareness']['method'] : 'opt_in',
+      ];
+      $with_cookie_settings = ['opt_in', 'opt_out'];
+      if (in_array($personalization['consent_awareness']['method'], $with_cookie_settings)) {
+        if ('opt_in' === $personalization['consent_awareness']['method']) {
+          $consent_value_input_name = 'value_accept';
+        }
+        else {
+          $consent_value_input_name = 'value_decline';
+        }
+        $cookie_consent_value = '';
+        if (!empty($personalization_values['consent_awareness']['cookie'][$consent_value_input_name])) {
+          $user_cookie_value = $personalization_values['consent_awareness']['cookie'][$consent_value_input_name];
+          if (strpos($user_cookie_value, ',') !== FALSE) {
+            $cookie_values = explode(',', $user_cookie_value);
+          }
+          else {
+            $cookie_values = [$user_cookie_value];
+          }
+          foreach ($cookie_values as &$cookie_value) {
+            $cookie_value = trim($cookie_value);
+          }
+          $cookie_consent_value = json_encode($cookie_values, JSON_UNESCAPED_UNICODE);
+        }
+        $personalization['consent_awareness']['cookie'] = [
+          'name' => !empty($personalization_values['consent_awareness']['cookie']['name']) ? $personalization_values['consent_awareness']['cookie']['name'] : 'cookie-agreed',
+          'operator' => !empty($personalization_values['consent_awareness']['cookie']['operator']) && in_array($personalization_values['consent_awareness']['cookie']['operator'], $cookie_operators) ? $personalization_values['consent_awareness']['cookie']['operator'] : '==',
+          'value' => $cookie_consent_value,
+        ];
+      }
+    }
+
+    $config->set('personalization', $personalization);
+
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {
       $values = $form_state->getValue($type_id, []);
@@ -309,6 +483,38 @@ class GlobalSettingsForm extends ConfigFormBase {
     }
 
     $config->save();
+  }
+
+  /**
+   * Returns a list of allowed consent awareness methods.
+   *
+   * @return array
+   *   The consent awareness methods.
+   */
+  protected function getConsentAwarenessMethods() {
+    $methods = [
+      'disabled' => $this->t('Disabled: Always use personalized ads.'),
+      'opt_in' => $this->t('Opt-in: Only use personalized ads when consent exists.'),
+      'opt_out' => $this->t('Opt-out: Use personalized ads, unless user declined.'),
+    ];
+    if ($this->moduleHandler->moduleExists('eu_cookie_compliance')) {
+      $methods['eu_cookie_compliance'] = $this->t('Adapt behavior defined by the EU Cookie Compliance module.');
+    }
+    return $methods;
+  }
+
+  /**
+   * Returns a list of allowed cookie value operators.
+   *
+   * @return array
+   *   The cookie value operators.
+   */
+  protected function getCookieOperators() {
+    return [
+      '==' => $this->t('Equals'),
+      '>' => $this->t('Greater than'),
+      '<' => $this->t('Less than'),
+    ];
   }
 
 }

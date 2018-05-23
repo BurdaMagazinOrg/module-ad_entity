@@ -1,3 +1,11 @@
+ad_entity.settings.dfp:
+  type: mapping
+  label: 'Global settings for the DFP type.'
+  mapping:
+    order_info:
+      type: boolean
+      label: 'Include targeting information about the slot loading order'
+
 ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
   type: mapping
   label: 'Entity config for DFP ads'

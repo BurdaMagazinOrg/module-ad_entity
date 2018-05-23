@@ -5,6 +5,33 @@ ad_entity.settings:
     enable_responsive_behavior:
       type: boolean
       label: 'Whether responsive behavior is enabled or not'
+    personalization:
+      type: mapping
+      label: 'Personalization'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Whether personalized ads are enabled or not'
+        consent_awareness:
+          type: mapping
+          label: 'Consent awareness'
+          mapping:
+            method:
+              type: string
+              label: 'Method'
+            cookie:
+              type: mapping
+              label: 'Consent cookie'
+              mapping:
+                name:
+                  type: string
+                  label: 'Name of consent cookie'
+                operator:
+                  type: string
+                  label: 'Cookie value operator'
+                value:
+                  type: string
+                  label: 'Value(s) of consent cookie'
     behavior_on_context_reset:
       type: mapping
       label: 'Behavior when backend context has been reset to the scope of an entity'

@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * This is not a standalone form and won't work on its own.
  * It's usually used as a sub-form element inside content entity forms,
- * or inside the global settings form to define side-wide context.
+ * or inside the global settings form to define site-wide context.
  * Context data is being attached to field data like the ContextItem,
  * or to configuration like the global settings for Advertising entities.
  * This element class does nothing regards attaching the data.

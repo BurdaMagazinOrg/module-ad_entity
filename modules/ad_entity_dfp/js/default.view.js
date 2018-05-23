@@ -3,20 +3,18 @@
  * JS View handler implementation for ads which are using the 'dfp_default' view plugin.
  */
 
-(function ($, Drupal, window) {
-
-  'use strict';
+(function ($, Drupal, drupalSettings, window) {
 
   window.googletag = window.googletag || {};
   window.googletag.cmd = window.googletag.cmd || [];
 
-  Drupal.ad_entity = Drupal.ad_entity || {};
+  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
 
   Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
 
   var $window = $(window);
 
-  Drupal.ad_entity.viewHandlers.dfp_default = Drupal.ad_entity.viewHandlers.dfp_default || {
+  Drupal.ad_entity.viewHandlers.dfp_default = {
     initialize: function (containers, context, settings) {
       window.googletag.cmd.push(function () {
         var onPageLoad = 'true';
@@ -71,8 +69,10 @@
           slot.setTargeting(key, targeting[key]);
         }
       }
-      slot.setTargeting('slotNumber', slotNumber);
-      slot.setTargeting('onPageLoad', onPageLoad);
+      if (this.withSlotOrder) {
+        slot.setTargeting('slotNumber', slotNumber);
+        slot.setTargeting('onPageLoad', onPageLoad);
+      }
 
       slot.addService(window.googletag.pubads());
     },
@@ -145,7 +145,15 @@
 
       window.googletag.pubads().addEventListener('slotRenderEnded', initHandler, false);
     },
-    numberOfAds: 0
+    numberOfAds: 0,
+    withSlotOrder: true
   };
 
-}(jQuery, Drupal, window));
+  // Do not include slot order targeting when this feature is explicitly not enabled.
+  if (drupalSettings.hasOwnProperty('dfp_order_info')) {
+    if (!drupalSettings.dfp_order_info) {
+      Drupal.ad_entity.viewHandlers.dfp_default.withSlotOrder = false;
+    }
+  }
+
+}(jQuery, Drupal, drupalSettings, window));

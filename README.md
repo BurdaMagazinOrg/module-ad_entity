@@ -3,6 +3,16 @@
 A Drupal module which provides consolidated integration for various types of
 advertising instances (mainly advertisement).
 
+**Why you might want consolidated ad management**:
+- All your ads respect your theme's breakpoints in the same way.
+- All your ads can be turned off on demand, and can be
+  attached with targeting via context fields.
+- Always be able to replace your existing ads by others of any type
+  with just a few clicks, without losing any context.
+- Configure consent-aware personalization: This module offers
+  a unified way to configure GDPR compliant ads,
+  optionally combined with the EU Cookie Compliance module.
+
 # Requirements
 
 - The <a href="https://www.drupal.org/project/entity">Entity API</a> module.
