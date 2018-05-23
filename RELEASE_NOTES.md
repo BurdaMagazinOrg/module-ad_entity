@@ -4,6 +4,14 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta16:
+- New feature: Configure to use personalized ads with consent awareness.
+  Can be optionally combined with the EU Cookie Compliance module.
+- Fixed #2969296 by Cecilina: JS set fixed targeting
+  value for slotname and onPageLoad
+NOTE: Contains API changes, which might affect your extensions or modifications.
+      Take care of it when updating your codebase.
+
 8.x-1.0-beta15:
 - Performance: Added viewready.js handler for being able to load
   ads before document is ready on first page load.
