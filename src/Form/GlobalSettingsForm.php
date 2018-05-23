@@ -249,19 +249,19 @@ class GlobalSettingsForm extends ConfigFormBase {
           $warning[] = $module;
         }
       }
-      $info_markup = [];
-      $info_markup[] = $this->t('At this time, this module feature does <strong>not support Accelerated Mobile Pages (AMP)</strong>.<br />You need to make sure on your own, that any ads on AMP pages are compliant with existing privacy protection laws.<br /> Read more about it at Google DFP documentation <a href="@url" target="_blank" rel="noopener nofollow">Ads personalization settings for AMP pages</a>.', ['@url' => 'https://support.google.com/dfp_premium/answer/7678538?hl=en']);
+      $consent_info = [];
+      $consent_info[] = $this->t('At this time, this module feature does <strong>not support Accelerated Mobile Pages (AMP)</strong>.<br />You need to make sure on your own, that any ads on AMP pages are compliant with existing privacy protection laws.<br /> Read more about it at Google DFP documentation <a href="@url" target="_blank" rel="noopener nofollow">Ads personalization settings for AMP pages</a>.', ['@url' => 'https://support.google.com/dfp_premium/answer/7678538?hl=en']);
       if (!empty($ok)) {
-        $info_markup[] = $this->t('Following modules support personalized ads and support consent awareness: <em>@ok</em>.', ['@ok' => implode(', ', $ok)]);
+        $consent_info[] = $this->t('Following modules support personalized ads and support consent awareness: <em>@ok</em>.', ['@ok' => implode(', ', $ok)]);
       }
       if (!empty($warning)) {
-        $info_markup[] = $this->t('Following modules might use personalized ads, <strong>regardless whether personalization is disabled here</strong>, and it is not known whether or how they are consent aware: <em>@warning</em>.<br/><strong>You need to make sure on your own that these integrations are compliant with existing privacy protection laws.</strong>', ['@warning' => implode(', ', $warning)]);
+        $consent_info[] = $this->t('Following modules might use personalized ads, <strong>regardless whether personalization is disabled here</strong>, and it is not known whether or how they are consent aware: <em>@warning</em>.<br/><strong>You need to make sure on your own that these integrations are compliant with existing privacy protection laws.</strong>', ['@warning' => implode(', ', $warning)]);
       }
 
-      if (!empty($info_markup)) {
+      if (!empty($consent_info)) {
         $form['personalization']['info'] = [
           '#theme' => 'item_list',
-          '#items' => $info_markup,
+          '#items' => $consent_info,
           '#weight' => 10
         ];
       }

@@ -24,6 +24,16 @@ function ad_entity_dfp_page_attachments(&$attachments) {
   // e.g. via Drupal attach behaviors and AJAX,
   // but it must be placed into the HTML head.
   $attachments['#attached']['library'][] = 'ad_entity/provider.googletag';
+
+  // By default, the ordering targeting info is enabled.
+  // We only need this setting when this feature is explicitly not enabled.
+  if ($config = \Drupal::config('ad_entity.settings')) {
+    if ($settings = $config->get('dfp')) {
+      if (isset($settings['order_info']) && empty($settings['order_info'])) {
+        $attachments['#attached']['drupalSettings']['dfp_order_info'] = FALSE;
+      }
+    }
+  }
 }
 
 /**
