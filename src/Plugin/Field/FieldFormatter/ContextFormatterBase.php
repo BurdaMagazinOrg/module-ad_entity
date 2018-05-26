@@ -105,7 +105,7 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    */
   public static function defaultSettings() {
     return [
-      'appliance_mode' => 'frontend',
+      'appliance_mode' => 'backend',
       'targeting' => [
         'bundle_label' => FALSE,
       ],

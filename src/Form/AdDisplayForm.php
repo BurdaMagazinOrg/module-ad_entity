@@ -102,7 +102,7 @@ class AdDisplayForm extends EntityForm {
     ];
 
     $default_theme = $this->configFactory()->get('system.theme') ?
-      $this->configFactory()->get('system.theme')->get('default') : NULL;
+      $this->configFactory()->get('system.theme')->get('default') : 'stable';
     $selected_theme = $form_state->get('block_theme');
 
     $installed_themes = $this->configFactory()->get('core.extension')->get('theme') ?: [];
@@ -119,6 +119,17 @@ class AdDisplayForm extends EntityForm {
     if (!empty($selected_theme) && ($default_theme != $selected_theme)) {
       array_unshift($installed_themes, $selected_theme);
     }
+    $installed_theme_options = array_combine($installed_themes, $installed_themes);
+
+    $theme_canonical = !empty($ad_display->get('theme_canonical')) ? $ad_display->get('theme_canonical') : $default_theme;
+    $form['theme_canonical'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Default theme to use when viewing via canonical url or iFrame.'),
+      '#description' => $this->t('Choose the theme to use when viewing via /ad-display/ID. This also applies if you would view this config as an iFrame. Default would usually be the <strong>@default</strong> theme. Use the <strong>stable</strong> theme if you want to have a guaranteed clean layout for viewing via iFrame. Do not forget to choose entities for the chosen theme below.', ['@default' => $default_theme]),
+      '#options' => $installed_theme_options,
+      '#default_value' => !empty($theme_canonical) && isset($installed_theme_options[$theme_canonical]) ? $theme_canonical : reset($installed_theme_options),
+      '#required' => TRUE,
+    ];
 
     // Get all Advertising entities to choose from.
     $options = [];
@@ -200,7 +211,7 @@ class AdDisplayForm extends EntityForm {
     $form['fallback']['use_settings_from'] = [
       '#type' => 'select',
       '#title' => $this->t("Use display settings of theme"),
-      '#options' => array_combine($installed_themes, $installed_themes),
+      '#options' => $installed_theme_options,
       '#empty_value' => '',
       '#default_value' => !empty($fallback_settings['use_settings_from']) ? $fallback_settings['use_settings_from'] : '',
       '#required' => FALSE,

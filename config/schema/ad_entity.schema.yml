@@ -83,6 +83,9 @@ ad_entity.display.*:
       label: 'Label'
     uuid:
       type: string
+    theme_canonical:
+      type: string
+      label: 'Default theme to use when viewing via canonical url or iFrame.'
     variants:
       type: sequence
       label: 'List of variants to display, keyed by themes.'

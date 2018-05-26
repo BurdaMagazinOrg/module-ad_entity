@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @Block(
  *   id = "ad_display",
  *   admin_label = @Translation("Display for Advertisement"),
+ *   category = @Translation("Display for Advertisement"),
  *   deriver = "Drupal\ad_entity\Plugin\Derivative\AdDisplayBlock"
  * )
  */
@@ -141,8 +142,8 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
     $id = $this->getDerivativeId();
     $build = [];
     if ($ad_display = $this->adDisplayStorage->load($id)) {
-      $view = $this->adDisplayViewBuilder->view($ad_display, 'default');
       if ($ad_display->access('view')) {
+        $view = $this->adDisplayViewBuilder->view($ad_display, 'default');
         $build[$id] = $view;
       }
     }

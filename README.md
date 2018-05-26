@@ -90,9 +90,16 @@ When choosing the proper field formatter for delivering the Advertising context,
 you may additionally choose between <em>frontend appliance</em>
 and <em>backend appliance</em> mode. Frontend appliance mode will use
 Javascript to apply the delivered context, whereas backend appliance mode
-will do this job on the server-side. 
+will do this job on the server-side. Backend appliance mode is generally
+the recommended mode to choose (next section explains why).
 
-For regular HTML ads, it's recommended to use the frontend appliance mode.
+The frontend appliance mode used to be the recommended mode in favor of
+saving resources on the server side. It has been shown though that this
+would not become true unless your appliance process is very complex.
+Most of the appliance processes are not complex though, and if so,
+you would need to reconsider the whole process since you don't want a slow
+frontend too. The frontend appliance mode still exists, but may be considered
+to be deprecated for the next major release (2.x).
 If you want to apply Advertising contexts on iframes or feeds,
 you'll need to use the backend appliance mode on your field formatters.
 

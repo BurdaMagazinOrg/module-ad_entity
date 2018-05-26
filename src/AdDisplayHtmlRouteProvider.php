@@ -30,6 +30,26 @@ class AdDisplayHtmlRouteProvider extends AdminHtmlRouteProvider {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function getCanonicalRoute(EntityTypeInterface $entity_type) {
+    if ($entity_type->hasLinkTemplate('canonical') && $entity_type->hasViewBuilderClass()) {
+      $entity_type_id = $entity_type->id();
+      $route = new Route($entity_type->getLinkTemplate('canonical'));
+      $route
+        ->addDefaults([
+          '_controller' => '\Drupal\ad_entity\Controller\AdDisplayController::view',
+        ])
+        ->setRequirement('_entity_access', "{$entity_type_id}.view")
+        ->setOption('parameters', [
+          $entity_type_id => ['type' => 'entity:' . $entity_type_id],
+        ]);
+      return $route;
+    }
+    return NULL;
+  }
+
+  /**
    * Gets the collection route.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type

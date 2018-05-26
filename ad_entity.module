@@ -25,6 +25,10 @@ function ad_entity_theme($existing, $type, $theme, $path) {
     'ad_display' => [
       'variables' => ['ad_display' => NULL, 'variants' => []],
     ],
+    'ad_display_iframe' => [
+      'variables' => ['ad_display' => NULL, 'width' => 0, 'height' => 0],
+      'file' => 'ad_entity.theme.inc',
+    ],
     'ad_entity' => [
       'variables' => ['ad_entity' => NULL, 'variant' => '["any"]'],
       'file' => 'ad_entity.theme.inc',
@@ -435,7 +439,7 @@ function _ad_entity_attach_js_settings_head(array &$variables) {
 /**
  * Returns a render array for embedding the ad_entity/base library inline.
  *
- * This might be useful for elements like iframes, which
+ * This might be useful for elements like iFrames, which
  * need to include the base functionality for ad_entity Javascript.
  *
  * @return array

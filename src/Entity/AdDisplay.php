@@ -36,7 +36,7 @@ use Drupal\Core\Theme\ActiveTheme;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/ad_entity/display/{ad_display}",
+ *     "canonical" = "/ad-display/{ad_display}",
  *     "add-form" = "/admin/structure/ad_entity/display/add",
  *     "edit-form" = "/admin/structure/ad_entity/display/{ad_display}/edit",
  *     "delete-form" = "/admin/structure/ad_entity/display/{ad_display}/delete",

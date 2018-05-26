@@ -112,3 +112,28 @@ function template_preprocess_ad_entity_context(array &$variables) {
   // Attach the JS implementation for the context plugin.
   $variables['#attached']['library'][] = $definition['library'];
 }
+
+/**
+ * Preprocess implementation for viewing a display config as iFrame.
+ *
+ * @param array &$variables
+ *   An array of variables.
+ */
+function template_preprocess_ad_display_iframe(&$variables) {
+  /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $ad_display */
+  $ad_display = $variables['ad_display'];
+  $attributes = [
+    'width' => $variables['width'],
+    'height' => $variables['height'],
+    'class' => ['ad-display-iframe'],
+  ];
+  if ($ad_display->isNew()) {
+    \Drupal::logger('ad_entity')->error(t('Tried to view a new, unsaved Advertising display config via iFrame. Only saved configs can be viewed via iFrame.'));
+    $variables['#cache']['max-age'] = 0;
+    $attributes['srcdoc'] = t('The display config can only be viewed when it is saved.');
+  }
+  else {
+    $attributes['src'] = $ad_display->toUrl('canonical')->setAbsolute(TRUE)->toString();
+  }
+  $variables['attributes'] = new Attribute($attributes);
+}
