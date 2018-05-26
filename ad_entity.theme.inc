@@ -119,7 +119,7 @@ function template_preprocess_ad_entity_context(array &$variables) {
  * @param array &$variables
  *   An array of variables.
  */
-function template_preprocess_ad_display_iframe(&$variables) {
+function template_preprocess_ad_display_iframe(array &$variables) {
   /** @var \Drupal\ad_entity\Entity\AdDisplayInterface $ad_display */
   $ad_display = $variables['ad_display'];
   $attributes = [

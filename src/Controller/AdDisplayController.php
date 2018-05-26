@@ -62,7 +62,7 @@ class AdDisplayController implements ContainerInjectionInterface {
    *
    * @param string $default_theme
    *   The system default theme name.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
@@ -101,6 +101,7 @@ class AdDisplayController implements ContainerInjectionInterface {
    *
    * @param \Drupal\ad_entity\Entity\AdDisplayInterface $ad_display
    *   The display config.
+   *
    * @return array
    *   The render array for viewing the advertisement.
    */
