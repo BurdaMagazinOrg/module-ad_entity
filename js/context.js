@@ -3,13 +3,11 @@
  * Fundamental JS implementation for applying Advertising context.
  */
 
-(function ($, Drupal, window) {
+(function (ad_entity) {
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
+  ad_entity.context = ad_entity.context || {};
 
-  Drupal.ad_entity.context = Drupal.ad_entity.context || {};
-
-  Drupal.ad_entity.contextObjects = Drupal.ad_entity.contextObjects || [];
+  ad_entity.contextObjects = ad_entity.contextObjects || [];
 
   /**
    * Adds all context objects from the given DOM.
@@ -17,13 +15,18 @@
    * @param {object} dom
    *   The DOM, usually provided by the Drupal context.
    */
-  Drupal.ad_entity.context.addFrom = function (dom) {
-    $('script[data-ad-entity-context]', dom).each(function () {
-      var $this = $(this);
-      var context_object = JSON.parse($this.html());
-      Drupal.ad_entity.contextObjects.push(context_object);
-      $this.remove();
-    });
+  ad_entity.context.addFrom = function (dom) {
+    var items = dom.querySelectorAll('script[data-ad-entity-context]');
+    var length = items.length;
+    var item;
+    var i;
+    var context_object;
+    for (i = 0; i < length; i++) {
+      item = items[i];
+      context_object = JSON.parse(item.innerHTML);
+      ad_entity.contextObjects.push(context_object);
+      item.parentNode.removeChild(item);
+    }
   };
 
   /**
@@ -32,20 +35,28 @@
    * @param {object} newcomers
    *   The list of newly collected Advertising containers.
    */
-  Drupal.ad_entity.context.applyOn = function (newcomers) {
-    var context_objects = Drupal.ad_entity.contextObjects;
+  ad_entity.context.applyOn = function (newcomers) {
+    var context_objects = ad_entity.contextObjects;
+    var context_object;
+    var id;
+    var container;
+    var to_apply;
+    var ad_entity_id;
+    var context_id;
+    var context_settings;
+
     while (context_objects.length) {
-      var context_object = context_objects.shift();
-      for (var id in newcomers) {
+      context_object = context_objects.shift();
+      for (id in newcomers) {
         if (newcomers.hasOwnProperty(id)) {
-          var container = newcomers[id];
+          container = newcomers[id];
 
           // Determine whether to apply the given context
           // on the Advertising container.
-          var to_apply = true;
+          to_apply = true;
           if (context_object.hasOwnProperty('apply_on') && context_object.apply_on.length > 0) {
-            var ad_entity_id = container.data('adEntity');
-            if ($.inArray(ad_entity_id, context_object.apply_on) < 0) {
+            ad_entity_id = container.data('data-ad-entity');
+            if (context_object.apply_on.indexOf(ad_entity_id) < 0) {
               to_apply = false;
             }
           }
@@ -53,13 +64,13 @@
           if (to_apply) {
             // When given, let the corresponding implementation
             // of the context plugin perform the appliance.
-            var context_id = context_object.context_id;
-            if (Drupal.ad_entity.context.hasOwnProperty(context_id)) {
-              var context_settings = {};
+            context_id = context_object.context_id;
+            if (ad_entity.context.hasOwnProperty(context_id)) {
+              context_settings = {};
               if (context_object.hasOwnProperty('settings')) {
                 context_settings = context_object.settings;
               }
-              Drupal.ad_entity.context[context_id].apply(container, context_settings, newcomers);
+              ad_entity.context[context_id].apply(container, context_settings, newcomers);
             }
           }
         }
@@ -67,4 +78,4 @@
     }
   };
 
-}(jQuery, Drupal, window));
+}(window.adEntity));

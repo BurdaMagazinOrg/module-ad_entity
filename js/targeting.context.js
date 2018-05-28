@@ -3,46 +3,49 @@
  * JS handler implementation for the 'targeting' context.
  */
 
-(function ($, Drupal, window) {
+(function (ad_entity) {
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
+  ad_entity.context = ad_entity.context || {};
 
-  Drupal.ad_entity.context = Drupal.ad_entity.context || {};
-
-  Drupal.ad_entity.context.targeting = {
+  ad_entity.context.targeting = {
     apply: function (container, context_settings, newcomers) {
+      var targeting;
+      var context_targeting;
       if (context_settings.hasOwnProperty('targeting')) {
-        var context_targeting = context_settings.targeting;
+        context_targeting = context_settings.targeting;
         if (typeof context_targeting === 'object') {
-          var targeting = container.data('adEntityTargeting');
+          targeting = container.data('data-ad-entity-targeting');
           if (typeof targeting !== 'object') {
             targeting = {};
           }
 
           this.merge(targeting, context_targeting);
 
-          container.data('adEntityTargeting', targeting);
-          container.attr('data-ad-entity-targeting', JSON.stringify(targeting));
+          container.data('data-ad-entity-targeting', targeting);
+          container.el.setAttribute('data-ad-entity-targeting', JSON.stringify(targeting));
         }
       }
     },
     merge: function (targeting, context_targeting) {
       // Merge the targeting with the given context targeting.
-      for (var key in context_targeting) {
+      var key;
+      var item_length;
+      var i;
+      for (key in context_targeting) {
         if (context_targeting.hasOwnProperty(key)) {
           if (targeting.hasOwnProperty(key)) {
             if (targeting[key] === context_targeting[key]) {
               continue;
             }
-            if (!($.isArray(targeting[key]))) {
+            if (!(Array.isArray(targeting[key]))) {
               targeting[key] = [targeting[key]];
             }
-            if (!($.isArray(context_targeting[key]))) {
+            if (!(Array.isArray(context_targeting[key]))) {
               context_targeting[key] = [context_targeting[key]];
             }
-            var item_length = context_targeting[key].length;
-            for (var i = 0; i < item_length; i++) {
-              if ($.inArray(context_targeting[key][i], targeting[key]) < 0) {
+            item_length = context_targeting[key].length;
+            for (i = 0; i < item_length; i++) {
+              if (targeting[key].indexOf(context_targeting[key][i]) < 0) {
                 targeting[key].push(context_targeting[key][i]);
               }
             }
@@ -55,4 +58,4 @@
     }
   };
 
-}(jQuery, Drupal, window));
+}(window.adEntity));

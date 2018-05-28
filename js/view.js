@@ -3,17 +3,15 @@
  * Initial JS for viewing Advertising entities.
  */
 
-(function ($, Drupal, window) {
+(function (ad_entity, Drupal, window) {
 
-  var $window = $(window);
+  // At this point, the global adEntity object is fully
+  // initialized and available as Drupal component.
+  Drupal.ad_entity = ad_entity;
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
-
-  Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
-
-  Drupal.ad_entity.context = Drupal.ad_entity.context || {};
-
-  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
+  ad_entity.adContainers = ad_entity.adContainers || {};
+  ad_entity.context = ad_entity.context || {};
+  ad_entity.viewHandlers = ad_entity.viewHandlers || {};
 
   /**
    * Collects all not yet initialized Advertising containers from the given context.
@@ -26,23 +24,32 @@
    * @return {object}
    *   The newly added containers (newcomers).
    */
-  Drupal.ad_entity.collectAdContainers = function (context, settings) {
+  ad_entity.collectAdContainers = function (context, settings) {
     var newcomers = {};
-    var collected = Drupal.ad_entity.adContainers;
-    $('.ad-entity-container', context).each(function () {
-      var id = this.id;
-      if (typeof id !== 'string' || !(id.length > 0)) {
-        return;
+    var collected = ad_entity.adContainers;
+    var container_items = context.querySelectorAll('.ad-entity-container');
+    var length = container_items.length;
+    var el;
+    var i;
+    var container;
+    for (i = 0; i < length; i++) {
+      el = container_items[i];
+      if (typeof el.id !== 'string' || !(el.id.length > 0)) {
+        continue;
       }
-      if (collected.hasOwnProperty(id)) {
-        return;
+      if (collected.hasOwnProperty(el.id)) {
+        continue;
       }
-      var container = $(this);
-      collected[id] = container;
-      newcomers[id] = container;
-      container.data('id', id);
-    });
-    $window.trigger('adEntity:collected', [collected, newcomers, context, settings]);
+      container = {
+        el: el,
+        data: function (key, value) {
+          return ad_entity.helpers.metadata(this.el, this, key, value);
+        }
+      };
+      collected[el.id] = container;
+      newcomers[el.id] = container;
+    }
+    ad_entity.helpers.trigger(window, 'adEntity:collected', false, true, [collected, newcomers, context, settings]);
     return newcomers;
   };
 
@@ -56,37 +63,48 @@
    * @return {object}
    *   The containers which are in the scope of the current breakpoint.
    */
-  Drupal.ad_entity.restrictAdsToScope = function (containers) {
+  ad_entity.restrictAdsToScope = function (containers) {
+    var helpers = ad_entity.helpers;
     var scope = ['any'];
+    var in_scope;
+    var breakpoint;
+    var container;
+    var container_id;
+    var variant;
+    var variant_length;
+    var el;
+    var i;
+
     if (typeof window.themeBreakpoints.getCurrentBreakpoint === 'function') {
-      var breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+      breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
       if (breakpoint) {
         scope.push(breakpoint.name);
       }
     }
 
-    var in_scope = {};
-    for (var id in containers) {
-      if (containers.hasOwnProperty(id)) {
-        var container = containers[id];
-        var variant = container.data('adEntityVariant');
-        var variant_length = variant.length;
-        for (var i = 0; i < variant_length; i++) {
-          if (!($.inArray(variant[i], scope) < 0)) {
-            in_scope[id] = container;
+    in_scope = {};
+    for (container_id in containers) {
+      if (containers.hasOwnProperty(container_id)) {
+        container = containers[container_id];
+        el = container.el;
+        variant = container.data('data-ad-entity-variant');
+        variant_length = variant.length;
+        for (i = 0; i < variant_length; i++) {
+          if (!(scope.indexOf(variant[i]) < 0)) {
+            in_scope[container_id] = container;
             if (container.data('inScope') !== true) {
-              container.addClass('in-scope');
-              container.removeClass('out-of-scope');
-              container.css('display', '');
+              helpers.addClass(el, 'in-scope');
+              helpers.removeClass(el, 'out-of-scope');
+              el.style.display = null;
               container.data('inScope', true);
             }
             break;
           }
         }
-        if (!in_scope.hasOwnProperty(id) && container.data('inScope') !== false) {
-          container.removeClass('in-scope');
-          container.addClass('out-of-scope');
-          container.css('display', 'none');
+        if (!in_scope.hasOwnProperty(container_id) && (container.data('inScope') !== false)) {
+          helpers.removeClass(el, 'in-scope');
+          helpers.addClass(el, 'out-of-scope');
+          el.style.display = 'none';
           container.data('inScope', false);
         }
       }
@@ -104,18 +122,23 @@
    * @return {object}
    *   The correlation.
    */
-  Drupal.ad_entity.correlate = function (containers) {
+  ad_entity.correlate = function (containers) {
+    var view_handlers = ad_entity.viewHandlers;
+    var view_handler;
     var correlation = {};
     var handler_id = '';
-    for (var id in containers) {
-      if (containers.hasOwnProperty(id)) {
-        var container = containers[id];
-        handler_id = container.data('adEntityView');
+    var container;
+    var container_id;
 
-        if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
-          var view_handler = Drupal.ad_entity.viewHandlers[handler_id];
+    for (container_id in containers) {
+      if (containers.hasOwnProperty(container_id)) {
+        container = containers[container_id];
+        handler_id = container.data('data-ad-entity-view');
+
+        if (view_handlers.hasOwnProperty(handler_id)) {
+          view_handler = view_handlers[handler_id];
           correlation[handler_id] = correlation[handler_id] || {handler: view_handler, containers: {}};
-          correlation[handler_id].containers[id] = container;
+          correlation[handler_id].containers[container_id] = container;
         }
       }
     }
@@ -133,39 +156,47 @@
    * @param {object} settings
    *   The Drupal settings.
    */
-  Drupal.ad_entity.restrictAndInitialize = function (containers, context, settings) {
-    var to_initialize = Drupal.ad_entity.restrictAdsToScope(containers);
+  ad_entity.restrictAndInitialize = function (containers, context, settings) {
+    var view_handlers = ad_entity.viewHandlers;
+    var helpers = ad_entity.helpers;
+    var to_initialize = ad_entity.restrictAdsToScope(containers);
+    var container;
+    var container_id;
+    var initialized;
+    var disabled;
+    var correlation;
+    var handler_id;
 
-    for (var id in to_initialize) {
-      if (to_initialize.hasOwnProperty(id)) {
-        var container = to_initialize[id];
-        var initialized = container.data('initialized');
+    for (container_id in to_initialize) {
+      if (to_initialize.hasOwnProperty(container_id)) {
+        container = to_initialize[container_id];
+        initialized = container.data('initialized');
         if (typeof initialized !== 'boolean') {
-          initialized = !container.hasClass('not-initialized');
+          initialized = !helpers.hasClass(container.el, 'not-initialized');
           container.data('initialized', initialized);
         }
         // Prevent re-initialization of already initialized Advertisement.
         if (initialized === true) {
-          delete to_initialize[id];
+          delete to_initialize[container_id];
         }
         else {
           // Do not initialize disabled containers.
           // As per documentation since beta status,
           // the primary flag for disabling initialization
           // is the class name.
-          var disabled = container.hasClass('initialization-disabled');
+          disabled = helpers.hasClass(container.el, 'initialization-disabled');
           container.data('disabled', disabled);
           if (disabled) {
-            delete to_initialize[id];
+            delete to_initialize[container_id];
           }
         }
       }
     }
 
     // Let the view handlers initialize their ads.
-    var correlation = Drupal.ad_entity.correlate(to_initialize);
-    for (var handler_id in Drupal.ad_entity.viewHandlers) {
-      if (Drupal.ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
+    correlation = ad_entity.correlate(to_initialize);
+    for (handler_id in view_handlers) {
+      if (view_handlers.hasOwnProperty(handler_id)) {
         if (correlation.hasOwnProperty(handler_id)) {
           correlation[handler_id].handler.initialize(correlation[handler_id].containers, context, settings);
         }
@@ -178,16 +209,16 @@
    */
   Drupal.behaviors.adEntityView = {
     attach: function (context, settings) {
-      var ad_entity = Drupal.ad_entity;
       var containers = ad_entity.collectAdContainers(context, settings);
+      var isEmptyObject = ad_entity.helpers.isEmptyObject;
 
       // No need to proceed in case no new containers have been found.
-      if ($.isEmptyObject(containers)) {
+      if (isEmptyObject(containers)) {
         return;
       }
 
       // Apply Advertising contexts, if available.
-      if (!($.isEmptyObject(ad_entity.context))) {
+      if (!(isEmptyObject(ad_entity.context))) {
         ad_entity.context.addFrom(context);
         ad_entity.context.applyOn(containers);
       }
@@ -199,36 +230,41 @@
       // re-apply scope restriction with initialization on breakpoint changes.
       if (ad_entity.hasOwnProperty('settings') && ad_entity.settings.hasOwnProperty('responsive')) {
         if (ad_entity.settings.responsive === true) {
-          $window.on('themeBreakpoint:changed', function () {
+          window.addEventListener('themeBreakpoint:changed', function () {
             ad_entity.restrictAndInitialize(containers, context, settings);
           });
         }
       }
     },
     detach: function (context, settings) {
-
-      var ad_entity = Drupal.ad_entity;
       var containers = {};
       var collected = ad_entity.adContainers;
+      var correlation;
+      var handler_id;
 
       // Remove the detached container from the collection,
       // but keep them in mind for other view handlers to act on.
-      $('.ad-entity-container', context).each(function () {
-        var id = this.id;
-        if (typeof id !== 'string' || !(id.length > 0)) {
-          return;
+      var container_items = context.querySelectorAll('.ad-entity-container');
+      var length = container_items.length;
+      var i;
+      var el;
+
+      for (i = 0; i < length; i++) {
+        el = container_items[i];
+        if (typeof el.id !== 'string' || !(el.id.length > 0)) {
+          continue;
         }
-        if (!collected.hasOwnProperty(id)) {
-          return;
+        if (!collected.hasOwnProperty(el.id)) {
+          continue;
         }
 
-        containers[id] = collected[id];
-        delete collected[id];
-      });
+        containers[el.id] = collected[el.id];
+        delete collected[el.id];
+      }
 
       // Let the view handlers act on detachment of their ads.
-      var correlation = ad_entity.correlate(containers);
-      for (var handler_id in ad_entity.viewHandlers) {
+      correlation = ad_entity.correlate(containers);
+      for (handler_id in ad_entity.viewHandlers) {
         if (ad_entity.viewHandlers.hasOwnProperty(handler_id)) {
           if (correlation.hasOwnProperty(handler_id)) {
             correlation[handler_id].handler.detach(correlation[handler_id].containers, context, settings);
@@ -238,4 +274,4 @@
     }
   };
 
-}(jQuery, Drupal, window));
+}(window.adEntity, Drupal, window));

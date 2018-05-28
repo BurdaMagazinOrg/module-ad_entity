@@ -3,15 +3,11 @@
  * JS fallback view handler implementation.
  */
 
-(function ($, Drupal, drupalSettings, window) {
+(function (ad_entity, drupalSettings, window) {
 
-  'use strict';
+  ad_entity.fallbacks = ad_entity.fallbacks || {};
 
-  var $window = $(window);
-
-  Drupal.ad_entity.fallbacks = Drupal.ad_entity.fallbacks || {};
-
-  var fallbacks = Drupal.ad_entity.fallbacks;
+  var fallbacks = ad_entity.fallbacks;
 
   /**
    * Correlates all known ad containers with their fallback containers.
@@ -32,7 +28,7 @@
       if (containers.hasOwnProperty(id)) {
         container = containers[id];
         // Fetch the original container.
-        correlationId = container.data('fallbackContainer');
+        correlationId = container.data('data-fallback-container');
         if (typeof correlationId !== 'undefined') {
           if (!correlated.hasOwnProperty(correlationId)) {
             correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
@@ -41,7 +37,7 @@
         }
         else {
           // Fetch the fallback container.
-          correlationId = container.data('fallbackContainerFor');
+          correlationId = container.data('data-fallback-container-for');
           if (typeof correlationId !== 'undefined') {
             if (!correlated.hasOwnProperty(correlationId)) {
               correlated[correlationId] = {originalContainer: null, fallbackContainer: null};
@@ -72,8 +68,10 @@
    *   The Drupal settings.
    */
   fallbacks.processFallbacks = function (containers, context, settings) {
+    var helpers = ad_entity.helpers;
     var correlated = this.correlateContainers(containers);
     var to_load = {};
+    var id;
     for (var correlationId in correlated) {
       if (correlated.hasOwnProperty(correlationId)) {
         var item = correlated[correlationId];
@@ -88,20 +86,20 @@
         if (fallback.data('initialized') === true || fallback.data('inScope') !== true) {
           continue;
         }
-        fallback.removeClass('initialization-disabled');
+        helpers.removeClass(fallback.el, 'initialization-disabled');
         fallback.data('disabled', false);
-        var id = fallback.data('id');
+        id = fallback.el.id;
         to_load[id] = fallback;
 
         // Make sure that others won't accidentally try to
         // initialize the original container again.
-        original.addClass('initialization-disabled');
+        helpers.addClass(original.el, 'initialization-disabled');
         original.data('disabled', true);
         original.data('fallbackProcessed', true);
       }
     }
-    if (!($.isEmptyObject(to_load))) {
-      Drupal.ad_entity.restrictAndInitialize(to_load, context, settings);
+    if (!(helpers.isEmptyObject(to_load))) {
+      ad_entity.restrictAndInitialize(to_load, context, settings);
     }
   };
 
@@ -117,15 +115,15 @@
   fallbacks.getFallbackContainerFor = function (container) {
     var fallback = container.data('fallbackObject');
     if (typeof fallback === 'undefined') {
-      var correlationId = container.data('fallbackContainer');
+      var correlationId = container.data('data-fallback-container');
       if (correlationId !== 'undefined') {
         // Perform a complete lookup on all containers
         // to fetch the corresponding fallback container.
-        var all_containers = Drupal.ad_entity.adContainers;
+        var all_containers = ad_entity.adContainers;
         for (var id in all_containers) {
           if (all_containers.hasOwnProperty(id)) {
             var suspect = all_containers[id];
-            if (correlationId === suspect.data('fallbackContainerFor')) {
+            if (correlationId === suspect.data('data-fallback-container-for')) {
               fallback = suspect;
               container.data('fallbackObject', fallback);
               break;
@@ -160,6 +158,6 @@
     window.setTimeout(processCallback, timeout);
   };
 
-  $window.on('adEntity:collected', fallbacks.onCollect.bind(fallbacks));
+  window.addEventListener('adEntity:collected', fallbacks.onCollect.bind(fallbacks));
 
-}(jQuery, Drupal, drupalSettings, window));
+}(window.adEntity, drupalSettings, window));

@@ -3,66 +3,105 @@
  * JS View handler implementation for ads which are using the 'adtech_default' view plugin.
  */
 
-(function ($, Drupal, window) {
+(function (ad_entity, window) {
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
+  ad_entity.viewHandlers = ad_entity.viewHandlers || {};
 
-  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
-
-  var $window = $(window);
-
-  Drupal.ad_entity.viewHandlers.adtech_default = {
+  ad_entity.viewHandlers.adtech_default = {
     initialize: function (containers, context, settings) {
+      var load_arguments = [];
+      var argsNotEmpty = false;
+      var onPageLoad = true;
+      var container;
+      var container_id;
+      var ad_tag;
+      var ad_el;
+      var argument;
+      var targeting;
+      var delay;
+
       if (typeof window.atf_lib !== 'undefined') {
-        var load_arguments = [];
-        var onPageLoad = true;
+        ad_entity.adtechLoadingAttempts = true;
+
         if (this.numberOfAds > 0) {
           onPageLoad = false;
         }
-        for (var id in containers) {
-          if (containers.hasOwnProperty(id)) {
+        for (container_id in containers) {
+          if (containers.hasOwnProperty(container_id)) {
+            container = containers[container_id];
+            ad_el = container.el.querySelector('.adtech-factory-ad');
+            if (ad_el === null) {
+              continue;
+            }
+
             this.numberOfAds++;
-            var container = containers[id];
-            var ad_tag = $('.adtech-factory-ad', container[0]);
-            var argument = {element: ad_tag[0]};
-            var targeting = container.data('adEntityTargeting');
+            ad_tag = {
+              el: ad_el,
+              data: function (key, value) {
+                return ad_entity.helpers.metadata(this.el, this, key, value);
+              }
+            };
+            container.ad_tag = ad_tag;
+            argument = {element: ad_el};
+            targeting = container.data('data-ad-entity-targeting');
             if (typeof targeting === 'object') {
               argument.targeting = targeting;
             }
             else {
               argument.targeting = {};
+              container.data('data-ad-entity-targeting', argument.targeting);
             }
             argument.targeting.slotNumber = this.numberOfAds;
             argument.targeting.onPageLoad = onPageLoad;
             load_arguments.push(argument);
-            this.addEventsFor(ad_tag, container);
+            argsNotEmpty = true;
+            this.addEventsFor(container);
           }
         }
-        $window.trigger('atf:BeforeLoad', [load_arguments, onPageLoad]);
-        window.atf_lib.load_tag(load_arguments);
+        if (argsNotEmpty) {
+          ad_entity.helpers.trigger(window, 'atf:BeforeLoad', false, true, [load_arguments, onPageLoad]);
+        }
       }
       else {
-        if (this.numberOfLoadingAttempts < 20) {
-          this.numberOfLoadingAttempts++;
-          var delay = 10 * this.numberOfLoadingAttempts;
-          window.setTimeout(this.initialize.bind(this), delay, containers, context, settings);
+        if (typeof ad_entity.adtechLoadingAttempts === 'undefined') {
+          ad_entity.adtechLoadingAttempts = 0;
+          ad_entity.adtechLoadingUnit = 'default_view';
+        }
+        if (ad_entity.adtechLoadingAttempts === false) {
+          // Failed to load the library entirely, abort.
+          return;
+        }
+        if (typeof ad_entity.adtechLoadingAttempts === 'number') {
+          if (ad_entity.adtechLoadingAttempts < 40) {
+            ad_entity.adtechLoadingAttempts++;
+            delay = 10 * ad_entity.adtechLoadingAttempts;
+            if (!(ad_entity.adtechLoadingUnit === 'default_view')) {
+              // Another unit is already trying to load the library.
+              // Add further delay to ensure this one is being fired later.
+              delay += 100;
+            }
+            window.setTimeout(this.initialize.bind(this), delay, containers, context, settings);
+          }
+          else {
+            ad_entity.adtechLoadingAttempts = false;
+          }
         }
       }
     },
     detach: function (containers, context, settings) {},
-    addEventsFor: function (ad_tag, container) {
+    addEventsFor: function (container) {
       // Mark container as initialized once advertisement has been loaded.
       window.addEventListener('atf_ad_rendered', function (event) {
-        if (event.element_id === ad_tag.attr('id')) {
-          container.removeClass('not-initialized');
-          container.addClass('initialized');
+        var helpers = ad_entity.helpers;
+        if (event.element_id === container.ad_tag.el.id) {
+          helpers.removeClass(container.el, 'not-initialized');
+          helpers.addClass(container.el, 'initialized');
           container.data('initialized', true);
-          container.trigger('adEntity:initialized', [ad_tag, container]);
+          helpers.trigger(container.el, 'adEntity:initialized', true, true, [container]);
         }
       }, false);
     },
-    numberOfAds: 0,
-    numberOfLoadingAttempts: 0
+    numberOfAds: 0
   };
 
-}(jQuery, Drupal, window));
+}(window.adEntity, window));

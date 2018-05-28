@@ -3,24 +3,22 @@
  * JS handler implementation for the 'turnoff' context.
  */
 
-(function ($, Drupal, window) {
+(function (ad_entity) {
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
+  ad_entity.adContainers = ad_entity.adContainers || {};
 
-  Drupal.ad_entity.adContainers = Drupal.ad_entity.adContainers || {};
+  ad_entity.context = ad_entity.context || {};
 
-  Drupal.ad_entity.context = Drupal.ad_entity.context || {};
-
-  Drupal.ad_entity.context.turnoff = {
+  ad_entity.context.turnoff = {
     apply: function (container, context_settings, newcomers) {
-      var id = container.data('id');
+      var id = container.el.id;
       // Remove the container from the DOM.
-      container.remove();
+      container.el.parentNode.removeChild(container.el);
       // Delete the container from the global collection.
-      delete Drupal.ad_entity.adContainers[id];
+      delete ad_entity.adContainers[id];
       // Delete the container from the current list.
       delete newcomers[id];
     }
   };
 
-}(jQuery, Drupal, window));
+}(window.adEntity));

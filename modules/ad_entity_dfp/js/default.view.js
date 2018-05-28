@@ -3,33 +3,40 @@
  * JS View handler implementation for ads which are using the 'dfp_default' view plugin.
  */
 
-(function ($, Drupal, drupalSettings, window) {
+(function (ad_entity, drupalSettings, window) {
 
-  window.googletag = window.googletag || {};
-  window.googletag.cmd = window.googletag.cmd || [];
+  ad_entity.viewHandlers = ad_entity.viewHandlers || {};
 
-  Drupal.ad_entity = Drupal.ad_entity || window.adEntity || {};
-
-  Drupal.ad_entity.viewHandlers = Drupal.ad_entity.viewHandlers || {};
-
-  var $window = $(window);
-
-  Drupal.ad_entity.viewHandlers.dfp_default = {
+  ad_entity.viewHandlers.dfp_default = {
     initialize: function (containers, context, settings) {
       window.googletag.cmd.push(function () {
+        var ad_tags = [];
         var onPageLoad = 'true';
+        var container;
+        var container_id;
+        var ad_tag;
+        var ad_el;
         if (this.numberOfAds > 0) {
           onPageLoad = 'false';
         }
-        var ad_tags = [];
-        for (var id in containers) {
-          if (containers.hasOwnProperty(id)) {
+        for (container_id in containers) {
+          if (containers.hasOwnProperty(container_id)) {
+            container = containers[container_id];
+            ad_el = container.el.querySelector('.google-dfp-ad');
+            if (ad_el === null) {
+              continue;
+            }
+
             this.numberOfAds++;
-            var container = containers[id];
-            var ad_tag = $('.google-dfp-ad', container[0]);
-            ad_tag.data('id', ad_tag.attr('id'));
+            ad_tag = {
+              el: ad_el,
+              data: function (key, value) {
+                return ad_entity.helpers.metadata(this.el, this, key, value);
+              }
+            };
+            container.ad_tag = ad_tag;
             this.define(ad_tag, this.numberOfAds.toString(), onPageLoad, container);
-            this.addEventsFor(ad_tag, container);
+            this.addEventsFor(container);
             ad_tags.push(ad_tag);
           }
         }
@@ -38,17 +45,20 @@
     },
     detach: function (containers, context, settings) {},
     define: function (ad_tag, slotNumber, onPageLoad, container) {
-      var ad_id = ad_tag.data('id');
-      var network_id = ad_tag.data('dfpNetwork');
-      var unit_id = ad_tag.data('dfpUnit');
-      var out_of_page = ad_tag.data('dfpOutOfPage');
-
+      var ad_id = ad_tag.el.id;
+      var network_id = ad_tag.data('data-dfp-network');
+      var unit_id = ad_tag.data('data-dfp-unit');
+      var out_of_page = ad_tag.data('data-dfp-out-of-page');
       var slot;
+      var sizes;
+      var targeting;
+      var key;
+
       if (out_of_page === true) {
         slot = window.googletag.defineOutOfPageSlot('/' + network_id + '/' + unit_id, ad_id);
       }
       else {
-        var sizes = ad_tag.data('dfpSizes');
+        sizes = ad_tag.data('data-dfp-sizes');
         if (typeof sizes !== 'object') {
           sizes = [];
         }
@@ -57,14 +67,14 @@
 
       ad_tag.data('slot', slot);
 
-      var targeting = container.data('adEntityTargeting');
+      targeting = container.data('data-ad-entity-targeting');
       if (typeof targeting !== 'object') {
         targeting = {};
       }
 
-      $window.trigger('dfp:BeforeDisplay', [slot, targeting, slotNumber, onPageLoad]);
+      ad_entity.helpers.trigger(window, 'dfp:BeforeDisplay', false, true, [slot, targeting, slotNumber, onPageLoad]);
 
-      for (var key in targeting) {
+      for (key in targeting) {
         if (targeting.hasOwnProperty(key)) {
           slot.setTargeting(key, targeting[key]);
         }
@@ -83,23 +93,30 @@
       var slots = [[]];
       var slots_length;
       var slots_list;
+      var slot;
       var i;
-
+      var j;
+      var k;
+      var ad_tag;
+      var unit_path;
+      var exists;
+      var slots_list_length;
       var ad_tags_length = ad_tags.length;
+
       for (i = 0; i < ad_tags_length; i++) {
-        var ad_tag = ad_tags[i];
-        var slot = ad_tag.data('slot');
+        ad_tag = ad_tags[i];
+        slot = ad_tag.data('slot');
 
         if (typeof slot === 'object') {
-          window.googletag.display(ad_tag.data('id'));
+          window.googletag.display(ad_tag.el.id);
 
-          var unit_path = slot.getAdUnitPath();
+          unit_path = slot.getAdUnitPath();
           slots_length = slots.length;
-          for (var j = 0; j < slots_length; j++) {
-            var exists = false;
+          for (j = 0; j < slots_length; j++) {
+            exists = false;
             slots_list = slots[j];
-            var slots_list_length = slots_list.length;
-            for (var k = 0; k < slots_list_length; k++) {
+            slots_list_length = slots_list.length;
+            for (k = 0; k < slots_list_length; k++) {
               if (unit_path === slots_list[k].getAdUnitPath()) {
                 exists = true;
                 break;
@@ -124,22 +141,24 @@
         }
       }
     },
-    addEventsFor: function (ad_tag, container) {
+    addEventsFor: function (container) {
       // Mark container as initialized once advertisement has been loaded.
       var initHandler = function (event) {
-        if (event.slot.getSlotElementId() === ad_tag.data('id')) {
-          container.removeClass('not-initialized');
-          container.addClass('initialized');
+        var helpers = ad_entity.helpers;
+        var el = container.el;
+        if (event.slot.getSlotElementId() === container.ad_tag.el.id) {
+          helpers.removeClass(el, 'not-initialized');
+          helpers.addClass(el, 'initialized');
           container.data('initialized', true);
           if (event.isEmpty === true) {
-            container.addClass('empty');
-            container.removeClass('not-empty');
+            helpers.addClass(el, 'empty');
+            helpers.removeClass(el, 'not-empty');
           }
           else {
-            container.addClass('not-empty');
-            container.removeClass('empty');
+            helpers.addClass(el, 'not-empty');
+            helpers.removeClass(el, 'empty');
           }
-          container.trigger('adEntity:initialized', [ad_tag, container]);
+          helpers.trigger(el, 'adEntity:initialized', true, true, [container]);
         }
       };
 
@@ -152,8 +171,8 @@
   // Do not include slot order targeting when this feature is explicitly not enabled.
   if (drupalSettings.hasOwnProperty('dfp_order_info')) {
     if (!drupalSettings.dfp_order_info) {
-      Drupal.ad_entity.viewHandlers.dfp_default.withSlotOrder = false;
+      ad_entity.viewHandlers.dfp_default.withSlotOrder = false;
     }
   }
 
-}(jQuery, Drupal, drupalSettings, window));
+}(window.adEntity, drupalSettings, window));

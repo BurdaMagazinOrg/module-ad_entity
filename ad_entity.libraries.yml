@@ -3,13 +3,19 @@ base:
     js/base.js: {}
     js/consent.js: {}
 
+helpers:
+  js:
+    js/helpers.js: {}
+  dependencies:
+    - ad_entity/base
+
 view:
   js:
     js/view.js: {}
   dependencies:
     - ad_entity/base
+    - ad_entity/helpers
     - core/drupal
-    - core/jquery
 
 context:
   js:
@@ -17,7 +23,6 @@ context:
   dependencies:
     - ad_entity/view
     - core/drupal
-    - core/jquery
 
 turnoff_context:
   js:

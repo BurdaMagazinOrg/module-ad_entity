@@ -1,13 +1,13 @@
 /**
  * @file
- * Creating the base for the adEntity object, including settings.
+ * Initially builds the base for the adEntity object, including settings.
  */
 
 (function (window, document) {
 
   var settingsElement = document.getElementById('ad-entity-settings');
 
-  window.adEntity = {};
+  window.adEntity = {settings: {}, helpers: {}};
 
   if (settingsElement !== null) {
     window.adEntity.settings = JSON.parse(settingsElement.textContent);
