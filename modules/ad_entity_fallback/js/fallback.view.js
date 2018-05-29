@@ -19,14 +19,14 @@
    *   The correlation.
    */
   fallbacks.correlateContainers = function (containers) {
-    var id;
     var correlationId;
     var container;
+    var container_id;
     var correlated = {};
     var item;
-    for (id in containers) {
-      if (containers.hasOwnProperty(id)) {
-        container = containers[id];
+    for (container_id in containers) {
+      if (containers.hasOwnProperty(container_id)) {
+        container = containers[container_id];
         // Fetch the original container.
         correlationId = container.data('data-fallback-container');
         if (typeof correlationId !== 'undefined') {
@@ -140,17 +140,10 @@
    *
    * @param {object} event
    *   The corresponding event object.
-   * @param {object} all_containers
-   *   The global collection of containers.
-   * @param {object} newcomers
-   *   The newly collected containers.
-   * @param {object} context
-   *   The DOM context.
-   * @param {object} settings
-   *   The Drupal settings.
    */
-  fallbacks.onCollect = function (event, all_containers, newcomers, context, settings) {
-    var processCallback = this.processFallbacks.bind(this, newcomers, context, settings);
+  fallbacks.onCollect = function (event) {
+    var detail = event.detail;
+    var processCallback = this.processFallbacks.bind(this, detail.newcomers, detail.context, detail.settings);
     var timeout = 1000;
     if (drupalSettings.hasOwnProperty('ad_entity') && drupalSettings.ad_entity.hasOwnProperty('fallback_timeout')) {
       timeout = drupalSettings.ad_entity.fallback_timeout;

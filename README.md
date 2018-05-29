@@ -112,23 +112,19 @@ the Advertising implementations might provide events for you.
 
 Following events are provided in general:
  - When containers for Advertising entities have been collected from context:
-   ```
-   $window.trigger('adEntity:collected',
-   [Drupal.ad_entity.adContainers, newcomers, context, settings]);
-   ```
+   `adEntity:collected` with an `event.detail` object
+   holding `collected, newcomers, context, settings`.
  - After Advertisement has been initialized inside the container:
-   ```
-   container.trigger('adEntity:initialized', [ad_tag, container]);
-   ```
+   `adEntity:initialized` with an `event.detail` object holding `container`.
 
-The AdTech implementation provides the window event <code>atf:BeforeLoad</code>
-which is being triggered right before <code>atf_lib.load_tags()</code>
-is called with the <code>load_arguments</code> array.
+The AdTech implementation provides the window event `atf:BeforeLoad`
+which is being triggered right before `atf_lib.load_tags()`
+is called with the `load_arguments` array.
 
 The DFP implementation provides the window event <code>dfp:BeforeDisplay</code>
 which is being triggered right after the slot definition and before the
 display instruction, giving you the options to act on
-the <code>slot</code> and its corresponding <code>targeting</code>.
+the `slot` and its corresponding `targeting`.
 
 ## Manually loading and rendering Advertising entities
 

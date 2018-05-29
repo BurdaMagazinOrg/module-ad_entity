@@ -32,6 +32,7 @@
     var el;
     var i;
     var container;
+    var event_detail;
     for (i = 0; i < length; i++) {
       el = container_items[i];
       if (typeof el.id !== 'string' || !(el.id.length > 0)) {
@@ -49,7 +50,13 @@
       collected[el.id] = container;
       newcomers[el.id] = container;
     }
-    ad_entity.helpers.trigger(window, 'adEntity:collected', false, true, [collected, newcomers, context, settings]);
+    event_detail = {
+      collected: collected,
+      newcomers: newcomers,
+      context: context,
+      settings: settings
+    };
+    ad_entity.helpers.trigger(window, 'adEntity:collected', false, true, event_detail);
     return newcomers;
   };
 

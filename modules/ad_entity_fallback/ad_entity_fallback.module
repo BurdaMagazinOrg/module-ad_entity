@@ -10,6 +10,20 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\ad_entity\Entity\AdEntityInterface;
 
 /**
+ * Implements hook_library_info_alter().
+ */
+function ad_entity_fallback_library_info_alter(&$libraries, $extension) {
+  if (!('ad_entity' === $extension)) {
+    return;
+  }
+  if (!empty($libraries['viewready'])) {
+    // Ensure that the fallback JS code is
+    // being included right before viewready.js.
+    $libraries['viewready']['dependencies'][] = 'ad_entity_fallback/view';
+  }
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for ad_entity_settings.
  */
 function ad_entity_fallback_form_ad_entity_settings_alter(array &$form, FormStateInterface $form_state) {

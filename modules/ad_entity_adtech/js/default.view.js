@@ -59,7 +59,8 @@
           }
         }
         if (argsNotEmpty) {
-          ad_entity.helpers.trigger(window, 'atf:BeforeLoad', false, true, [load_arguments, onPageLoad]);
+          ad_entity.helpers.trigger(window, 'atf:BeforeLoad', false, true, {loadArguments: load_arguments, onPageLoad: onPageLoad});
+          window.atf_lib.load_tag(load_arguments);
         }
       }
       else {
@@ -97,7 +98,7 @@
           helpers.removeClass(container.el, 'not-initialized');
           helpers.addClass(container.el, 'initialized');
           container.data('initialized', true);
-          helpers.trigger(container.el, 'adEntity:initialized', true, true, [container]);
+          helpers.trigger(container.el, 'adEntity:initialized', true, true, {container: container});
         }
       }, false);
     },

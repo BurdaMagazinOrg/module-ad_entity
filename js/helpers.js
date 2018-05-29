@@ -16,8 +16,8 @@
    *   Indicating whether the event bubbles up through the DOM or not.
    * @param {boolean} cancelable
    *   Indicating whether the event is cancelable.
-   * @param {object} detail
-   *   The data array passed when initializing the event.
+   * @param {(object|number|string|boolean)} detail
+   *   The data passed in when initializing the event.
    */
   adEntity.helpers.trigger = function (target, type, canBubble, cancelable, detail) {
     // This is deprecated but needed for IE compatibility.

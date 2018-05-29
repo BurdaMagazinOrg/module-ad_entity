@@ -53,6 +53,7 @@
       var sizes;
       var targeting;
       var key;
+      var event_detail;
 
       if (out_of_page === true) {
         slot = window.googletag.defineOutOfPageSlot('/' + network_id + '/' + unit_id, ad_id);
@@ -72,7 +73,13 @@
         targeting = {};
       }
 
-      ad_entity.helpers.trigger(window, 'dfp:BeforeDisplay', false, true, [slot, targeting, slotNumber, onPageLoad]);
+      event_detail = {
+        slot: slot,
+        targeting: targeting,
+        slotNumber: slotNumber,
+        onPageLoad: onPageLoad
+      };
+      ad_entity.helpers.trigger(window, 'dfp:BeforeDisplay', false, true, event_detail);
 
       for (key in targeting) {
         if (targeting.hasOwnProperty(key)) {
@@ -158,7 +165,7 @@
             helpers.addClass(el, 'not-empty');
             helpers.removeClass(el, 'empty');
           }
-          helpers.trigger(el, 'adEntity:initialized', true, true, [container]);
+          helpers.trigger(el, 'adEntity:initialized', true, true, {container: container});
         }
       };
 
