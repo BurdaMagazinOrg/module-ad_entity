@@ -126,7 +126,9 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
    */
   public function getGlobalSettings() {
     if (!isset($this->globalSettings)) {
+      // phpcs:disable
       $this->setGlobalSettings(\Drupal::config('ad_entity.settings'));
+      // phpcs:enable
     }
     return $this->globalSettings;
   }
