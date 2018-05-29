@@ -1,7 +1,11 @@
 # Advertising Entity: Goals and achieved milestones
 
 8.x-1.0-beta:
-- Implement unit and web tests.
+- Implement unit and web tests. [missing!]
+- Performance optimizations:
+    - Get rid of jQuery (see #2974510) [done]
+    - Add viewready.js which fires as soon as possible [done]
+    - Provide the ability to initialize ads via inline JS [missing!]
 - Fix all known major problems.
   List of known major problems:
     - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7 [fixed]

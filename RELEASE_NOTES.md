@@ -4,6 +4,31 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta17:
+1. This release contains a lot of refactored code.
+   Contains API changes, which might affect your extensions or modifications.
+   Take care of it when updating your codebase. In case you have custom code
+   which makes use of any ad_entity API, either JS or PHP, make sure your
+   code still works. This is an extraordinary API change for a beta state,
+   but it's required to improve the module's frontend efficiency.
+2. Frontend appliance mode for Advertising contexts is now deprecated.
+   The frontend appliance mode used to be the recommended mode in favor of
+   saving resources on the server side. It has been shown though that this
+   would not become true unless your appliance process is very complex.
+   The global settings offer a tweak option to enforce backend appliance mode,
+   so that the module does not include any context.js files anymore.
+- #2974510 by arthur_lorenz, mxh: Get rid of jQuery dependency.
+  NOTE: Any adEntity event is not being triggered with jQuery anymore.
+  It's now a CustomEvent object, holding any parameter at event.detail.
+- New feature: Added a view controller for showing ad display configurations.
+  The controller is able to switch to a certain theme. With this controller,
+  ad display configs can now be embedded as a generic iFrame. You can also
+  create block configurations for generic ad display iFrames.
+- #13 (GitHub issue): Make Theme Breakpoints JS an optional dependency.
+- Bugfix (regression from 1.0-beta16): Missing Theme Breakpoints JS dependency.
+  This library would now be included only when the module is available.
+- Added an option to enforce backend appliance mode (see 2. above).
+
 8.x-1.0-beta16:
 - New feature: Configure to use personalized ads with consent awareness.
   Can be optionally combined with the EU Cookie Compliance module.
