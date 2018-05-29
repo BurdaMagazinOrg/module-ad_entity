@@ -95,6 +95,12 @@ function ad_entity_library_info_alter(&$libraries, $extension) {
   if (!('ad_entity' === $extension)) {
     return;
   }
+  $module_handler = \Drupal::moduleHandler();
+  if (!empty($libraries['view'])) {
+    if ($module_handler->moduleExists('theme_breakpoints_js')) {
+      $libraries['view']['dependencies'][] = 'theme_breakpoints_js/breakpointsLoader';
+    }
+  }
   if ($config = \Drupal::config('ad_entity.settings')) {
     $personalization = $config->get('personalization');
     if (empty($personalization['enabled'])) {

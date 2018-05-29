@@ -82,10 +82,12 @@
     var el;
     var i;
 
-    if (typeof window.themeBreakpoints.getCurrentBreakpoint === 'function') {
-      breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
-      if (breakpoint) {
-        scope.push(breakpoint.name);
+    if (typeof window.themeBreakpoints === 'object') {
+      if (typeof window.themeBreakpoints.getCurrentBreakpoint === 'function') {
+        breakpoint = window.themeBreakpoints.getCurrentBreakpoint();
+        if (breakpoint) {
+          scope.push(breakpoint.name);
+        }
       }
     }
 

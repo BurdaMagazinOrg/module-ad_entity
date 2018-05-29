@@ -114,8 +114,9 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Frontend'),
       '#weight' => 10,
     ];
+    $theme_breakpoints_js_exists = $this->moduleHandler->moduleExists('theme_breakpoints_js');
     $default_behavior = $config->get('enable_responsive_behavior') !== NULL ?
-      (int) $config->get('enable_responsive_behavior') : 1;
+      (int) $config->get('enable_responsive_behavior') : (int) $theme_breakpoints_js_exists;
     $form['common']['frontend']['enable_responsive_behavior'] = [
       '#type' => 'radios',
       '#title' => $this->t('Responsive behavior'),
@@ -124,6 +125,10 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#default_value' => $default_behavior,
       '#weight' => 10,
     ];
+    if (!$theme_breakpoints_js_exists) {
+      $form['common']['frontend']['enable_responsive_behavior']['#description'] = $this->t("Install the <a href=':url' target='_blank' rel='noopener nofollow'>Theme Breakpoints JS</a> module to enable ads to be dynamically initialized on breakpoint changes.", [':url' => 'https://www.drupal.org/project/theme_breakpoints_js']);
+      $form['common']['frontend']['enable_responsive_behavior']['#disabled'] = TRUE;
+    }
 
     $behavior_reset = $config->get('behavior_on_context_reset');
     $form['common']['behavior_on_context_reset'] = [
@@ -428,6 +433,9 @@ class GlobalSettingsForm extends ConfigFormBase {
     parent::submitForm($form, $form_state);
     $config = $this->getConfig();
     $config->set('enable_responsive_behavior', (bool) $form_state->getValue('enable_responsive_behavior'));
+    if (!$this->moduleHandler->moduleExists('theme_breakpoints_js')) {
+      $config->set('enable_responsive_behavior', FALSE);
+    }
     $config->set('behavior_on_context_reset', $form_state->getValue('behavior_on_context_reset'));
 
     $context_values = $form_state->getValue('site_wide_context');

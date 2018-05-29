@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Component\Serialization\Json;
-use Drupal\theme_breakpoints_js\ThemeBreakpointsJs;
 
 /**
  * Advertising display configuration form.
@@ -42,10 +41,10 @@ class AdDisplayForm extends EntityForm {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $ad_entity_storage
    *   The storage for Advertising entities.
-   * @param \Drupal\theme_breakpoints_js\ThemeBreakpointsJs $theme_breakpoints_js
-   *   The theme breakpoints js manager.
+   * @param mixed $theme_breakpoints_js
+   *   (Optional) The theme breakpoints js manager, if available.
    */
-  public function __construct(EntityStorageInterface $ad_entity_storage, ThemeBreakpointsJs $theme_breakpoints_js) {
+  public function __construct(EntityStorageInterface $ad_entity_storage, $theme_breakpoints_js = NULL) {
     $this->adEntityStorage = $ad_entity_storage;
     $this->themeBreakpointsJs = $theme_breakpoints_js;
     $this->adEntities = $this->adEntityStorage->loadMultiple();
@@ -56,9 +55,10 @@ class AdDisplayForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     $type_manager = $container->get('entity_type.manager');
+    $theme_breakpoints_js = $container->has('theme_breakpoints_js') ? $container->get('theme_breakpoints_js') : NULL;
     return new static(
       $type_manager->getStorage('ad_entity'),
-      $container->get('theme_breakpoints_js')
+      $theme_breakpoints_js
     );
   }
 
@@ -140,7 +140,7 @@ class AdDisplayForm extends EntityForm {
     // Provide settings per theme.
     $variants = $ad_display->get('variants');
     foreach ($installed_themes as $index => $theme_name) {
-      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+      $theme_breakpoints = isset($this->themeBreakpointsJs) ? $this->themeBreakpointsJs->getBreakpoints($theme_name) : [];
 
       $variants_by_entity = !empty($variants[$theme_name]) ? $variants[$theme_name] : [];
       $variants_by_breakpoint = [];
@@ -168,6 +168,9 @@ class AdDisplayForm extends EntityForm {
         '#options' => $options,
         '#default_value' => !empty($variants_by_breakpoint['any']) ? $variants_by_breakpoint['any'] : NULL,
       ];
+      if (!isset($this->themeBreakpointsJs)) {
+        $form['theme'][$theme_name]['variant_any']['#description'] = $this->t("The selected Advertising entity will always be displayed, regardless of the given screen width. If you want to use variants per theme breakpoint, install the <a href=':url' target='_blank' rel='noopener nofollow'>Theme Breakpoints JS</a> module.", [':url' => 'https://www.drupal.org/project/theme_breakpoints_js']);
+      }
       if (!empty($theme_breakpoints)) {
         $form['theme'][$theme_name]['breakpoint_hint'] = [
           '#markup' => $this->t("<strong>When using variants, make sure that the theme has its breakpoints properly set up.</strong>"),
@@ -230,7 +233,7 @@ class AdDisplayForm extends EntityForm {
 
     $variants = $ad_display->get('variants');
     foreach ($theme_settings as $theme_name => $settings) {
-      $theme_breakpoints = $this->themeBreakpointsJs->getBreakpoints($theme_name);
+      $theme_breakpoints = isset($this->themeBreakpointsJs) ? $this->themeBreakpointsJs->getBreakpoints($theme_name) : [];
 
       $variants[$theme_name] = [];
       foreach (array_merge(array_keys($theme_breakpoints), ['any']) as $variant) {

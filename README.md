@@ -4,11 +4,12 @@ A Drupal module which provides consolidated integration for various types of
 advertising instances (mainly advertisement).
 
 **Why you might want consolidated ad management**:
-- All your ads respect your theme's breakpoints in the same way.
 - All your ads can be turned off on demand, and can be
   attached with targeting via context fields.
 - Always be able to replace your existing ads by others of any type
   with just a few clicks, without losing any context.
+- All your ads respect your theme's breakpoints in the same way
+  by using the Theme Breakpoints JS module.
 - Configure consent-aware personalization: This module offers
   a unified way to configure GDPR compliant ads,
   optionally combined with the EU Cookie Compliance module.
@@ -16,8 +17,9 @@ advertising instances (mainly advertisement).
 # Requirements
 
 - The <a href="https://www.drupal.org/project/entity">Entity API</a> module.
-- The <a href="https://github.com/BurdaMagazinOrg/module-theme_breakpoints_js">
-Theme Breakpoint JS</a> module.
+- If you want to setup ads, which respect your theme breakpoints, then you need
+  the <a href="https://github.com/BurdaMagazinOrg/module-theme_breakpoints_js">
+  Theme Breakpoint JS</a> module.
 
 # Quick start
 
