@@ -2,6 +2,7 @@
 
 namespace Drupal\ad_entity\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
@@ -18,6 +19,13 @@ use Drupal\ad_entity\Plugin\AdContextManager;
  * Base formatter class for Advertising context fields.
  */
 abstract class ContextFormatterBase extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The global settings of the ad_entity module.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $globalSettings;
 
   /**
    * The Advertising context manager.
@@ -48,10 +56,17 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   protected $currentUser;
 
   /**
+   * Whether the backend appliance mode is being enforced or not.
+   *
+   * @var bool
+   */
+  protected $backendEnforced;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $plugin_id,
       $plugin_definition,
       $configuration['field_definition'],
@@ -64,6 +79,9 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       $container->get('renderer'),
       $container->get('current_user')
     );
+    $global_settings = $container->get('config.factory')->get('ad_entity.settings');
+    $instance->setGlobalSettings($global_settings);
+    return $instance;
   }
 
   /**
@@ -101,6 +119,44 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
   }
 
   /**
+   * Get the global settings config.
+   *
+   * @return \Drupal\Core\Config\ImmutableConfig
+   *   The global settings of the ad_entity module.
+   */
+  public function getGlobalSettings() {
+    if (!isset($this->globalSettings)) {
+      $this->setGlobalSettings(\Drupal::config('ad_entity.settings'));
+    }
+    return $this->globalSettings;
+  }
+
+  /**
+   * Set the global settings config.
+   *
+   * @param \Drupal\Core\Config\ImmutableConfig $global_settings
+   *   The global settings of the ad_entity module.
+   */
+  public function setGlobalSettings(ImmutableConfig $global_settings) {
+    $this->globalSettings = $global_settings;
+  }
+
+  /**
+   * Whether the backend appliance mode has been enforced or not.
+   *
+   * @return bool
+   *   TRUE when enforced, FALSE otherwise.
+   */
+  public function backendEnforced() {
+    if (!isset($this->backendEnforced)) {
+      // Ensure the global config is being respected.
+      $global_settings = $this->getGlobalSettings();
+      $this->backendEnforced = (bool) $global_settings->get('tweaks.force_backend_appliance');
+    }
+    return $this->backendEnforced;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
@@ -119,19 +175,26 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
     $elements = [];
 
     $options = [
-      'frontend' => $this->t("Frontend appliance mode"),
       'backend' => $this->t("Backend appliance mode"),
-      'both' => $this->t("Both frontend & backend"),
     ];
+    if (!$this->backendEnforced()) {
+      $options += [
+        'frontend' => $this->t("Frontend appliance mode (deprecated)"),
+        'both' => $this->t("Both frontend & backend"),
+      ];
+    }
     $elements['appliance_mode'] = [
       '#type' => 'select',
       '#options' => $options,
       '#title' => $this->t("Appliance mode"),
-      '#description' => $this->t("<em>Frontend appliance mode</em> lets the client's browser apply the context via Javascript. <em>Backend appliance mode</em> lets the context being applied from server-side, which might be more suitable for iframes or feeds. The option <em>Both frontend & backend</em> appliance modes should only be considered for rare edge cases."),
+      '#description' => $this->t("Only backend appliance mode is available, because it has been enforced at the <a href='/admin/structure/ad_entity/global-settings' target='_blank'>global settings</a>."),
       '#default_value' => $this->getSetting('appliance_mode'),
       '#required' => TRUE,
       '#weight' => 10,
     ];
+    if (!$this->backendEnforced()) {
+      $elements['appliance_mode']['#description'] = $this->t("<em>Frontend appliance mode</em> lets the client's browser apply the context via Javascript. <em>See the README why frontend appliance has been deprecated</em>. <em>Backend appliance mode</em> lets the context being applied from server-side, which might be more suitable for iframes or feeds. The option <em>Both frontend & backend</em> appliance modes should only be considered for rare edge cases.");
+    }
     $elements['targeting'] = [
       '#type' => 'fieldset',
       '#collapsible' => FALSE,
@@ -245,6 +308,16 @@ abstract class ContextFormatterBase extends FormatterBase implements ContainerFa
       $apply_on = $context_item->get('apply_on')->getValue();
       $this->contextManager->addContextData($plugin_id, $settings, $apply_on);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSetting($key) {
+    if ($this->backendEnforced() && ($key === 'appliance_mode')) {
+      return 'backend';
+    }
+    return parent::getSetting($key);
   }
 
 }

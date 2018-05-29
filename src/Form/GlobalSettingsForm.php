@@ -349,12 +349,29 @@ class GlobalSettingsForm extends ConfigFormBase {
       ],
     ];
 
+    $tweaks = $config->get('tweaks');
+    $form['tweaks'] = [
+      '#type' => 'fieldset',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#title' => $this->t('System and performance tweaks'),
+      '#attributes' => ['id' => 'edit-tweaks'],
+      '#weight' => 30,
+      '#tree' => TRUE,
+    ];
+    $form['tweaks']['force_backend_appliance'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Force backend appliance mode'),
+      '#description' => $this->t('When checked, context data will always be applied on server-side, ignoring any given formatter settings. This needs to be checked so that any context.js code would never be loaded into the client. Frontend appliance has been shown not to be efficient at any time, so this feature has been deprecated and will not be ported to version 2.x of this module.'),
+      '#default_value' => (int) !empty($tweaks['force_backend_appliance']),
+    ];
+
     $type_ids = array_keys($this->typeManager->getDefinitions());
     if (!empty($type_ids)) {
       $form['settings_tabs'] = [
         '#type' => 'vertical_tabs',
         '#default_tab' => 'edit-' . key($type_ids),
-        '#weight' => 30,
+        '#weight' => 40,
       ];
 
       foreach ($type_ids as $type_id) {
@@ -469,6 +486,11 @@ class GlobalSettingsForm extends ConfigFormBase {
     }
 
     $config->set('personalization', $personalization);
+
+    $tweaks = [];
+    $user_tweaks = $form_state->getValue('tweaks');
+    $tweaks['force_backend_appliance'] = !empty($user_tweaks['force_backend_appliance']);
+    $config->set('tweaks', $tweaks);
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     foreach ($type_ids as $type_id) {

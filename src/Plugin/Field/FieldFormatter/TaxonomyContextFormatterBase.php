@@ -34,7 +34,7 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $plugin_id,
       $plugin_definition,
       $configuration['field_definition'],
@@ -48,6 +48,9 @@ abstract class TaxonomyContextFormatterBase extends ContextFormatterBase {
       $container->get('current_user'),
       $container->get('entity_type.manager')->getStorage('taxonomy_term')
     );
+    $global_settings = $container->get('config.factory')->get('ad_entity.settings');
+    $instance->setGlobalSettings($global_settings);
+    return $instance;
   }
 
   /**

@@ -1,6 +1,8 @@
 /**
  * @file
  * JS handler implementation for the 'turnoff' context.
+ *
+ * @deprecated See README.md why this feature is deprecated.
  */
 
 (function (ad_entity) {

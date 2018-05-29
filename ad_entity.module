@@ -53,20 +53,23 @@ function ad_entity_library_info_build() {
   // Add the viewready.js library, in case view handlers exist
   // which support execution before document is ready.
   $dependencies = [];
-  if (\Drupal::hasService('ad_entity.view_manager')) {
-    /** @var \Drupal\ad_entity\Plugin\AdViewManager $view_manager */
-    $view_manager = \Drupal::service('ad_entity.view_manager');
-    foreach ($view_manager->getDefinitions() as $definition) {
-      if (!empty($definition['library']) && isset($definition['requiresDomready']) && ($definition['requiresDomready'] === FALSE)) {
-        $dependencies[] = $definition['library'];
-      }
+  /** @var \Drupal\ad_entity\Plugin\AdViewManager $view_manager */
+  $view_manager = \Drupal::service('ad_entity.view_manager');
+  foreach ($view_manager->getDefinitions() as $definition) {
+    if (!empty($definition['library']) && isset($definition['requiresDomready']) && ($definition['requiresDomready'] === FALSE)) {
+      $dependencies[] = $definition['library'];
     }
   }
   if (!empty($dependencies)) {
-    // Make sure the initial JS implementation is included.
+    $use_context_js = TRUE;
+    if ($config = \Drupal::config('ad_entity.settings')) {
+      // Check whether frontend appliance has been forced to be turned off.
+      $use_context_js = !((bool) $config->get('tweaks.force_backend_appliance'));
+    }
+    // Make sure the view JS implementation is included.
     $dependencies[] = 'ad_entity/view';
     // Add context handlers, if available.
-    if (\Drupal::hasService('ad_entity.context_manager')) {
+    if ($use_context_js) {
       /** @var \Drupal\ad_entity\Plugin\AdContextManager $context_manager */
       $context_manager = \Drupal::service('ad_entity.context_manager');
       foreach ($context_manager->getDefinitions() as $definition) {

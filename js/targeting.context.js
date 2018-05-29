@@ -1,6 +1,8 @@
 /**
  * @file
  * JS handler implementation for the 'targeting' context.
+ *
+ * @deprecated See README.md why this feature is deprecated.
  */
 
 (function (ad_entity) {

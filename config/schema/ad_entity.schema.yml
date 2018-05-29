@@ -48,6 +48,13 @@ ad_entity.settings:
       sequence:
         type: ignore
         label: 'Context data'
+    tweaks:
+      type: mapping
+      label: 'System and performance tweaks'
+      mapping:
+        force_backend_appliance:
+          type: boolean
+          label: 'Force backend appliance mode'
 
 ad_entity.ad_entity.*:
   type: config_entity

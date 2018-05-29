@@ -1,6 +1,8 @@
 /**
  * @file
  * Fundamental JS implementation for applying Advertising context.
+ *
+ * @deprecated See README.md why this feature is deprecated.
  */
 
 (function (ad_entity) {
