@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ad_entity_dfp\Plugin\ad_entity\AdView;
+namespace Drupal\ad_entity_test\Plugin\ad_entity\AdView;
 
 use Drupal\ad_entity\Entity\AdEntityInterface;
 use Drupal\ad_entity\Plugin\AdViewBase;

@@ -6,7 +6,7 @@ use Drupal\ad_entity\TargetingCollection;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests the @covers ::widthFromDescriptors class.
+ * Tests the TargetingCollection class.
  *
  * @coversDefaultClass \Drupal\ad_entity\TargetingCollection
  * @group ad_entity
