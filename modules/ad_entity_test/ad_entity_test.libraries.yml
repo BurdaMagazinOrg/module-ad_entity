@@ -1,0 +1,6 @@
+test_view:
+  js:
+    js/test.view.js: {}
+  dependencies:
+    - ad_entity/provider.googletag
+    - ad_entity/view
