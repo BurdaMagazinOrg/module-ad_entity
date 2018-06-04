@@ -56,7 +56,13 @@
     length = cookie.value.length;
 
     current_value = adEntity.helpers.getCookie(cookie.name);
-    if (!(current_value === null)) {
+    if (typeof current_value !== 'string') {
+      matched = false;
+    }
+    else if (cookie.operator === 'e') {
+      matched = true;
+    }
+    else {
       for (i = 0; i < length; i++) {
         switch (cookie.operator) {
           case '==':
@@ -72,6 +78,11 @@
             break;
           case '<':
             if (current_value < cookie.value[i]) {
+              matched = true;
+            }
+            break;
+          case 'c':
+            if (!(current_value.indexOf(cookie.value[i]) < 0)) {
               matched = true;
             }
             break;
