@@ -106,6 +106,14 @@ class TargetingCollection {
               // There's no need for keys without values.
               unset($this->collected[$key]);
             }
+            elseif (count($this->collected[$key]) === 1) {
+              // Transform to a string value.
+              $this->collected[$key] = reset($this->collected[$key]);
+            }
+            else {
+              // Reindex the values array.
+              $this->collected[$key] = array_values($this->collected[$key]);
+            }
           }
         }
       }
@@ -138,6 +146,11 @@ class TargetingCollection {
       $value = array_unique($value);
       if (count($value) === 1) {
         $value = reset($value);
+      }
+      else {
+        // Reindex the values list, to ensure
+        // that the index numbering is consistent.
+        $value = array_values($value);
       }
     }
     $this->collected[$key] = $value;
