@@ -338,6 +338,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#states' => [
         'visible' => [
           'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_in'],
+          'select[name="personalization[consent_awareness][cookie][operator]"]' => ['!value' => 'e'],
         ],
       ],
     ];
@@ -350,6 +351,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#states' => [
         'visible' => [
           'select[name="personalization[consent_awareness][method]"]' => ['value' => 'opt_out'],
+          'select[name="personalization[consent_awareness][cookie][operator]"]' => ['!value' => 'e'],
         ],
       ],
     ];
@@ -544,6 +546,8 @@ class GlobalSettingsForm extends ConfigFormBase {
       '==' => $this->t('Equals'),
       '>' => $this->t('Greater than'),
       '<' => $this->t('Less than'),
+      'c' => $this->t('Contains'),
+      'e' => $this->t('Exists'),
     ];
   }
 
