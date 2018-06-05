@@ -71,6 +71,7 @@ trait AdEntityKernelTrait {
    * Get the manager for Advertising context plugins.
    *
    * @return \Drupal\ad_entity\Plugin\AdContextManager
+   *   The context manager.
    */
   protected function getContextManager() {
     try {
@@ -85,6 +86,7 @@ trait AdEntityKernelTrait {
    * Get the view builder for Advertising entities.
    *
    * @return \Drupal\Core\Entity\EntityViewBuilderInterface
+   *   The view builder for Advertising entities.
    */
   protected function getAdEntityViewBuilder() {
     try {
@@ -101,6 +103,7 @@ trait AdEntityKernelTrait {
    * Get the view builder for Display configs for Advertisement.
    *
    * @return \Drupal\Core\Entity\EntityViewBuilderInterface
+   *   The view builder for Display configs for Advertisement.
    */
   protected function getAdDisplayViewBuilder() {
     try {
@@ -117,6 +120,7 @@ trait AdEntityKernelTrait {
    * Get the renderer.
    *
    * @return \Drupal\Core\Render\RendererInterface
+   *   The renderer.
    */
   protected function getRenderer() {
     try {

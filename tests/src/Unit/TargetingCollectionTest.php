@@ -47,7 +47,8 @@ class TargetingCollectionTest extends UnitTestCase {
     $this->assertNull($collection->get('testkey'));
     $collection->set('testkey', 'testval');
     $this->assertEquals('testval', $collection->get('testkey'));
-    // When being set multiple times with the same key, ensure
+    // When being set multiple times with the same key,
+    // uniqueness must be ensured.
     $collection->set('testkey', 'testval');
     $this->assertEquals('testval', $collection->get('testkey'));
     $collection->add('testkey', 'testval');
