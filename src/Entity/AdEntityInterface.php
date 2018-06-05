@@ -53,6 +53,12 @@ interface AdEntityInterface extends ConfigEntityInterface {
   /**
    * Get a targeting collection from the backend context data.
    *
+   * The returned object is not holding any reference to the
+   * given Advertising entity. If you modify the targeting collection
+   * instance, it won't automatically apply to the Advertising entity.
+   * This is due to the fact that context data is based on arrays,
+   * which all might be added, removed or changed in arbitrary ways.
+   *
    * @return \Drupal\ad_entity\TargetingCollection
    *   The targeting collection from the backend context data.
    */

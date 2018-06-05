@@ -3,7 +3,7 @@
  * JS View handler implementation for the test_view plugin.
  */
 
-(function (ad_entity, drupalSettings, window) {
+(function (ad_entity) {
 
   ad_entity.viewHandlers = ad_entity.viewHandlers || {};
 
@@ -19,7 +19,7 @@
         }
       }
     },
-    detach: function (containers, context, settings) {},
+    detach: function (containers, context, settings) {}
   };
 
-}(window.adEntity, drupalSettings, window));
+}(window.adEntity));
