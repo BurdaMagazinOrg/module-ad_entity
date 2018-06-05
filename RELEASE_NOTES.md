@@ -4,6 +4,11 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta18:
+- Added further cookie operators (contains and exists) for consent awareness.
+- Implemented test coverage for TargetingCollection class,
+  ad_entity types and view builders.
+
 8.x-1.0-beta17:
 1. This release contains a lot of refactored code.
    Contains API changes, which might affect your extensions or modifications.
