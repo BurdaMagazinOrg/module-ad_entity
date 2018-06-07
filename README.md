@@ -3,7 +3,7 @@
 A Drupal module which provides consolidated integration for various types of
 advertising instances (mainly advertisement).
 
-**Why you might want consolidated ad management**:
+## Why you might want consolidated ad management
 - All your ads can be turned off on demand, and can be
   attached with targeting via context fields.
 - Always be able to replace your existing ads by others of any type
@@ -13,6 +13,19 @@ advertising instances (mainly advertisement).
 - Configure consent-aware personalization: This module offers
   a unified way to configure GDPR compliant ads,
   optionally combined with the EU Cookie Compliance module.
+
+## Available provider integrations
+
+- <a href="https://www.doubleclickbygoogle.com/">Doubleclick for Publishers
+  (DFP)</a>, included in this module.
+- <a href="http://www.adtechfactory.com/">AdTech Factory</a>, included in
+  this module.
+- <a href="https://www.drupal.org/project/ad_entity_vi">Video Intelligence</a>
+- <a href="https://www.drupal.org/project/ad_entity_smart">Smart AdServer</a>
+
+Have a further integration based on ad_entity and want to list it here?
+<a href="https://www.drupal.org/node/add/project-issue/ad_entity">
+Please tell us!</a>
 
 # Requirements
 
