@@ -31,4 +31,20 @@ function template_preprocess_adtech_default(array &$variables) {
     $attributes->setAttribute('data-atf-format', $settings['data_atf_format']);
   }
   $variables['attributes'] = $attributes;
+
+  /** @var \Drupal\Core\Routing\AdminContext $admin_context */
+  // Usually page targeting is already being included via
+  // ad_entity_adtech_page_attachments(). If we are on an admin
+  // page though, the page targeting needs to be manually included here.
+  $admin_context = \Drupal::service('router.admin_context');
+  if ($admin_context->isAdminRoute()) {
+    if ($config = \Drupal::config('ad_entity.settings')) {
+      $settings = $config->get('adtech_factory');
+      if (!empty($settings['page_targeting'])) {
+        // Include page targeting.
+        $variables['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
+        $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $settings['page_targeting'];
+      }
+    }
+  }
 }

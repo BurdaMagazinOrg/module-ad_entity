@@ -44,13 +44,26 @@ function ad_entity_adtech_library_info_build() {
  * Implements hook_page_attachments().
  */
 function ad_entity_adtech_page_attachments(&$attachments) {
-  if ($config = \Drupal::config('ad_entity.settings')) {
+  if (!($config = \Drupal::config('ad_entity.settings'))) {
+    return;
+  }
+
+  // The library must be included in the Html head. Since we cannot
+  // foresee whether or when ads are being loaded dynamically
+  // (e.g. via AJAX), we must include the library on any page.
+  // On admin pages though, we most probably don't need the library.
+  // It would still be loaded if an ad is being included directly on the page.
+  /** @var \Drupal\Core\Routing\AdminContext $admin_context */
+  $admin_context = \Drupal::service('router.admin_context');
+  if (!$admin_context->isAdminRoute()) {
     $settings = $config->get('adtech_factory');
     if (!empty($settings['page_targeting'])) {
+      // Include page targeting.
       $attachments['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
       $attachments['#attached']['drupalSettings']['adtech_page_targeting'] = $settings['page_targeting'];
     }
     else {
+      // No page targeting given, only include the library itself.
       $attachments['#attached']['library'][] = 'ad_entity_adtech/provider';
     }
   }
