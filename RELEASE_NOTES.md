@@ -4,6 +4,10 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta19:
+- Changed: No more force-including of external libraries on admin pages.
+- New feature: Added a performance tweak option for enabling script preloading.
+
 8.x-1.0-beta18:
 - Added further cookie operators (contains and exists) for consent awareness.
 - Implemented test coverage for TargetingCollection class,
