@@ -55,6 +55,9 @@ ad_entity.settings:
         force_backend_appliance:
           type: boolean
           label: 'Force backend appliance mode'
+        include_preload_tags:
+          type: boolean
+          label: 'Enable script preloading'
 
 ad_entity.ad_entity.*:
   type: config_entity

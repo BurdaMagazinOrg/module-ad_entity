@@ -66,6 +66,23 @@ function ad_entity_adtech_page_attachments(&$attachments) {
       // No page targeting given, only include the library itself.
       $attachments['#attached']['library'][] = 'ad_entity_adtech/provider';
     }
+
+    // When script preloading is enabled, include
+    // a preload tag for the required external libraries.
+    if ($config->get('tweaks.include_preload_tags') && ($href = $config->get('adtech_factory.library_source'))) {
+      _ad_entity_attach_gpt_preload($attachments);
+      $attachments['#attached']['html_head'][] = [
+        [
+          '#attributes' => [
+            'rel' => 'preload',
+            'as' => 'script',
+            'href' => $href,
+          ],
+          '#tag' => 'link',
+        ],
+        'preload_atf_lib',
+      ];
+    }
   }
 }
 

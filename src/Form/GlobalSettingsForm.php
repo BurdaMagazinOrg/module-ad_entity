@@ -372,6 +372,12 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#description' => $this->t('When checked, context data will always be applied on server-side, ignoring any given formatter settings. This needs to be checked so that any context.js code would never be loaded into the client. Frontend appliance has been shown not to be efficient at any time, so this feature has been deprecated and will not be ported to version 2.x of this module.'),
       '#default_value' => (int) !empty($tweaks['force_backend_appliance']),
     ];
+    $form['tweaks']['include_preload_tags'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable script preloading'),
+      '#description' => $this->t('<a href=":url_pl" target="_blank" rel="noopener noreferrer nofollow">Script preloading</a> might improve client loading performance.', [':url_pl' => 'https://www.w3.org/TR/preload/']),
+      '#default_value' => (int) !empty($tweaks['include_preload_tags']),
+    ];
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     if (!empty($type_ids)) {
@@ -500,6 +506,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     $tweaks = [];
     $user_tweaks = $form_state->getValue('tweaks');
     $tweaks['force_backend_appliance'] = !empty($user_tweaks['force_backend_appliance']);
+    $tweaks['include_preload_tags'] = !empty($user_tweaks['include_preload_tags']);
     $config->set('tweaks', $tweaks);
 
     $type_ids = array_keys($this->typeManager->getDefinitions());

@@ -473,3 +473,27 @@ function _ad_entity_js_base_inline() {
     'script' => ['#markup' => Markup::create($script)],
   ];
 }
+
+/**
+ * Attaches a preload tag for the external googletag library.
+ *
+ * @param array &$attachments
+ *   The page attachments array.
+ */
+function _ad_entity_attach_gpt_preload(array &$attachments) {
+  $attached = &drupal_static(__FUNCTION__, FALSE);
+  if (!$attached) {
+    $attached = TRUE;
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#attributes' => [
+          'rel' => 'preload',
+          'as' => 'script',
+          'href' => '//www.googletagservices.com/tag/js/gpt.js',
+        ],
+        '#tag' => 'link',
+      ],
+      'preload_gpt',
+    ];
+  }
+}

@@ -17,7 +17,7 @@ set -x
 source ~/.nvm/nvm.sh
 set +x
 nvm install 4
-npm install -g eslint
+npm install -g eslint@4.19.1
 eslint .
 rm -rf ~/.nvm
 mv ~/.nvm-backup ~/.nvm
