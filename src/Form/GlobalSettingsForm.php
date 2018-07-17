@@ -143,7 +143,7 @@ class GlobalSettingsForm extends ConfigFormBase {
         '#description' => $this->t('Choose a filter format which processes the targeting information before being displayed. You should use a filter which at least safely filters any markup. If none is chosen, any HTML inside the information would still be escaped.'),
         '#default_value' => $default_filter_format,
         '#empty_value' => '_none',
-        '#weight' => 20
+        '#weight' => 20,
       ];
     }
 

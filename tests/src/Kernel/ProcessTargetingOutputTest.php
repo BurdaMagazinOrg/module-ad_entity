@@ -56,11 +56,11 @@ class ProcessTargetingOutputTest extends EntityKernelTestBase {
    */
   public function expectedFilterResults() {
     $key = 'testkey';
-    $dangerous_value = '<script>alert("Hi there.");</script>';
+    $value = '<script>alert("Hi there.");</script>';
     return [
-      [NULL, $key, $dangerous_value, $key, Html::escape($dangerous_value)],
-      ['ad_entity_plain', $key, $dangerous_value, $key, Html::escape($dangerous_value)],
-      ['ad_entity_full', $key, $dangerous_value, $key, $dangerous_value],
+      [NULL, $key, $value, $key, Html::escape($value)],
+      ['ad_entity_plain', $key, $value, $key, Html::escape($value)],
+      ['ad_entity_full', $key, $value, $key, $value],
     ];
   }
 
