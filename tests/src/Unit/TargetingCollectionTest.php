@@ -90,6 +90,7 @@ class TargetingCollectionTest extends UnitTestCase {
     $collection = new TargetingCollection();
     $input_dangerous = 'testkey: <script>alert("Hi there.");</script>';
     $collection->collectFromUserInput($input_dangerous);
+    $collection->filter(NULL, FALSE);
     $this->assertEquals(Html::escape('<script>alert("Hi there.");</script>'), $collection->get('testkey'));
 
     $collection = new TargetingCollection();

@@ -10,6 +10,13 @@ use Drupal\Component\Utility\Html;
 class TargetingCollection {
 
   /**
+   * An array holding the collected targeting information.
+   *
+   * @var array
+   */
+  protected $collected;
+
+  /**
    * TargetingCollection constructor.
    *
    * @param array|string $info
@@ -27,13 +34,6 @@ class TargetingCollection {
       $this->collected = [];
     }
   }
-
-  /**
-   * An array holding the collected targeting information.
-   *
-   * @var array
-   */
-  protected $collected;
 
   /**
    * Get the value for the given key.
@@ -165,7 +165,7 @@ class TargetingCollection {
    *   Example format: "key1: value1, key2: value2, key2: value3".
    */
   public function collectFromUserInput($input) {
-    $pairs = explode(',', Html::escape($input));
+    $pairs = explode(',', $input);
     foreach ($pairs as $pair) {
       $pair = explode(':', trim($pair));
       $count = count($pair);
@@ -232,7 +232,7 @@ class TargetingCollection {
   }
 
   /**
-   * Returns the collected targeting information as User-editable output.
+   * Returns the collected targeting information as user-editable output.
    *
    * @return string
    *   The user-editable output.
@@ -250,6 +250,59 @@ class TargetingCollection {
       }
     }
     return implode(', ', $pairs);
+  }
+
+  /**
+   * Filters the targeting information.
+   *
+   * It should be avoided to run the filtering multiple times at the
+   * same collection. Otherwise it might lead to double escaping.
+   * Instead, use a separate collection object, filter on it, and
+   * add it to another collection holding already filtered information.
+   *
+   * @param string|null $format_id
+   *   (Optional) The filter format ID to use for processing.
+   *   If not given, any HTML will be escaped by default.
+   * @param bool $use_config
+   *   When set to TRUE, the method uses the assigned filter format
+   *   from the global settings (if any).
+   */
+  public function filter($format_id = NULL, $use_config = TRUE) {
+    if ($use_config) {
+      $format_id = \Drupal::config('ad_entity.settings')->get('process_targeting_output');
+    }
+    $filtered = [];
+    foreach ($this->collected as $key => $value) {
+      $this->doFilter($key, $format_id);
+      if (is_array($value)) {
+        foreach ($value as &$item) {
+          $this->doFilter($item, $format_id);
+        }
+      }
+      else {
+        $this->doFilter($value, $format_id);
+      }
+      $filtered[$key] = $value;
+    }
+    $this->collected = $filtered;
+  }
+
+  /**
+   * Performs filtering on the given text.
+   *
+   * @param string &$text
+   *   The text to filter.
+   * @param string|null $format_id
+   *   (Optional) The filter format ID to use for processing.
+   *   If not given, any HTML will be escaped by default.
+   */
+  protected function doFilter(&$text, $format_id = NULL) {
+    if (isset($format_id)) {
+      $text = (string) check_markup($text, $format_id);
+    }
+    else {
+      $text = Html::escape($text);
+    }
   }
 
 }

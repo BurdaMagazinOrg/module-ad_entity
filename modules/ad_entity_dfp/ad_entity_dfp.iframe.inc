@@ -38,6 +38,8 @@ function template_preprocess_dfp_iframe(array &$variables) {
   // Insert targeting from backend context data.
   $targeting_collection = $ad_entity->getTargetingFromContextData();
   if (!$targeting_collection->isEmpty()) {
+    // Filter the targeting information before being displayed.
+    $targeting_collection->filter();
     $variables['targeting'] = $targeting_collection->toJson();
   }
   else {

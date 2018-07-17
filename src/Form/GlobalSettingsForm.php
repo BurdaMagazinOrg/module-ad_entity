@@ -130,6 +130,23 @@ class GlobalSettingsForm extends ConfigFormBase {
       $form['common']['frontend']['enable_responsive_behavior']['#disabled'] = TRUE;
     }
 
+    if ($this->moduleHandler->moduleExists('filter')) {
+      $filter_format_options = [];
+      foreach (filter_formats() as $format_id => $format) {
+        $filter_format_options[$format_id] = $format->label();
+      }
+      $default_filter_format = $config->get('process_targeting_output') ? $config->get('process_targeting_output') : '_none';
+      $form['common']['frontend']['process_targeting_output'] = [
+        '#type' => 'select',
+        '#options' => $filter_format_options,
+        '#title' => $this->t('Process targeting output'),
+        '#description' => $this->t('Choose a filter format which processes the targeting information before being displayed. You should use a filter which at least safely filters any markup. If none is chosen, any HTML inside the information would still be escaped.'),
+        '#default_value' => $default_filter_format,
+        '#empty_value' => '_none',
+        '#weight' => 20
+      ];
+    }
+
     $behavior_reset = $config->get('behavior_on_context_reset');
     $form['common']['behavior_on_context_reset'] = [
       '#type' => 'fieldset',
@@ -444,6 +461,19 @@ class GlobalSettingsForm extends ConfigFormBase {
     if (!$this->moduleHandler->moduleExists('theme_breakpoints_js')) {
       $config->set('enable_responsive_behavior', FALSE);
     }
+
+    $chosen_targeting_filter = $form_state->getValue('process_targeting_output');
+    if (!$chosen_targeting_filter || ($chosen_targeting_filter === '_none')) {
+      $chosen_targeting_filter = NULL;
+    }
+    else {
+      $filter_formats = $this->moduleHandler->moduleExists('filter') ? filter_formats() : [];
+      if (!isset($filter_formats[$chosen_targeting_filter])) {
+        $chosen_targeting_filter = NULL;
+      }
+    }
+    $config->set('process_targeting_output', $chosen_targeting_filter);
+
     $config->set('behavior_on_context_reset', $form_state->getValue('behavior_on_context_reset'));
 
     $context_values = $form_state->getValue('site_wide_context');

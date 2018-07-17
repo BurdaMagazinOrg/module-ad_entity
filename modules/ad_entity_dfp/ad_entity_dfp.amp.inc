@@ -32,7 +32,7 @@ function template_preprocess_dfp_amp(array &$variables) {
     foreach ($decoded as $size) {
       // Currently, fluid is not a valid size here.
       // Validation would say: Invalid multi-size data format 'fluid'.
-      // TODO Find a proper way to support native ads on AMP pages.
+      // @todo Find a proper way to support native ads on AMP pages.
       if (is_array($size)) {
         $sizes[] = $size[0] . 'x' . $size[1];
       }
@@ -58,6 +58,8 @@ function template_preprocess_dfp_amp(array &$variables) {
   // Insert targeting from backend context data.
   $targeting_collection = $ad_entity->getTargetingFromContextData();
   if (!$targeting_collection->isEmpty()) {
+    // Filter the targeting information before being displayed.
+    $targeting_collection->filter();
     $json['targeting'] = $targeting_collection->toArray();
   }
   $variables['json'] = $json;

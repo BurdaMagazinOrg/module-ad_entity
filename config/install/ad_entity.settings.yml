@@ -1,4 +1,5 @@
 enable_responsive_behavior: true
+process_targeting_output: null
 behavior_on_context_reset:
   include_entity_info: true
   collect_default_data: true

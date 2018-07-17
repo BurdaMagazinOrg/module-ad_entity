@@ -13,7 +13,6 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Html;
 use Drupal\ad_entity\Plugin\AdContextManager;
 use Drupal\ad_entity\Render\Markup;
 
@@ -233,7 +232,7 @@ function ad_entity_ad_context_include(FieldItemListInterface $items, array $sett
   // When enabled, include "bundle: label" for targeting.
   if (!empty($settings['targeting']['bundle_label'])) {
     $bundle = $items->getEntity()->bundle();
-    $label = Html::escape($items->getEntity()->label());
+    $label = $items->getEntity()->label();
     $item_value['context'] = [
       'context_plugin_id' => 'targeting',
       'apply_on' => [],
@@ -273,7 +272,7 @@ function ad_entity_ad_context_data_reset(AdContextManager $context_manager, Enti
       if (!empty($behavior['include_entity_info'])) {
         $info = [
           'entitytype' => $type . '/' . $entity->bundle(),
-          'entitylabel' => Html::escape($entity->label()),
+          'entitylabel' => $entity->label(),
           'entityuuid' => $entity->uuid(),
         ];
         $context_manager

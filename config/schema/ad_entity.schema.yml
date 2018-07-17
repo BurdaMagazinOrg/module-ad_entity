@@ -5,6 +5,9 @@ ad_entity.settings:
     enable_responsive_behavior:
       type: boolean
       label: 'Whether responsive behavior is enabled or not'
+    process_targeting_output:
+      type: string
+      label: 'Process targeting output'
     personalization:
       type: mapping
       label: 'Personalization'
