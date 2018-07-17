@@ -3,7 +3,7 @@
 namespace Drupal\Tests\ad_entity\Unit;
 
 use Drupal\ad_entity\TargetingCollection;
-use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -23,7 +23,7 @@ class TargetingCollectionTest extends UnitTestCase {
    */
   public function testConstructor() {
     $as_array = ['testkey' => 'testval', 'testkey2' => ['testval', 'testval2']];
-    $as_json = json_encode($as_array, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $as_json = json_encode($as_array, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
     $collection1 = new TargetingCollection($as_array);
     $collection2 = new TargetingCollection($as_json);
     $this->assertArrayEquals($collection1->toArray(), $collection2->toArray());
@@ -91,7 +91,7 @@ class TargetingCollectionTest extends UnitTestCase {
     $input_dangerous = 'testkey: <script>alert("Hi there.");</script>';
     $collection->collectFromUserInput($input_dangerous);
     $collection->filter(NULL, FALSE);
-    $this->assertEquals(Html::escape('<script>alert("Hi there.");</script>'), $collection->get('testkey'));
+    $this->assertEquals(trim(Xss::filter(strip_tags('<script>alert("Hi there.");</script>'))), $collection->get('testkey'));
 
     $collection = new TargetingCollection();
     $input = 'test';

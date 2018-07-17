@@ -4,6 +4,7 @@ namespace Drupal\Tests\ad_entity\Kernel;
 
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
@@ -58,7 +59,7 @@ class ProcessTargetingOutputTest extends EntityKernelTestBase {
     $key = 'testkey';
     $value = '<script>alert("Hi there.");</script>';
     return [
-      [NULL, $key, $value, $key, Html::escape($value)],
+      [NULL, $key, $value, $key, trim(Xss::filter(strip_tags((($value)))))],
       ['ad_entity_plain', $key, $value, $key, Html::escape($value)],
       ['ad_entity_full', $key, $value, $key, $value],
     ];

@@ -2,7 +2,7 @@
 
 namespace Drupal\ad_entity;
 
-use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Class for collected targeting information.
@@ -228,7 +228,7 @@ class TargetingCollection {
    */
   public function toJson() {
     // Encoding must be the same as TargetingContext::getJsonEncode().
-    return json_encode($this->collected, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return json_encode($this->collected, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
   }
 
   /**
@@ -262,7 +262,7 @@ class TargetingCollection {
    *
    * @param string|null $format_id
    *   (Optional) The filter format ID to use for processing.
-   *   If not given, any HTML will be escaped by default.
+   *   If not given, any tag will be stripped out by default.
    * @param bool $use_config
    *   When set to TRUE, the method uses the assigned filter format
    *   from the global settings (if any).
@@ -294,14 +294,14 @@ class TargetingCollection {
    *   The text to filter.
    * @param string|null $format_id
    *   (Optional) The filter format ID to use for processing.
-   *   If not given, any HTML will be escaped by default.
+   *   If not given, any tag will be stripped out by default.
    */
   protected function doFilter(&$text, $format_id = NULL) {
     if (isset($format_id)) {
       $text = (string) check_markup($text, $format_id);
     }
     else {
-      $text = Html::escape($text);
+      $text = trim(Xss::filter(strip_tags($text)));
     }
   }
 

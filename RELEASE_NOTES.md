@@ -5,11 +5,11 @@ We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
 8.x-1.0-beta20:
-- Issue #2985402: "Make the targeting system more flexible,
-  e.g. for Tokens support". This change affects the logic of displaying
-  targeting information. All information is now being escaped by default,
-  with the possibility of using a filter format instead. Filter formats
-  enable you to apply arbitrary filter processing on the targeting information.
+- #2985402: "Make the targeting system more flexible, e.g. for Tokens support".
+  NOTE: This change affects the logic of displaying targeting information.
+  HTML tags are now being stripped out by default, with the possibility
+  of using a filter format instead. Filter formats enable you to apply
+  arbitrary filter processing on the targeting information.
 
 8.x-1.0-beta19:
 - Changed: No more force-including of external libraries on admin pages.

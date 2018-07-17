@@ -140,7 +140,7 @@ class GlobalSettingsForm extends ConfigFormBase {
         '#type' => 'select',
         '#options' => $filter_format_options,
         '#title' => $this->t('Process targeting output'),
-        '#description' => $this->t('Choose a filter format which processes the targeting information before being displayed. You should use a filter which at least safely filters any markup. If none is chosen, any HTML inside the information would still be escaped.'),
+        '#description' => $this->t('Choose a filter format which processes the targeting information before being displayed. You should use a filter which at least safely filters any markup. If none is chosen, any HTML tag inside the information would be stripped out by default.'),
         '#default_value' => $default_filter_format,
         '#empty_value' => '_none',
         '#weight' => 20,
