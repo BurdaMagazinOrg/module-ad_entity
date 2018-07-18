@@ -4,6 +4,11 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta21:
+- TargetingContext::getJsonEncode now includes filter processing.
+  The encoding method must equal the encoding result of collection objects.
+  This change directly affects the (deprecated) frontend appliance mode.
+
 8.x-1.0-beta20:
 - #2985402: "Make the targeting system more flexible, e.g. for Tokens support".
   NOTE: This change affects the logic of displaying targeting information.

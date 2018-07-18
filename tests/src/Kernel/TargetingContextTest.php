@@ -38,7 +38,11 @@ class TargetingContextTest extends EntityKernelTestBase {
    * @dataProvider jsonEncodeExpected
    */
   public function testJsonEncode($info, $expected_result) {
-    $context_data = ['context_id' => 'targeting', 'settings' => ['targeting' => $info], 'apply_on' => []];
+    $context_data = [
+      'context_id' => 'targeting',
+      'settings' => ['targeting' => $info],
+      'apply_on' => [],
+    ];
     $encoded = TargetingContext::getJsonEncode($context_data);
     $this->assertContains($expected_result, $encoded);
 
