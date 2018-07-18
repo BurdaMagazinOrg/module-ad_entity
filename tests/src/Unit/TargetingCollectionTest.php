@@ -91,7 +91,8 @@ class TargetingCollectionTest extends UnitTestCase {
     $input_dangerous = 'testkey: <script>alert("Hi there.");</script>';
     $collection->collectFromUserInput($input_dangerous);
     $collection->filter(NULL, FALSE);
-    $this->assertEquals(trim(Xss::filter(strip_tags('<script>alert("Hi there.");</script>'))), $collection->get('testkey'));
+    $expected = trim(Xss::filter(strip_tags('<script>alert("Hi there.");</script>')));
+    $this->assertEquals($expected, $collection->get('testkey'));
 
     $collection = new TargetingCollection();
     $input = 'test';

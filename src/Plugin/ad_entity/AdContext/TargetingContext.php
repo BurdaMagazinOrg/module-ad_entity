@@ -20,6 +20,21 @@ class TargetingContext extends AdContextBase {
   /**
    * {@inheritdoc}
    */
+  public static function getJsonEncode(array $context_data) {
+    if (isset($context_data['settings']['targeting'])) {
+      // Encoding via the plugin method usually means that the context
+      // data will be displayed at the frontend. Thus, filter the
+      // targeting information before it's being displayed.
+      $collection = new TargetingCollection($context_data['settings']['targeting']);
+      $collection->filter();
+      $context_data['settings']['targeting'] = $collection->toArray();
+    }
+    return parent::getJsonEncode($context_data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $settings, array $form, FormStateInterface $form_state) {
     $element = [];
 
