@@ -73,7 +73,8 @@ class ContextItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return !empty($this->get('context')) ? $this->get('context')->isEmpty() : TRUE;
+    $context_value = $this->get('context')->getValue();
+    return empty($context_value) || empty($context_value['context_plugin_id']);
   }
 
   /**
