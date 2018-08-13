@@ -4,6 +4,9 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta22:
+- Bugfix: Properly check whether the field item is empty.
+
 8.x-1.0-beta21:
 - TargetingContext::getJsonEncode now includes filter processing.
   The encoding method must equal the encoding result of collection objects.
