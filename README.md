@@ -37,6 +37,10 @@ Please tell us!</a>
 # Quick start
 
 - Install this module.
+- Set permissions to view ads. As there are two separate entity types
+  (ad_entity and ad_display) involved, make sure your roles do have granted
+  view access to both types by setting: "View Advertising entities" and
+  "View Display configs for Advertisement".
 - You need at least one further module which defines an Advertising type.
   The ad_entity_dfp module for example enables you to create
   types of Doubleclick for Publishers (DFP) advertisement.
