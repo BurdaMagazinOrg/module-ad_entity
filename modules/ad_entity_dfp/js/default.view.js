@@ -22,6 +22,10 @@
         for (container_id in containers) {
           if (containers.hasOwnProperty(container_id)) {
             container = containers[container_id];
+            if (typeof container.ad_tag === 'object') {
+              continue;
+            }
+
             ad_el = container.el.querySelector('.google-dfp-ad');
             if (ad_el === null) {
               continue;

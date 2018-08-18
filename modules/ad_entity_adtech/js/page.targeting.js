@@ -10,15 +10,20 @@
     var key;
     var delay;
 
+    if (this.adtechPageTargetingAdded === true) {
+      return;
+    }
     if (settings.hasOwnProperty('adtech_page_targeting')) {
-      this.adtechLoadingAttempts = true;
+      this.adtechPageTargetingAdded = false;
       if (typeof window.atf_lib !== 'undefined') {
+        this.adtechLoadingAttempts = true;
         page_targeting = JSON.parse(settings['adtech_page_targeting']);
         for (key in page_targeting) {
           if (page_targeting.hasOwnProperty(key)) {
             window.atf_lib.add_page_targeting(key, page_targeting[key]);
           }
         }
+        this.adtechPageTargetingAdded = true;
       }
       else {
         if (typeof this.adtechLoadingAttempts === 'undefined') {
@@ -30,14 +35,9 @@
           return;
         }
         if (typeof this.adtechLoadingAttempts === 'number') {
-          if (this.adtechLoadingAttempts < 40) {
+          if (this.adtechLoadingAttempts < 100) {
             this.adtechLoadingAttempts++;
             delay = 10 * this.adtechLoadingAttempts;
-            if (!(this.adtechLoadingUnit === 'page_targeting')) {
-              // Another unit is already trying to load the library.
-              // Add further delay to ensure this one is being fired later.
-              delay += 100;
-            }
             window.setTimeout(this.adtechAddPageTargeting.bind(this), delay, settings);
           }
           else {

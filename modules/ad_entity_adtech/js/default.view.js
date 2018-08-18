@@ -20,6 +20,17 @@
       var targeting;
       var delay;
 
+      if (ad_entity.adtechPageTargetingAdded === false) {
+        delay = 10;
+        if (typeof ad_entity.adtechLoadingAttempts === 'number') {
+          delay = (10 * ad_entity.adtechLoadingAttempts) + 5;
+        }
+        if (ad_entity.adtechLoadingAttempts !== false) {
+          window.setTimeout(this.initialize.bind(this), delay, containers, context, settings);
+        }
+        return;
+      }
+
       if (typeof window.atf_lib !== 'undefined') {
         ad_entity.adtechLoadingAttempts = true;
 
@@ -29,6 +40,10 @@
         for (container_id in containers) {
           if (containers.hasOwnProperty(container_id)) {
             container = containers[container_id];
+            if (typeof container.ad_tag === 'object') {
+              continue;
+            }
+
             ad_el = container.el.querySelector('.adtech-factory-ad');
             if (ad_el === null) {
               continue;
@@ -73,13 +88,13 @@
           return;
         }
         if (typeof ad_entity.adtechLoadingAttempts === 'number') {
-          if (ad_entity.adtechLoadingAttempts < 40) {
+          if (ad_entity.adtechLoadingAttempts < 100) {
             ad_entity.adtechLoadingAttempts++;
             delay = 10 * ad_entity.adtechLoadingAttempts;
             if (!(ad_entity.adtechLoadingUnit === 'default_view')) {
               // Another unit is already trying to load the library.
               // Add further delay to ensure this one is being fired later.
-              delay += 100;
+              delay += 20;
             }
             window.setTimeout(this.initialize.bind(this), delay, containers, context, settings);
           }
