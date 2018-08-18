@@ -3,6 +3,7 @@
 namespace Drupal\ad_entity\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Theme\ActiveTheme;
 
 /**
@@ -109,6 +110,31 @@ class AdDisplay extends ConfigEntityBase implements AdDisplayInterface {
       }
     }
     return !empty($variants[$theme_name]) ? $variants[$theme_name] : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    $this->invalidateBlockCache();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    parent::delete();
+    $this->invalidateBlockCache();
+  }
+
+  /**
+   * Invalidates the block cache to update ad_display derivatives.
+   */
+  protected function invalidateBlockCache() {
+    if (\Drupal::moduleHandler()->moduleExists('block')) {
+      \Drupal::service('plugin.manager.block')->clearCachedDefinitions();
+    }
   }
 
 }
