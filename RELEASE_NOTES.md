@@ -4,6 +4,9 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta24:
+- Bugfix: Make sure page targeting is being added before ads are initialized.
+
 8.x-1.0-beta23:
 Some bug fixes for:
 - #2993184: Blocks for display configurations didn't appear right after
