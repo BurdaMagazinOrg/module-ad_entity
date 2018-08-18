@@ -4,6 +4,17 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta23:
+Some bug fixes for:
+- #2993184: Blocks for display configurations didn't appear right after
+  new display configurations have been created.
+- #2993421: Warning: Invalid argument supplied for foreach() in
+  Drupal\ad_entity\TargetingCollection->collectFromCollection() (line 188 of
+  modules/ad_entity/src/TargetingCollection.php).
+- #2991197: When a module with new implementations for Advertising types and
+  views has been installed, its plugins would not show up without a
+  cache clear before.
+
 8.x-1.0-beta22:
 - Bugfix: Properly check whether the field item is empty.
 
