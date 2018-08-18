@@ -4,6 +4,7 @@ namespace Drupal\Tests\ad_entity\Unit;
 
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Archiver\Tar;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -32,6 +33,11 @@ class TargetingCollectionTest extends UnitTestCase {
     $this->assertEquals('testval', $collection2->get('testkey'));
     $this->assertArrayEquals(['testval', 'testval2'], $collection1->get('testkey2'));
     $this->assertArrayEquals(['testval', 'testval2'], $collection2->get('testkey2'));
+
+    // Check against an invalid format.
+    $collection1 = new TargetingCollection('invalid');
+    $collection2 = new TargetingCollection([]);
+    $this->assertArrayEquals($collection1->toArray(), $collection2->toArray());
   }
 
   /**

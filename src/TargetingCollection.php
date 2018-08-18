@@ -30,7 +30,7 @@ class TargetingCollection {
     elseif (is_string($info)) {
       $this->collected = json_decode($info, TRUE);
     }
-    else {
+    if (empty($this->collected)) {
       $this->collected = [];
     }
   }
