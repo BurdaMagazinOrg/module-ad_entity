@@ -4,7 +4,6 @@ namespace Drupal\Tests\ad_entity\Unit;
 
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Archiver\Tar;
 use Drupal\Tests\UnitTestCase;
 
 /**
