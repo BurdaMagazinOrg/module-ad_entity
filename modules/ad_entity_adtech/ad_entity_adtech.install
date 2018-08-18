@@ -2,17 +2,13 @@
 
 /**
  * @file
- * Advertising Entity: Fallback install file.
+ * Advertising Entity: AdTech Factory install file.
  */
 
 /**
  * Implements hook_install().
  */
-function ad_entity_fallback_install() {
-  // This module makes heavy changes in entity_view_alter(),
-  // which might be incompatible with alterations from others.
-  module_set_weight('ad_entity_fallback', 1100);
-
+function ad_entity_adtech_install() {
   // Clear cached plugin definitions from ad_entity services
   // to include any definition by this module.
   if (\Drupal::hasService('ad_entity')) {
@@ -25,7 +21,7 @@ function ad_entity_fallback_install() {
 /**
  * Implements hook_uninstall().
  */
-function ad_entity_fallback_uninstall() {
+function ad_entity_adtech_uninstall() {
   // Clear cached plugin definitions from ad_entity services
   // to remove any definition by this module.
   if (\Drupal::hasService('ad_entity')) {

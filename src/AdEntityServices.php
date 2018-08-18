@@ -114,4 +114,13 @@ class AdEntityServices implements EntityHandlerInterface {
     return $this;
   }
 
+  /**
+   * Clears all cached plugin definitions from the services.
+   */
+  public function clearCachedDefinitions() {
+    $this->viewManager->clearCachedDefinitions();
+    $this->typeManager->clearCachedDefinitions();
+    $this->contextManager->clearCachedDefinitions();
+  }
+
 }
