@@ -4,6 +4,13 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta25:
+- Issue #2994073 by osopolar: Can't get token to work in ad-entity input
+  field "Default page targeting".
+- ad_entity_adtech: Convert page targeting from JSON to array inside the
+  global configuration.
+Export your configuration after running database updates.
+
 8.x-1.0-beta24:
 - Bugfix: Make sure page targeting is being added before ads are initialized.
 
