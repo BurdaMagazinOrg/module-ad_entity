@@ -17,7 +17,7 @@
       this.adtechPageTargetingAdded = false;
       if (typeof window.atf_lib !== 'undefined') {
         this.adtechLoadingAttempts = true;
-        page_targeting = JSON.parse(settings['adtech_page_targeting']);
+        page_targeting = settings['adtech_page_targeting'];
         for (key in page_targeting) {
           if (page_targeting.hasOwnProperty(key)) {
             window.atf_lib.add_page_targeting(key, page_targeting[key]);

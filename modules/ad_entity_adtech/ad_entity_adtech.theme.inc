@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
+use Drupal\ad_entity\TargetingCollection;
 
 /**
  * Preprocess implementation for a default AdTech Factory tag view.
@@ -42,8 +43,10 @@ function template_preprocess_adtech_default(array &$variables) {
       $settings = $config->get('adtech_factory');
       if (!empty($settings['page_targeting'])) {
         // Include page targeting.
+        $page_targeting = new TargetingCollection($settings['page_targeting']);
+        $page_targeting->filter();
         $variables['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
-        $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $settings['page_targeting'];
+        $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $page_targeting->toArray();
       }
     }
   }

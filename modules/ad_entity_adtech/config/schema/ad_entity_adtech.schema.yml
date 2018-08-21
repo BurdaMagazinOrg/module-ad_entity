@@ -6,7 +6,7 @@ ad_entity.settings.adtech_factory:
       type: string
       label: 'Library source'
     page_targeting:
-      type: string
+      type: ignore
       label: 'Default pairs of key-values for targeting on the page'
 
 ad_entity.ad_entity.*.third_party_settings.ad_entity_adtech:
