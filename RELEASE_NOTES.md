@@ -4,6 +4,9 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta26:
+- Bugfix: Switch to array format instead of JSON for AdTech page targeting.
+
 8.x-1.0-beta25:
 - Issue #2994073 by osopolar: Can't get token to work in ad-entity input
   field "Default page targeting".
