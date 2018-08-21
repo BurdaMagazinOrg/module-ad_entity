@@ -86,7 +86,7 @@ class AdtechType extends AdTypeBase {
       // Convert the targeting to a JSON-encoded string.
       $targeting = new TargetingCollection();
       $targeting->collectFromUserInput($values['page_targeting']);
-      $config->set($id . '.page_targeting', $targeting->toJson());
+      $config->set($id . '.page_targeting', $targeting->toArray());
     }
   }
 
