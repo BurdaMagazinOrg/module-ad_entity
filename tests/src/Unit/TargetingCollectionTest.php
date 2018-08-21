@@ -85,12 +85,12 @@ class TargetingCollectionTest extends UnitTestCase {
    */
   public function testTransformationMethods() {
     $collection = new TargetingCollection();
-    $input_ok = 'testkey: testval, testkey:testval2,   testkey2: testval, testkey: testval';
+    $input_ok = 'testkey: testval, testkey:testval2,   testkey2: testval, testkey: testval, tokenkey: [token:val], [token:key]:tokenval';
     $collection->collectFromUserInput($input_ok);
-    $this->assertSame(2, count($collection->toArray()));
+    $this->assertSame(4, count($collection->toArray()));
     $this->assertSame(2, count($collection->get('testkey')));
     $this->assertEquals('testval', $collection->get('testkey2'));
-    $this->assertEquals('testkey: testval, testkey: testval2, testkey2: testval', $collection->toUserOutput());
+    $this->assertEquals('testkey: testval, testkey: testval2, testkey2: testval, tokenkey: [token:val], category: [token:key]:tokenval', $collection->toUserOutput());
 
     $collection = new TargetingCollection();
     $input_dangerous = 'testkey: <script>alert("Hi there.");</script>';

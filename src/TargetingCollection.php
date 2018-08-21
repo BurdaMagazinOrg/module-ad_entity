@@ -167,12 +167,41 @@ class TargetingCollection {
   public function collectFromUserInput($input) {
     $pairs = explode(',', $input);
     foreach ($pairs as $pair) {
-      $pair = explode(':', trim($pair));
+      $pair = explode(': ', trim($pair));
       $count = count($pair);
       if ($count === 1) {
-        $this->add('category', trim($pair[0]));
+        // The user might have forgotten to add a space.
+        $original = trim($pair[0]);
+        $pair = explode(':', $original);
+        if (empty($pair[0])) {
+          if (empty($pair[1])) {
+            // Nothing was given.
+            continue;
+          }
+          // An empty key was given.
+          $pair[0] = 'category';
+        }
+        elseif (empty($pair[1])) {
+          // Only a single value was given, which
+          // must belong to some kind of key.
+          $pair[1] = $pair[0];
+          $pair[0] = 'category';
+        }
+        else {
+          foreach ($pair as $part) {
+            $first_letter = substr(trim($part), 0, 1);
+            if (!ctype_alnum($first_letter)) {
+              // The first letter of the key or value is not
+              // alphanumeric, thus assume that this value is supposed to be
+              // processed later on, e.g. this might be a token.
+              $pair[0] = 'category';
+              $pair[1] = $original;
+              break;
+            }
+          }
+        }
       }
-      elseif ($count === 2) {
+      if ($count > 0) {
         $this->add(trim($pair[0]), trim($pair[1]));
       }
     }
