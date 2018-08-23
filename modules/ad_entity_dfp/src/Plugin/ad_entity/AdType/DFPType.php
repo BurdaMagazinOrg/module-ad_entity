@@ -121,6 +121,7 @@ class DFPType extends AdTypeBase {
       new TargetingCollection($context['targeting']) : NULL;
     $element['targeting'] = [
       '#type' => 'textfield',
+      '#maxlength' => 2048,
       '#title' => $this->stringTranslation->translate("Default targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the ad tag. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
       '#default_value' => isset($targeting) ? $targeting->toUserOutput() : '',

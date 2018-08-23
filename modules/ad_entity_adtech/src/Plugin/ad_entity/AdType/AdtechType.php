@@ -67,6 +67,7 @@ class AdtechType extends AdTypeBase {
       new TargetingCollection($settings['page_targeting']) : NULL;
     $element['page_targeting'] = [
       '#type' => 'textfield',
+      '#maxlength' => 2048,
       '#title' => $this->stringTranslation->translate("Default page targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the page. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
       '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
@@ -127,6 +128,7 @@ class AdtechType extends AdTypeBase {
     }
     $element['targeting'] = [
       '#type' => 'textfield',
+      '#maxlength' => 2048,
       '#title' => $this->stringTranslation->translate("Default targeting"),
       '#description' => $this->stringTranslation->translate("Default pairs of key-values for targeting on the ad tag. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
       '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',

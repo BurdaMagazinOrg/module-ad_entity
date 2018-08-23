@@ -42,6 +42,7 @@ class TargetingContext extends AdContextBase {
       new TargetingCollection($settings['targeting']) : NULL;
     $element['targeting'] = [
       '#type' => 'textfield',
+      '#maxlength' => 2048,
       '#title' => $this->stringTranslation->translate("Targeting"),
       '#description' => $this->stringTranslation->translate("Pairs of key-values. Example: <strong>pos: top, category: value1, category: value2, ...</strong>"),
       '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
