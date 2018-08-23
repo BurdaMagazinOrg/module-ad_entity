@@ -7,7 +7,14 @@
 
   var settingsElement = document.getElementById('ad-entity-settings');
 
-  window.adEntity = {settings: {}, helpers: {}, queue: []};
+  if (!(typeof window.adEntity === 'object')) {
+    window.adEntity = {settings: {}, helpers: {}, queue: []};
+  }
+  else {
+    window.adEntity.settings = {};
+    window.adEntity.helpers = window.adEntity.helpers || {};
+    window.adEntity.queue = window.adEntity.queue || [];
+  }
 
   if (settingsElement !== null) {
     window.adEntity.settings = JSON.parse(settingsElement.textContent);
