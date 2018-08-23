@@ -61,6 +61,9 @@ ad_entity.settings:
         include_preload_tags:
           type: boolean
           label: 'Enable script preloading'
+        use_inline_js:
+          type: boolean
+          label: 'Use inline JavaScript to initialize Advertising containers'
 
 ad_entity.ad_entity.*:
   type: config_entity

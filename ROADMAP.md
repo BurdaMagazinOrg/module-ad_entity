@@ -4,13 +4,13 @@ Goals for 8.x-2.x:
 - Implement a better method of collecting and delivering Advertising contexts.
 - Drop the deprecated frontend appliance mode of 8.x-1.x.
 - Major test coverage.
-- Performance: Provide the ability to initialize ads via inline JS.
 
 8.x-1.0-beta [current]:
 - Implement unit and web tests. [incomplete]
 - Performance optimizations:
     - Get rid of jQuery (see #2974510) [done]
     - Add viewready.js which fires as soon as possible [done]
+    - Provide the ability to initialize ads via inline JS. [done]
 - Fix all known major problems.
   List of known major problems:
     - https://github.com/BurdaMagazinOrg/module-ad_entity/issues/7 [fixed]

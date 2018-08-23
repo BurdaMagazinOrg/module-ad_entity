@@ -27,28 +27,37 @@
   ad_entity.collectAdContainers = function (context, settings) {
     var newcomers = {};
     var collected = ad_entity.adContainers;
-    var container_items = context.querySelectorAll('.ad-entity-container');
-    var length = container_items.length;
+    var queues = [ad_entity.queue];
+    var queue;
+    var length;
     var el;
     var i;
     var container;
     var event_detail;
-    for (i = 0; i < length; i++) {
-      el = container_items[i];
-      if (typeof el.id !== 'string' || !(el.id.length > 0)) {
-        continue;
-      }
-      if (collected.hasOwnProperty(el.id)) {
-        continue;
-      }
-      container = {
-        el: el,
-        data: function (key, value) {
-          return ad_entity.helpers.metadata(this.el, this, key, value);
+    ad_entity.queue = [];
+    if (!ad_entity.settings.inline) {
+      queues.push(context.querySelectorAll('.ad-entity-container'));
+    }
+    while (queues.length > 0) {
+      queue = queues.shift();
+      length = queue.length;
+      for (i = 0; i < length; i++) {
+        el = queue[i];
+        if (typeof el.id !== 'string' || !(el.id.length > 0)) {
+          continue;
         }
-      };
-      collected[el.id] = container;
-      newcomers[el.id] = container;
+        if (collected.hasOwnProperty(el.id)) {
+          continue;
+        }
+        container = {
+          el: el,
+          data: function (key, value) {
+            return ad_entity.helpers.metadata(this.el, this, key, value);
+          }
+        };
+        collected[el.id] = container;
+        newcomers[el.id] = container;
+      }
     }
     event_detail = {
       collected: collected,

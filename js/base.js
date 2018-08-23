@@ -7,7 +7,7 @@
 
   var settingsElement = document.getElementById('ad-entity-settings');
 
-  window.adEntity = {settings: {}, helpers: {}};
+  window.adEntity = {settings: {}, helpers: {}, queue: []};
 
   if (settingsElement !== null) {
     window.adEntity.settings = JSON.parse(settingsElement.textContent);

@@ -37,6 +37,9 @@ function template_preprocess_ad_entity(array &$variables) {
     return;
   }
 
+  // Pass through global frontend settings.
+  $variables['settings'] = _ad_entity_get_js_settings();
+
   // Generate attributes.
   $id = 'ad-entity-' . Crypt::randomBytesBase64(8);
   $attributes = new Attribute(['id' => $id]);

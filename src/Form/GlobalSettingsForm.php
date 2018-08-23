@@ -395,6 +395,12 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#description' => $this->t('<a href=":url_pl" target="_blank" rel="noopener noreferrer nofollow">Script preloading</a> might improve client loading performance.', [':url_pl' => 'https://www.w3.org/TR/preload/']),
       '#default_value' => (int) !empty($tweaks['include_preload_tags']),
     ];
+    $form['tweaks']['use_inline_js'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use inline JavaScript to initialize Advertising containers'),
+      '#description' => $this->t('For modern browsers, using inline JavaScript can slightly improve performance during ad initialization.'),
+      '#default_value' => (int) !empty($tweaks['use_inline_js']),
+    ];
 
     $type_ids = array_keys($this->typeManager->getDefinitions());
     if (!empty($type_ids)) {
@@ -537,6 +543,7 @@ class GlobalSettingsForm extends ConfigFormBase {
     $user_tweaks = $form_state->getValue('tweaks');
     $tweaks['force_backend_appliance'] = !empty($user_tweaks['force_backend_appliance']);
     $tweaks['include_preload_tags'] = !empty($user_tweaks['include_preload_tags']);
+    $tweaks['use_inline_js'] = !empty($user_tweaks['use_inline_js']);
     $config->set('tweaks', $tweaks);
 
     $type_ids = array_keys($this->typeManager->getDefinitions());

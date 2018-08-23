@@ -326,12 +326,12 @@ function _ad_entity_get_module_info() {
 }
 
 /**
- * Builds the JS settings regards viewing Advertising entities.
+ * Get the JS settings regards viewing Advertising entities.
  *
  * @return array
  *   The JS settings array.
  */
-function _ad_entity_build_js_settings() {
+function _ad_entity_get_js_settings() {
   $settings = &drupal_static(__FUNCTION__, []);
   if (!empty($settings)) {
     return $settings;
@@ -346,8 +346,10 @@ function _ad_entity_build_js_settings() {
     }
   }
   $settings['responsive'] = FALSE;
+  $settings['inline'] = FALSE;
   if ($config = \Drupal::config('ad_entity.settings')) {
     $settings['responsive'] = $config->get('enable_responsive_behavior') ? TRUE : FALSE;
+    $settings['inline'] = $config->get('tweaks.use_inline_js') ? TRUE : FALSE;
 
     // Include consent awareness settings regards personalization.
     $personalization = $config->get('personalization');
@@ -402,7 +404,7 @@ function _ad_entity_build_js_settings() {
  *   The render array for the ad_entity JS settings tag.
  */
 function _ad_entity_js_settings_tag() {
-  $settings = _ad_entity_build_js_settings();
+  $settings = _ad_entity_get_js_settings();
   $attributes = [
     'id' => 'ad-entity-settings',
     'type' => 'application/json',

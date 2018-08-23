@@ -8,6 +8,10 @@ personalization:
   consent_awareness:
     method: opt_in
     cookie:
-      name: cookie-agreed
-      operator: '=='
-      value: '[1,2]'
+      name: oil_data
+      operator: e
+      value: ''
+tweaks:
+  force_backend_appliance: true
+  include_preload_tags: true
+  use_inline_js: true
