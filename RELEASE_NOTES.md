@@ -4,6 +4,10 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta27:
+- #2994073: Increased #maxlength for targeting input.
+- New feature: Added the option to initialize ads with inline JS.
+
 8.x-1.0-beta26:
 - Bugfix: Switch to array format instead of JSON for AdTech page targeting.
 
