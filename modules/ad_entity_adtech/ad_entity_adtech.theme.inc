@@ -39,15 +39,12 @@ function template_preprocess_adtech_default(array &$variables) {
   // page though, the page targeting needs to be manually included here.
   $admin_context = \Drupal::service('router.admin_context');
   if ($admin_context->isAdminRoute()) {
-    if ($config = \Drupal::config('ad_entity.settings')) {
-      $settings = $config->get('adtech_factory');
-      if (!empty($settings['page_targeting'])) {
-        // Include page targeting.
-        $page_targeting = new TargetingCollection($settings['page_targeting']);
-        $page_targeting->filter();
-        $variables['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
-        $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $page_targeting->toArray();
-      }
+    /** @var \Drupal\ad_entity\TargetingCollection $page_targeting */
+    $page_targeting = \Drupal::service('ad_entity_adtech.page_targeting')->get();
+    if (!$page_targeting->isEmpty()) {
+      // Include page targeting.
+      $variables['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
+      $variables['#attached']['drupalSettings']['adtech_page_targeting'] = $page_targeting->toArray();
     }
   }
 }

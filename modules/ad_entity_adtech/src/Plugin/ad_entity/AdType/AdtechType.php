@@ -7,6 +7,8 @@ use Drupal\ad_entity\Plugin\AdTypeBase;
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,11 +30,27 @@ class AdtechType extends AdTypeBase {
   protected $configFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The entity bundle info service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityBundleInfo;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->setConfigFactory($container->get('config.factory'));
+    $instance->setEntityTypeManager($container->get('entity_type.manager'));
+    $instance->setEntityBundleInfo($container->get('entity_type.bundle.info'));
     return $instance;
   }
 
@@ -44,6 +62,26 @@ class AdtechType extends AdTypeBase {
    */
   protected function setConfigFactory(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
+  }
+
+  /**
+   * Set the entity type manager.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  protected function setEntityTypeManager(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * Set the entity bundle info service.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   *   The bundle info service to set.
+   */
+  protected function setEntityBundleInfo(EntityTypeBundleInfoInterface $bundle_info) {
+    $this->entityBundleInfo = $bundle_info;
   }
 
   /**
@@ -73,6 +111,30 @@ class AdtechType extends AdTypeBase {
       '#default_value' => !empty($targeting) ? $targeting->toUserOutput() : '',
     ];
 
+    $element['include_content_info'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->stringTranslation->translate("Include page targeting regards the given content (channel, subchannel, contenttype)"),
+      '#default_value' => (int) !empty($settings['include_content_info']),
+    ];
+
+    if ($this->entityTypeManager->hasDefinition('taxonomy_term')) {
+      $bundles = $this->entityBundleInfo->getBundleInfo('taxonomy_term');
+      $bundle_options = [];
+      foreach ($bundles as $bundle_id => $bundle) {
+        $bundle_options[$bundle_id] = !empty($bundle['label']) ? $bundle['label'] : $bundle_id;
+      }
+      $element['channel_vocabulary'] = [
+        '#type' => 'select',
+        '#title' => $this->stringTranslation->translate('Channel vocabulary'),
+        '#description' => $this->stringTranslation->translate('The vocabulary, which represents the channel. Default is set to "channel".'),
+        '#default_value' => !empty($settings['channel_vocabulary']) ? $settings['channel_vocabulary'] : 'channel',
+        '#options' => $bundle_options,
+        '#states' => [
+          'visible' => ['input[name="adtech_factory[include_content_info]"' => ['checked' => TRUE]],
+        ],
+      ];
+    }
+
     return $element;
   }
 
@@ -89,6 +151,13 @@ class AdtechType extends AdTypeBase {
       $targeting->collectFromUserInput($values['page_targeting']);
       $config->set($id . '.page_targeting', $targeting->toArray());
     }
+
+    $bundles = $this->entityTypeManager->hasDefinition('taxonomy_term') ?
+      $this->entityBundleInfo->getBundleInfo('taxonomy_term') : [];
+    $config->set($id . '.include_content_info', !empty($values['include_content_info']));
+    $channel_vocabulary = !empty($values['channel_vocabulary']) ? $values['channel_vocabulary'] : 'channel';
+    $channel_vocabulary = isset($bundles[$channel_vocabulary]) ? $channel_vocabulary : 'channel';
+    $config->set($id . '.channel_vocabulary', $channel_vocabulary);
   }
 
   /**

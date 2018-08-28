@@ -58,11 +58,10 @@ function ad_entity_adtech_page_attachments(&$attachments) {
   /** @var \Drupal\Core\Routing\AdminContext $admin_context */
   $admin_context = \Drupal::service('router.admin_context');
   if (!$admin_context->isAdminRoute()) {
-    $settings = $config->get('adtech_factory');
-    if (!empty($settings['page_targeting'])) {
+    /** @var \Drupal\ad_entity\TargetingCollection $page_targeting */
+    $page_targeting = \Drupal::service('ad_entity_adtech.page_targeting')->get();
+    if (!$page_targeting->isEmpty()) {
       // Include page targeting.
-      $page_targeting = new TargetingCollection($settings['page_targeting']);
-      $page_targeting->filter();
       $attachments['#attached']['library'][] = 'ad_entity_adtech/page_targeting';
       $attachments['#attached']['drupalSettings']['adtech_page_targeting'] = $page_targeting->toArray();
     }

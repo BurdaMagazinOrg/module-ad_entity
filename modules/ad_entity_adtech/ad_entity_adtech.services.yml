@@ -1,0 +1,4 @@
+services:
+  ad_entity_adtech.page_targeting:
+    class: Drupal\ad_entity_adtech\AdtechPageTargeting
+    arguments: ['@config.factory', '@entity_type.manager', '@current_route_match', '@transliteration']
