@@ -160,7 +160,6 @@ class AdtechPageTargeting {
    */
   protected function getPageEntity() {
     $page_entity = NULL;
-    $types = $this->entityTypeManager->getDefinitions();
     foreach ($this->routeMatch->getParameters() as $param) {
       if ($param instanceof EntityInterface) {
         $page_entity = $param;
@@ -170,6 +169,7 @@ class AdtechPageTargeting {
     if (!isset($page_entity)) {
       // Some routes don't properly define entity parameters.
       // Thus, try to load them by its raw Id, if given.
+      $types = $this->entityTypeManager->getDefinitions();
       foreach ($this->routeMatch->getParameters()->keys() as $param_key) {
         if (!isset($types[$param_key])) {
           continue;
