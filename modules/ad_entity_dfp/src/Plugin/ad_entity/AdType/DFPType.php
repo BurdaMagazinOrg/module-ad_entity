@@ -93,12 +93,14 @@ class DFPType extends AdTypeBase {
     $sizes_default = [];
     if (!empty($settings['sizes'])) {
       $decoded = Json::decode($settings['sizes']);
-      foreach ($decoded as $size) {
-        if (is_array($size)) {
-          $sizes_default[] = $size[0] . 'x' . $size[1];
-        }
-        else {
-          $sizes_default[] = $size;
+      if (!empty($decoded)) {
+        foreach ($decoded as $size) {
+          if (is_array($size)) {
+            $sizes_default[] = $size[0] . 'x' . $size[1];
+          }
+          else {
+            $sizes_default[] = $size;
+          }
         }
       }
     }
