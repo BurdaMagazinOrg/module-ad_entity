@@ -33,4 +33,7 @@ function template_preprocess_dfp_default(array &$variables) {
   if (!empty($settings['sizes'])) {
     $variables['sizes'] = $settings['sizes'];
   }
+
+  // Make sure, that the GPT library will be included.
+  $variables['#attached']['library'][] = 'ad_entity/provider.googletag';
 }

@@ -74,7 +74,6 @@ function ad_entity_adtech_page_attachments(&$attachments) {
     // When script preloading is enabled, include
     // a preload tag for the required external libraries.
     if ($config->get('tweaks.include_preload_tags') && ($href = $config->get('adtech_factory.library_source'))) {
-      _ad_entity_attach_gpt_preload($attachments);
       $attachments['#attached']['html_head'][] = [
         [
           '#attributes' => [
