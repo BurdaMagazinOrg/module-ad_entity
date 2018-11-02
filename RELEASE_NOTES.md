@@ -4,6 +4,13 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta28:
+- Performance: The viewready.js library now includes only view handler
+  libraries, which are being used by existing Advertising entities.
+- DFP: External GPT.js is now only when being used by existing entities.
+- API: Added a service, providing information about which type or view
+  plugins are being used by existing entities.
+
 8.x-1.0-beta27:
 - #2994073: Increased #maxlength for targeting input.
 - New feature: Added the option to initialize ads with inline JS.
