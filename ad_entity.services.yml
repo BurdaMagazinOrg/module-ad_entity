@@ -16,3 +16,6 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager', '@plugin.manager.field.formatter']
     calls:
       - [resetContextDataForRoute, ['@current_route_match']]
+  ad_entity.usage:
+    class: Drupal\ad_entity\AdEntityUsage
+    arguments: ['@entity_type.manager', '@ad_entity', '@cache.default']

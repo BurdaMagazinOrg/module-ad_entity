@@ -38,13 +38,18 @@ function ad_entity_dfp_page_attachments(&$attachments) {
   // if an ad is being included directly on the page.
   /** @var \Drupal\Core\Routing\AdminContext $admin_context */
   $admin_context = \Drupal::service('router.admin_context');
-  if (!$admin_context->isAdminRoute() && _ad_entity_dfp_default_exists()) {
-    $attachments['#attached']['library'][] = 'ad_entity/provider.googletag';
+  if (!$admin_context->isAdminRoute()) {
+    /** @var \Drupal\ad_entity\AdEntityUsage $usage */
+    $usage = \Drupal::service('ad_entity.usage');
+    $used_view_plugins = $usage->getCurrentlyUsedAdViewPlugins();
+    if (!empty($used_view_plugins['dfp_default'])) {
+      $attachments['#attached']['library'][] = 'ad_entity/provider.googletag';
 
-    // When script preloading is enabled, include
-    // a preload tag for the required external libraries.
-    if ($config && $config->get('tweaks.include_preload_tags')) {
-      _ad_entity_attach_gpt_preload($attachments);
+      // When script preloading is enabled, include
+      // a preload tag for the required external libraries.
+      if ($config && $config->get('tweaks.include_preload_tags')) {
+        _ad_entity_attach_gpt_preload($attachments);
+      }
     }
   }
 }
@@ -67,36 +72,4 @@ function ad_entity_dfp_theme($existing, $type, $theme, $path) {
       'file' => 'ad_entity_dfp.amp.inc',
     ],
   ];
-}
-
-/**
- * Checks whether Advertising entities using the default DFP view exist.
- *
- * @return bool
- *   Returns TRUE when entities using the DFP type exist, FALSE otherwise.
- */
-function _ad_entity_dfp_default_exists() {
-  $storage = \Drupal::entityTypeManager()->getStorage('ad_entity');
-  $cache = \Drupal::cache('default');
-  $cid = 'ad_entity_dfp.using_default';
-  $plugin_id = 'dfp_default';
-
-  if ($cached = $cache->get($cid)) {
-    if (empty($cached->data)) {
-      return FALSE;
-    }
-    /** @var \Drupal\ad_entity\Entity\AdEntityInterface $ad_entity */
-    if ($ad_entity = $storage->load($cached->data)) {
-      if ($plugin_id === $ad_entity->get('view_plugin_id')) {
-        return TRUE;
-      }
-    }
-  }
-
-  $entities = $storage->loadByProperties(['view_plugin_id' => $plugin_id]);
-  if ($exists = !empty($entities)) {
-    $entity = reset($entities);
-    $cache->set($cid, $entity->id(), Cache::PERMANENT, ['config:ad_entity_list']);
-  }
-  return $exists;
 }
