@@ -5,8 +5,6 @@
  * Advertising Entity: DFP module file.
  */
 
-use Drupal\Core\Cache\Cache;
-
 /**
  * Implements hook_ad_entity_module_info().
  */
