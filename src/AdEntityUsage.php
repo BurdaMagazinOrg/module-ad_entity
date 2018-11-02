@@ -38,7 +38,7 @@ class AdEntityUsage {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\ad_entity\AdEntityServices
+   * @param \Drupal\ad_entity\AdEntityServices $ad_entity_services
    *   The services commonly used by Advertising entities.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
@@ -50,7 +50,7 @@ class AdEntityUsage {
   }
 
   /**
-   * Get all view plugin ids, which are currently being used by Advertising entities.
+   * Get all view plugin ids, which are being used by Advertising entities.
    *
    * @return array
    *   An array, keyed by plugin id. When the value is TRUE,
@@ -61,7 +61,7 @@ class AdEntityUsage {
   }
 
   /**
-   * Get all type plugin ids, which are currently being used by Advertising entities.
+   * Get all type plugin ids, which are being used by Advertising entities.
    *
    * @return array
    *   An array, keyed by plugin id. When the value is TRUE,
@@ -76,7 +76,7 @@ class AdEntityUsage {
    *
    * @param string $key
    *   The property key of the Advertising entities.
-   * @param $cid
+   * @param string $cid
    *   The cache key to use.
    * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
    *   The corresponding plugin manager.
