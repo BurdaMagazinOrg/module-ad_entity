@@ -24,23 +24,23 @@
   }.bind(adEntity.generic);
   if (adEntity.generic.loadHandlers.length === 0) {
     adEntity.generic.loadHandlers.push({name: 'queue', callback: function (ad_tags) {
-        var ad_tag = ad_tags.shift();
-        this.toLoad = this.toLoad || [];
-        while (typeof ad_tag === 'object') {
-          this.toLoad.push(ad_tag);
-          ad_tag = ad_tags.shift();
-        }
-      }.bind(adEntity.generic)});
+      var ad_tag = ad_tags.shift();
+      this.toLoad = this.toLoad || [];
+      while (typeof ad_tag === 'object') {
+        this.toLoad.push(ad_tag);
+        ad_tag = ad_tags.shift();
+      }
+    }.bind(adEntity.generic)});
   }
   if (adEntity.generic.removeHandlers.length === 0) {
     adEntity.generic.removeHandlers.push({name: 'queue', callback: function (ad_tags) {
-        var ad_tag = ad_tags.shift();
-        this.toRemove = this.toRemove || [];
-        while (typeof ad_tag === 'object') {
-          this.toRemove.push(ad_tag);
-          ad_tag = ad_tags.shift();
-        }
-      }.bind(adEntity.generic)});
+      var ad_tag = ad_tags.shift();
+      this.toRemove = this.toRemove || [];
+      while (typeof ad_tag === 'object') {
+        this.toRemove.push(ad_tag);
+        ad_tag = ad_tags.shift();
+      }
+    }.bind(adEntity.generic)});
   }
 
 }(window.adEntity));
