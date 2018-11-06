@@ -37,7 +37,7 @@
       ad_tag.done();
       ad_tag = ad_tags.shift();
     }
-  }.bind(adEntity.generic)});
+  }});
   adEntity.generic.removeHandlers = adEntity.generic.removeHandlers || [];
   adEntity.generic.removeHandlers.push({name: 'queue', callback: function (ad_tags) {
     var ad_tag = ad_tags.shift();
