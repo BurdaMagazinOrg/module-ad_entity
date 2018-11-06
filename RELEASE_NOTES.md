@@ -10,6 +10,7 @@ to see the current blockers for the first release candidate.
 - DFP: External GPT.js is now only when being used by existing entities.
 - API: Added a service, providing information about which type or view
   plugins are being used by existing entities.
+- New feature: Added a submodule for managing generic ads.
 
 8.x-1.0-beta27:
 - #2994073: Increased #maxlength for targeting input.
