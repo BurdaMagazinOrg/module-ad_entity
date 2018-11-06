@@ -8,7 +8,8 @@ Provides generic ads.
 
 ## Usage
 
-@todo Write documentation.
+Have a look at the ad_entity_generic_example module
+for an example usage implementation.
 
 ## Requirements
 

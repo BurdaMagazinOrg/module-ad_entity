@@ -49,21 +49,17 @@
         ad_tag.format = ad_tag.data('data-ad-format');
         ad_tag.name = container.data('data-ad-entity');
         ad_tag.targeting = targeting;
-        ad_tag.isLoaded = false;
-        ad_tag.isEmpty = null;
-        ad_tag.done = function () {
+        ad_tag.done = function (success, isEmpty) {
           var el = this.el;
-          if (this.ad_tag.isLoaded === false) {
+          if ((success === false) || (this.ad_tag.isLoaded === true)) {
             return;
           }
-          if (this.ad_tag.doneCalled === true) {
-            return;
-          }
-          this.ad_tag.doneCalled = true;
+          this.ad_tag.isLoaded = true;
           helpers.removeClass(el, 'not-initialized');
           helpers.addClass(el, 'initialized');
           this.data('initialized', true);
-          if (this.ad_tag.isEmpty === true) {
+          if (isEmpty === true) {
+            this.ad_tag.isEmpty = true;
             helpers.addClass(el, 'empty');
             helpers.removeClass(el, 'not-empty');
           }
