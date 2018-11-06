@@ -22,6 +22,8 @@ advertising instances (mainly advertisement).
   this module.
 - <a href="https://www.drupal.org/project/ad_entity_vi">Video Intelligence</a>
 - <a href="https://www.drupal.org/project/ad_entity_smart">Smart AdServer</a>
+- For advanced use cases, the already included ad_entity_generic submodule
+  provides a skeleton to manage ads of custom and arbitrary types.
 
 Have a further integration based on ad_entity and want to list it here?
 <a href="https://www.drupal.org/node/add/project-issue/ad_entity">
