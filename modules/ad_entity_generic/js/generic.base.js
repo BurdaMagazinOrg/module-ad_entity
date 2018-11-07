@@ -10,7 +10,7 @@
     var i = 0;
     this.loadHandlers = this.loadHandlers || [];
     while (i < this.loadHandlers.length) {
-      this.loadHandlers[i].callback(ad_tags.slice());
+      this.loadHandlers[i].callback(ad_tags);
       i++;
     }
   }.bind(adEntity.generic);
@@ -18,29 +18,25 @@
     var i = 0;
     this.removeHandlers = this.removeHandlers || [];
     while (i < this.removeHandlers.length) {
-      this.removeHandlers[i].callback(ad_tags.slice());
+      this.removeHandlers[i].callback(ad_tags);
       i++;
     }
   }.bind(adEntity.generic);
-  if (adEntity.generic.loadHandlers.length === 0) {
-    adEntity.generic.loadHandlers.push({name: 'queue', callback: function (ad_tags) {
-      var ad_tag = ad_tags.shift();
-      this.toLoad = this.toLoad || [];
-      while (typeof ad_tag === 'object') {
-        this.toLoad.push(ad_tag);
-        ad_tag = ad_tags.shift();
-      }
-    }.bind(adEntity.generic)});
-  }
-  if (adEntity.generic.removeHandlers.length === 0) {
-    adEntity.generic.removeHandlers.push({name: 'queue', callback: function (ad_tags) {
-      var ad_tag = ad_tags.shift();
-      this.toRemove = this.toRemove || [];
-      while (typeof ad_tag === 'object') {
-        this.toRemove.push(ad_tag);
-        ad_tag = ad_tags.shift();
-      }
-    }.bind(adEntity.generic)});
-  }
+  adEntity.generic.loadHandlers.push({name: 'queue', callback: function (ad_tags) {
+    var ad_tag = ad_tags.shift();
+    this.toLoad = this.toLoad || [];
+    while (typeof ad_tag === 'object') {
+      this.toLoad.push(ad_tag);
+      ad_tag = ad_tags.shift();
+    }
+  }.bind(adEntity.generic)});
+  adEntity.generic.removeHandlers.push({name: 'queue', callback: function (ad_tags) {
+    var ad_tag = ad_tags.shift();
+    this.toRemove = this.toRemove || [];
+    while (typeof ad_tag === 'object') {
+      this.toRemove.push(ad_tag);
+      ad_tag = ad_tags.shift();
+    }
+  }.bind(adEntity.generic)});
 
 }(window.adEntity));

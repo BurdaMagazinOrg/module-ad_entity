@@ -4,9 +4,9 @@
  *
  * Short description about the example: This implementation is assuming
  * to be loaded asynchronously. If it's a little late, it may check for
- * the queue, whether some tags are already waiting to be loaded.
- * Once done, it takes care of loading further ads on its own,
- * by adding itself as a loading handler.
+ * globally available queues (toLoad and toRemove), whether some tags
+ * are already waiting. It takes care of loading further ads on its own,
+ * by adding itself as a loading and on-removal handler.
  */
 
 (function (adEntity) {
@@ -14,7 +14,7 @@
   var loadCallback = function (ad_tags) {
     // Should not use the logger on production.
     console.log('Load handler called. Items to load: ' + ad_tags.length);
-    // Use the shift method to empty incoming queues.
+    // Use the shift method to empty the incoming ad_tags queue.
     var ad_tag = ad_tags.shift();
     // Every ad_tag consists of the following properties:
     // - id: The DOM element ID as string.
@@ -55,16 +55,16 @@
 
   adEntity.generic = adEntity.generic || {toLoad: [], toRemove: [], loadHandlers: [], removeHandlers: []};
 
-  // Removes the very first handler, which would only add further tags to the queue.
-  adEntity.generic.loadHandlers.shift();
-  adEntity.generic.loadHandlers.push({name: 'example_loader', callback: loadCallback});
+  // Put your callbacks on top of the handler lists,
+  // to be the first one working on the incoming queues.
+  // At the end of each handler list, a "queue" handler
+  // is available to put all the rest of non-shifted
+  // tag items to its globally available queue.
+  adEntity.generic.loadHandlers.unshift({name: 'example_loader', callback: loadCallback});
+  adEntity.generic.removeHandlers.unshift({name: 'example_on_removal', callback: removeCallback});
 
-  // Equivalent to the very first load handler, there is also one
-  // which only adds tags to be removed from the queue.
-  adEntity.generic.removeHandlers.shift();
-  adEntity.generic.removeHandlers.push({name: 'example_on_removal', callback: removeCallback});
-
-  // Directly use the callbacks as queue workers.
+  // Directly check on the globally available queues,
+  // whether some tags are already waiting.
   loadCallback(adEntity.generic.toLoad);
   removeCallback(adEntity.generic.toRemove);
 
