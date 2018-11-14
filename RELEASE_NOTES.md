@@ -11,6 +11,8 @@ to see the current blockers for the first release candidate.
 - API: Added a service, providing information about which type or view
   plugins are being used by existing entities.
 - New feature: Added a submodule for managing generic ads.
+- Bugfix: Advertising entity form might collide when view and type plugin
+  have the same machine name.
 
 8.x-1.0-beta27:
 - #2994073: Increased #maxlength for targeting input.
