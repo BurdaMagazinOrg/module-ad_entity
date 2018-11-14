@@ -155,7 +155,7 @@ class AdEntityForm extends EntityForm {
           '#attributes' => ['id' => 'type-plugin-' . $type_id],
           '#title' => $this->t("Type configuration"),
         ] + $type->entityConfigForm($form, $form_state, $ad_entity);
-        $form['third_party'][$type_id] = $type_form;
+        $form['third_party']['type__' . $type_id] = $type_form;
       }
 
       if (!empty($allowed_views)) {
@@ -194,7 +194,7 @@ class AdEntityForm extends EntityForm {
             '#attributes' => ['id' => 'view-plugin-' . $view_id],
             '#title' => $this->t("View handler configuration"),
           ] + $view_handler->entityConfigForm($form, $form_state, $ad_entity);
-          $form['third_party'][$view_id] = $view_form;
+          $form['third_party']['view__' . $view_id] = $view_form;
         }
       }
     }
