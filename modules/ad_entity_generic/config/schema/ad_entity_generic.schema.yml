@@ -17,6 +17,9 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_generic:
   type: mapping
   label: 'Entity config for generic ads'
   mapping:
+    id:
+      type: string
+      label: 'Identifier'
     format:
       type: string
       label: 'Display format'

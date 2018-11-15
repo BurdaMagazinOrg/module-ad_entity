@@ -75,6 +75,14 @@ class GenericType extends AdTypeBase {
 
     $settings = $ad_entity->getThirdPartySettings($this->getPluginDefinition()['provider']);
 
+    $element['id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->stringTranslation->translate('Identifier'),
+      '#default_value' => !empty($settings['id']) ? $settings['id'] : '',
+      '#size' => 20,
+      '#required' => TRUE,
+    ];
+
     $element['format'] = [
       '#type' => 'textfield',
       '#title' => $this->stringTranslation->translate("Display format"),

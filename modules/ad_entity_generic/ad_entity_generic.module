@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Template\Attribute;
-use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\Html;
 use Drupal\ad_entity\TargetingCollection;
 use Drupal\ad_entity\Render\Markup;
 
@@ -33,7 +33,7 @@ function template_preprocess_ad_entity_generic_js(array &$variables) {
   $settings = $ad_entity->getThirdPartySettings('ad_entity_generic');
 
   // Generate attributes.
-  $id = 'ad-' . Crypt::randomBytesBase64(8);
+  $id = Html::getUniqueId($settings['id']);
   $attributes = new Attribute(['id' => $id]);
   $attributes->addClass('adtag');
   $attributes->setAttribute('data-ad-format', $settings['format']);
