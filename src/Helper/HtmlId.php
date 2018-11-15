@@ -26,8 +26,6 @@ abstract class HtmlId {
   /**
    * Prepares a string for use as a valid Html Id and guarantees uniqueness.
    *
-   * For more details, see \Drupal\Component\Utility\Html::getUniqueId().
-   *
    * @param string $id
    *   The ID to clean.
    *
@@ -55,9 +53,6 @@ abstract class HtmlId {
   /**
    * Prepares a string for use as a valid HTML ID.
    *
-   * Only use this function when you want to intentionally skip the uniqueness
-   * guarantee of self::getUniqueId().
-   *
    * @param string $id
    *   The ID to clean.
    *
@@ -68,15 +63,7 @@ abstract class HtmlId {
    */
   public static function get($id) {
     $id = str_replace([' ', '[', ']'], ['-', '-', ''], $id);
-
-    // As defined in http://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
-    // only contain letters, digits ([0-9]), hyphens ("-"), underscores ("_"),
-    // colons (":"), and periods ("."). We strip out any character not in that
-    // list. Note that the CSS spec doesn't allow colons or periods in identifiers
-    // (http://www.w3.org/TR/CSS21/syndata.html#characters), so we strip those two
-    // characters as well.
     $id = preg_replace('/[^A-Za-z0-9\-_]/', '', $id);
-
     return $id;
   }
 
