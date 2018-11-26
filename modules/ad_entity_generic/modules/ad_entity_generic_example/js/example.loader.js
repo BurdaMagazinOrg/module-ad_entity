@@ -64,9 +64,9 @@
   adEntity.generic = adEntity.generic || {toLoad: [], toRemove: [], loadHandlers: [], removeHandlers: []};
 
   // [8] Put your callbacks on top of the handler lists,
-  //     to be the first one working on the incoming queues.
-  // [9] At the end of each handler list, a "queue" handler
-  //     is will put all the rest of not yet pulled ad_tag
+  //     to be an early one working on the incoming queues.
+  // [9] A "queue" handler will be executed afterwards and
+  //     will put all the rest of not yet pulled ad_tag
   //     items to the globally available queue toLoad and toRemove.
   adEntity.generic.loadHandlers.unshift({name: 'example_loader', callback: loadCallback});
   adEntity.generic.removeHandlers.unshift({name: 'example_on_removal', callback: removeCallback});
