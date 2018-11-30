@@ -320,7 +320,7 @@ class GlobalSettingsForm extends ConfigFormBase {
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#title' => $this->t('Consent cookie'),
-      '#description' => $this->t('These settings only define which cookie to check for. This module does not create or set the cookie. This is the job of other modules like the <a href="https://drupal.org/project/eu_cookie_compliance" target="_blank" rel="noopener nofollow">EU Cookie compliance</a> module.'),
+      '#description' => $this->t('These settings only define which cookie to check for. This module does not create or set the cookie. This is the job of other modules like the <a href="https://drupal.org/project/consent" target="_blank" rel="noopener nofollow">Consent</a> or <a href="https://drupal.org/project/eu_cookie_compliance" target="_blank" rel="noopener nofollow">EU Cookie compliance</a> module.'),
       '#weight' => 20,
       '#states' => [
         'visible' => [
@@ -573,6 +573,9 @@ class GlobalSettingsForm extends ConfigFormBase {
       'opt_in' => $this->t('Opt-in: Only use personalized ads when consent exists.'),
       'opt_out' => $this->t('Opt-out: Use personalized ads, unless user declined.'),
     ];
+    if ($this->moduleHandler->moduleExists('consent')) {
+      $methods['oil'] = $this->t('Use personalized ads when opt-in cookie is set via OIL.js.');
+    }
     if ($this->moduleHandler->moduleExists('eu_cookie_compliance')) {
       $methods['eu_cookie_compliance'] = $this->t('Adapt behavior defined by the EU Cookie Compliance module.');
     }

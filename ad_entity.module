@@ -360,8 +360,19 @@ function _ad_entity_get_js_settings() {
     $settings['p13n'] = !empty($personalization['enabled']);
     if ($settings['p13n'] && !empty($personalization['consent_awareness'])) {
       $consent_awareness = $personalization['consent_awareness'];
-      if (!empty($consent_awareness['method'])
-        && ('eu_cookie_compliance' === $consent_awareness['method'])
+      $method = !empty($consent_awareness['method']) ? $consent_awareness['method'] : 'opt_in';
+      if ('oil' === $method) {
+        // Use personalized ads when opt-in cookie is set via OIL.js.
+        $settings['consent'] = [
+          'method' => 'opt_in',
+          'cookie' => [
+            'name' => 'oil_data',
+            'operator' => 'e',
+            'value' => '',
+          ],
+        ];
+      }
+      elseif (('eu_cookie_compliance' === $method)
         && (\Drupal::moduleHandler()->moduleExists('eu_cookie_compliance'))
         && ($eu_cc_config = \Drupal::config('eu_cookie_compliance.settings'))) {
 
@@ -381,10 +392,8 @@ function _ad_entity_get_js_settings() {
         }
       }
       else {
-        $settings['consent'] = [
-          'method' => !empty($consent_awareness['method']) ? $consent_awareness['method'] : 'opt_in',
-        ];
-        if ('disabled' !== $settings['consent']['method']) {
+        $settings['consent'] = ['method' => $method];
+        if ('disabled' !== $method) {
           $settings['consent'] += [
             'cookie' => [
               'name' => !empty($consent_awareness['cookie']['name']) ? $consent_awareness['cookie']['name'] : 'cookie-agreed',

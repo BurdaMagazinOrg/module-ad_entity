@@ -12,7 +12,7 @@ advertising instances (mainly advertisement).
   by using the Theme Breakpoints JS module.
 - Configure consent-aware personalization: This module offers
   a unified way to configure GDPR compliant ads,
-  optionally combined with the EU Cookie Compliance module.
+  optionally combined with the "Consent" or "EU Cookie Compliance" module.
 
 ## Available provider integrations
 

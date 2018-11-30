@@ -4,6 +4,9 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta29:
+- New feature: Added consent awareness option for OIL.js framework.
+
 8.x-1.0-beta28:
 - Performance: The viewready.js library now includes only view handler
   libraries, which are being used by existing Advertising entities.
