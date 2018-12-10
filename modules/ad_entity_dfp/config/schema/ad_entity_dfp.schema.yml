@@ -51,3 +51,13 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
         same_domain_rendering:
           type: boolean
           label: 'Enable same domain rendering'
+        consent:
+          label: 'Personalization by consent'
+          type: mapping
+          mapping:
+            block_behavior:
+              type: string
+              label: 'Blocking behavior'
+            npa_unknown:
+              type: boolean
+              label: 'Request non-personalized ads when consent is unknown.'

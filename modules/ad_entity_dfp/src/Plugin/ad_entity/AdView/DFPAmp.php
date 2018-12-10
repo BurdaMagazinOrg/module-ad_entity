@@ -21,6 +21,18 @@ use Drupal\ad_entity\Plugin\AdViewBase;
 class DFPAmp extends AdViewBase {
 
   /**
+   * The blocking behavior options.
+   *
+   * @var array
+   */
+  static protected $blockOnConsentOptions = [
+    '0' => 'Not enabled',
+    '_till_accepted' => 'Enabled until accepted (default behavior)',
+    '_till_responded' => 'Enabled until responded',
+    '_auto_reject' => 'Auto reject',
+  ];
+
+  /**
    * {@inheritdoc}
    */
   public function build(AdEntityInterface $entity) {
@@ -76,7 +88,39 @@ class DFPAmp extends AdViewBase {
       '#default_value' => !empty($settings['amp']['same_domain_rendering']) ? $settings['amp']['same_domain_rendering'] : 0,
     ];
 
+    $element['amp']['consent'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->stringTranslation->translate('Personalization by consent'),
+      '#description' => $this->stringTranslation->translate('Read more about this <a href="@url" target="_blank" rel="noopener noreferrer">here</a>.', ['@url' => 'https://support.google.com/admanager/answer/7678538']),
+    ];
+    $block_on_consent_options = static::blockOnConsentOptions();
+    foreach ($block_on_consent_options as &$value) {
+      $value = $this->stringTranslation->translate($value);
+    }
+    $element['amp']['consent']['block_behavior'] = [
+      '#type' => 'select',
+      '#title' => $this->stringTranslation->translate('Blocking behavior'),
+      '#options' => $block_on_consent_options,
+      '#default_value' => !empty($settings['amp']['consent']['block_behavior']) ? $settings['amp']['consent']['block_behavior'] : '0',
+      '#empty_value' => '0',
+    ];
+    $element['amp']['consent']['npa_unknown'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->stringTranslation->translate('Request non-personalized ads when consent is unknown.'),
+      '#default_value' => !empty($settings['amp']['consent']['npa_unknown']),
+    ];
+
     return $element;
+  }
+
+  /**
+   * Get allowed blocking behavior options.
+   *
+   * @return array
+   *   The blocking behavior options.
+   */
+  public static function blockOnConsentOptions() {
+    return static::$blockOnConsentOptions;
   }
 
 }

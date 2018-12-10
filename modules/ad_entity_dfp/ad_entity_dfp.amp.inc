@@ -7,6 +7,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Serialization\Json;
+use Drupal\ad_entity_dfp\Plugin\ad_entity\AdView\DFPAmp;
 
 /**
  * Preprocess implementation for a DFP tag for AMP.
@@ -47,6 +48,18 @@ function template_preprocess_dfp_amp(array &$variables) {
     else {
       $attributes->setAttribute('data-multi-size-validation', 'false');
     }
+  }
+  if (!empty($settings['amp']['consent']['block_behavior'])) {
+    $block_behavior = $settings['amp']['consent']['block_behavior'];
+    if (!($block_behavior == '0')) {
+      $allowed_options = DFPAmp::blockOnConsentOptions();
+      if (isset($allowed_options[$block_behavior])) {
+        $attributes->setAttribute('data-block-on-consent', $block_behavior);
+      }
+    }
+  }
+  if (!empty($settings['amp']['consent']['npa_unknown'])) {
+    $attributes->setAttribute('data-npa-on-unknown-consent', 'true');
   }
   $variables['attributes'] = $attributes;
 
