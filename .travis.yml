@@ -99,7 +99,7 @@ mysql:
   encoding: utf8
 
 before_install:
-  - composer self-update 1.7.3
+  - composer self-update
 
   # Code Checks
   - bash -x -e ./scripts/travis/test-source-code.sh
