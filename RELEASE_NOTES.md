@@ -4,6 +4,9 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta30:
+- DFP: Added personalization options by consent for the AMP view handler.
+
 8.x-1.0-beta29:
 - New feature: Added consent awareness option for OIL.js framework.
 
