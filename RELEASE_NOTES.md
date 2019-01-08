@@ -6,6 +6,8 @@ to see the current blockers for the first release candidate.
 
 8.x-1.0-beta30:
 - DFP: Added personalization options by consent for the AMP view handler.
+- DFP: Issue #3020997 by Cecilina, mxh: Add an optional setting to define the
+  changeCorrelator option for fetching ads.
 
 8.x-1.0-beta29:
 - New feature: Added consent awareness option for OIL.js framework.
