@@ -148,7 +148,12 @@
       for (i = 0; i < slots_length; i++) {
         slots_list = slots[i];
         if (slots_list.length > 0) {
-          window.googletag.pubads().refresh(slots_list);
+          if (typeof this.changeCorrelator === 'boolean') {
+            window.googletag.pubads().refresh(slots_list, {changeCorrelator: this.changeCorrelator});
+          }
+          else {
+            window.googletag.pubads().refresh(slots_list);
+          }
         }
       }
     },
@@ -176,7 +181,8 @@
       window.googletag.pubads().addEventListener('slotRenderEnded', initHandler, false);
     },
     numberOfAds: 0,
-    withSlotOrder: true
+    withSlotOrder: true,
+    changeCorrelator: null
   };
 
   // Do not include slot order targeting when this feature is explicitly not enabled.
@@ -184,6 +190,11 @@
     if (!drupalSettings.dfp_order_info) {
       ad_entity.viewHandlers.dfp_default.withSlotOrder = false;
     }
+  }
+
+  // Include the changeCorrelator setting when it's being set.
+  if (drupalSettings.hasOwnProperty('dfp_change_correlator')) {
+    ad_entity.viewHandlers.dfp_default.changeCorrelator = drupalSettings.dfp_change_correlator;
   }
 
 }(window.adEntity, drupalSettings, window));

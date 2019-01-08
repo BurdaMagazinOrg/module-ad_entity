@@ -21,11 +21,18 @@ function ad_entity_dfp_ad_entity_module_info() {
 function ad_entity_dfp_page_attachments(&$attachments) {
   $config = \Drupal::config('ad_entity.settings');
 
-  // By default, the ordering targeting info is enabled.
-  // We only need this setting when this feature is explicitly not enabled.
   if ($config && ($settings = $config->get('dfp'))) {
+    // By default, the ordering targeting info is enabled.
+    // We only need this setting when this feature is explicitly not enabled.
     if (isset($settings['order_info']) && empty($settings['order_info'])) {
       $attachments['#attached']['drupalSettings']['dfp_order_info'] = FALSE;
+    }
+
+    // Include the changeCorrelator setting when it's being set.
+    // changeCorrelator specifies whether or not a new correlator
+    // is to be generated for fetching ads.
+    if (isset($settings['change_correlator'])) {
+      $attachments['#attached']['drupalSettings']['dfp_change_correlator'] = $settings['change_correlator'];
     }
   }
 

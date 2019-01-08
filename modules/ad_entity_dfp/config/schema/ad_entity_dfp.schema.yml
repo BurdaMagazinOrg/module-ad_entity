@@ -5,6 +5,9 @@ ad_entity.settings.dfp:
     order_info:
       type: boolean
       label: 'Include targeting information about the slot loading order'
+    change_correlator:
+      type: boolean
+      label: 'Whether or not a new correlator is to be generated for fetching ads.'
 
 ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
   type: mapping

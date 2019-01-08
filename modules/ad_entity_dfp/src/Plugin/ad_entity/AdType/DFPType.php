@@ -42,6 +42,20 @@ class DFPType extends AdTypeBase {
       '#weight' => 10,
     ];
 
+    $correlator_options = [
+      'default' => $this->stringTranslation->translate('Let the GPT service handle on its own (default)'),
+      1 => $this->stringTranslation->translate('Always generate a new correlator'),
+      0 => $this->stringTranslation->translate('Do not change the correlator'),
+    ];
+    $element['change_correlator'] = [
+      '#type' => 'select',
+      '#title' => $this->stringTranslation->translate('Correlator behavior for fetching ads'),
+      '#description' => $this->stringTranslation->translate('Whether or not a new correlator is to be generated for fetching ads.'),
+      '#default_value' => isset($settings['change_correlator']) ? (int) $settings['change_correlator'] : 'default',
+      '#options' => $correlator_options,
+      '#weight' => 20,
+    ];
+
     return $element;
   }
 
@@ -55,6 +69,15 @@ class DFPType extends AdTypeBase {
     if (isset($values['order_info'])) {
       // Make sure the value is being stored as boolean.
       $config->set($id . '.order_info', (bool) $values['order_info']);
+    }
+    if (isset($values['change_correlator'])) {
+      if (($values['change_correlator'] == 'default') || !is_numeric($values['change_correlator'])) {
+        $config->clear($id . '.change_correlator');
+      }
+      else {
+        $change_correlator = (int) $values['change_correlator'];
+        $config->set($id . '.change_correlator', (bool) $change_correlator);
+      }
     }
   }
 
