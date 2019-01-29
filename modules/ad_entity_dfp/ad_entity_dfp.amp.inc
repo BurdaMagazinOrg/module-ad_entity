@@ -76,4 +76,24 @@ function template_preprocess_dfp_amp(array &$variables) {
     $json['targeting'] = $targeting_collection->toArray();
   }
   $variables['json'] = $json;
+
+  $rtc_config = [];
+  if (isset($settings['amp']['rtc_config']['vendors'])) {
+      foreach($settings['amp']['rtc_config']['vendors']['vendor_items'] as $vendor){
+        $vendor_vals = explode(",", $vendor['vendor_values']);
+        foreach( $vendor_vals as $val ) {
+          $tmp = explode( ':', $val );
+          $vendor_values[ $tmp[0] ] = $tmp[1];
+        }
+        $rtc_config['vendors'][$vendor['vendor']] = $vendor_values;
+      }
+      if (!empty($settings['amp']['rtc_config']['urls'])) {
+        $rtc_config['urls'] = [$settings['amp']['rtc_config']['urls']];
+      }
+      if (!empty($settings['amp']['rtc_config']['timeoutMillis'])) {
+        $rtc_config['timeoutMillis'] = $settings['amp']['rtc_config']['timeoutMillis'];
+      }
+      $variables['rtc_config'] = $rtc_config;
+  }
+
 }

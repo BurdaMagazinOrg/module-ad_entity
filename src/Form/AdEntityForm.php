@@ -217,6 +217,13 @@ class AdEntityForm extends EntityForm {
         $type->entityConfigValidate($form, $form_state, $ad_entity);
       }
     }
+    if ($view_id = $form_state->getValue('view_plugin_id')) {
+      if ($this->viewManager->hasDefinition($view_id)) {
+        /** @var \Drupal\ad_entity\Plugin\AdViewInterface $view */
+        $view = $this->viewManager->createInstance($view_id);
+        $view->entityConfigValidate($form, $form_state, $ad_entity);
+      }
+    }
   }
 
   /**
@@ -232,6 +239,13 @@ class AdEntityForm extends EntityForm {
         /** @var \Drupal\ad_entity\Plugin\AdTypeInterface $type */
         $type = $this->typeManager->createInstance($type_id);
         $type->entityConfigSubmit($form, $form_state, $ad_entity);
+      }
+    }
+    if ($view_id = $form_state->getValue('view_plugin_id')) {
+      if ($this->viewManager->hasDefinition($view_id)) {
+        /** @var \Drupal\ad_entity\Plugin\AdViewInterface $view */
+        $view = $this->viewManager->createInstance($view_id);
+        $view->entityConfigSubmit($form, $form_state, $ad_entity);
       }
     }
   }
