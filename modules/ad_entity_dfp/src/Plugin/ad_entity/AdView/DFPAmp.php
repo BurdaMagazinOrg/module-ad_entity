@@ -269,7 +269,6 @@ class DFPAmp extends AdViewBase {
     return $form['third_party']['view__dfp_amp']['amp']['rtc_config'];
   }
 
-
   /**
    * @inheritdoc
    */
