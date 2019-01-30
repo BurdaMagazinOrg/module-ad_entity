@@ -125,9 +125,9 @@ class DFPAmp extends AdViewBase {
       '#group' => 'rtc_config-vendors',
       '#open' => TRUE,
     ];
-
-    if ($form_state->hasValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'])) {
-      $num_vendors = (int) $form_state->getValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors']);
+    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    if ($form_state->hasValue($vendor_num)) {
+      $num_vendors = (int) $form_state->getValue($vendor_num);
     }
     else {
       if (!isset($settings['amp'])) {
@@ -224,7 +224,8 @@ class DFPAmp extends AdViewBase {
    *   The Drupal\Core\Form\FormStateInterface FormStateInterface.
    */
   public static function addOneVendor(array &$form, FormStateInterface $form_state) {
-    $num_vendors = $form_state->hasValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors']) ? (int) $form_state->getValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors']) : 1;
+    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
     $form_state->setValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'], ++$num_vendors);
     $form_state->setRebuild(TRUE);
   }
@@ -238,8 +239,9 @@ class DFPAmp extends AdViewBase {
    *   The Drupal\Core\Form\FormStateInterface FormStateInterface.
    */
   public static function removeOneVendor(array &$form, FormStateInterface $form_state) {
-    $num_vendors = $form_state->hasValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors']) ? (int) $form_state->getValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors']) : 1;
-    $form_state->setValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'], --$num_vendors);
+    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
+    $form_state->setValue($vendor_num, --$num_vendors);
     $form_state->setRebuild(TRUE);
   }
 
