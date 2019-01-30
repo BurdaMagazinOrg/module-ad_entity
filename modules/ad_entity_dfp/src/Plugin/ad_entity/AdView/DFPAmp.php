@@ -131,7 +131,7 @@ class DFPAmp extends AdViewBase {
       'amp',
       'rtc_config',
       'vendors',
-      'num_vendors'
+      'num_vendors',
     ];
     if ($form_state->hasValue($vendor_num)) {
       $num_vendors = (int) $form_state->getValue($vendor_num);
@@ -237,10 +237,10 @@ class DFPAmp extends AdViewBase {
       'amp',
       'rtc_config',
       'vendors',
-      'num_vendors'
+      'num_vendors',
     ];
     $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
-    $form_state->setValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'], ++$num_vendors);
+    $form_state->setValue($vendor_num, ++$num_vendors);
     $form_state->setRebuild(TRUE);
   }
 
@@ -259,7 +259,7 @@ class DFPAmp extends AdViewBase {
       'amp',
       'rtc_config',
       'vendors',
-      'num_vendors'
+      'num_vendors',
     ];
     $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
     $form_state->setValue($vendor_num, --$num_vendors);
