@@ -187,7 +187,7 @@ class DFPAmp extends AdViewBase {
     }
 
     $element['amp']['rtc_config']['timeoutMillis'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#required' => FALSE,
       '#title' => $this->stringTranslation->translate('timeoutMillis'),
       '#size' => 10,
@@ -217,6 +217,7 @@ class DFPAmp extends AdViewBase {
 
   /**
    * Adds one vendor.
+   *
    * @param array $form
    *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -230,6 +231,7 @@ class DFPAmp extends AdViewBase {
 
   /**
    * Removes one vendor.
+   *
    * @param array $form
    *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -243,6 +245,7 @@ class DFPAmp extends AdViewBase {
 
   /**
    * Add vendor ajax callback.
+   *
    * @param array $form
    *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -257,6 +260,7 @@ class DFPAmp extends AdViewBase {
 
   /**
    * Remove vendor ajax callback.
+   *
    * @param array $form
    *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -270,7 +274,7 @@ class DFPAmp extends AdViewBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function entityConfigSubmit(array &$form, FormStateInterface $form_state, AdEntityInterface $ad_entity) {
     $provider = $this->getPluginDefinition()['provider'];
