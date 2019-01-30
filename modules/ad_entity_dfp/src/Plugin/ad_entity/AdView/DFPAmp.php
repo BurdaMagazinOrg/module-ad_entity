@@ -125,7 +125,14 @@ class DFPAmp extends AdViewBase {
       '#group' => 'rtc_config-vendors',
       '#open' => TRUE,
     ];
-    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    $vendor_num = [
+      'third_party_settings',
+      'ad_entity_dfp',
+      'amp',
+      'rtc_config',
+      'vendors',
+      'num_vendors'
+    ];
     if ($form_state->hasValue($vendor_num)) {
       $num_vendors = (int) $form_state->getValue($vendor_num);
     }
@@ -224,7 +231,14 @@ class DFPAmp extends AdViewBase {
    *   The Drupal\Core\Form\FormStateInterface FormStateInterface.
    */
   public static function addOneVendor(array &$form, FormStateInterface $form_state) {
-    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    $vendor_num = [
+      'third_party_settings',
+      'ad_entity_dfp',
+      'amp',
+      'rtc_config',
+      'vendors',
+      'num_vendors'
+    ];
     $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
     $form_state->setValue(['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'], ++$num_vendors);
     $form_state->setRebuild(TRUE);
@@ -239,7 +253,14 @@ class DFPAmp extends AdViewBase {
    *   The Drupal\Core\Form\FormStateInterface FormStateInterface.
    */
   public static function removeOneVendor(array &$form, FormStateInterface $form_state) {
-    $vendor_num = ['third_party_settings', 'ad_entity_dfp', 'amp', 'rtc_config', 'vendors', 'num_vendors'];
+    $vendor_num = [
+      'third_party_settings',
+      'ad_entity_dfp',
+      'amp',
+      'rtc_config',
+      'vendors',
+      'num_vendors'
+    ];
     $num_vendors = $form_state->hasValue($vendor_num) ? (int) $form_state->getValue($vendor_num) : 1;
     $form_state->setValue($vendor_num, --$num_vendors);
     $form_state->setRebuild(TRUE);
