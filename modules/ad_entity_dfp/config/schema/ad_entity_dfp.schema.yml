@@ -64,3 +64,33 @@ ad_entity.ad_entity.*.third_party_settings.ad_entity_dfp:
             npa_unknown:
               type: boolean
               label: 'Request non-personalized ads when consent is unknown.'
+        rtc_config:
+          type: mapping
+          label: 'RTC Config'
+          mapping:
+            vendors:
+              type: mapping
+              label: 'Vendors'
+              mapping:
+                num_vendors:
+                  type: integer
+                  label: 'Number of Vendors'
+                timeoutMillis:
+                  type: integer
+                  label: 'Timeout milliseconds'
+                urls:
+                  type: string
+                  label: 'Urls'
+                vendor_items:
+                  type: sequence
+                  label: 'Vendor Items'
+                  sequence:
+                    type: mapping
+                    label: 'Vendor Item'
+                    mapping:
+                      vendor:
+                        type: string
+                        label: 'Vendor name'
+                      vendor_values:
+                        type: string
+                        label: 'Vendor values'
