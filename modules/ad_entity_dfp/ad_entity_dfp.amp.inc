@@ -81,9 +81,10 @@ function template_preprocess_dfp_amp(array &$variables) {
   $rtc_config = [];
   if (isset($settings['amp']['rtc_config']['vendors'])) {
     foreach ($settings['amp']['rtc_config']['vendors']['vendor_items'] as $vendor) {
-      $vendor_vals = explode(",", $vendor['vendor_values']);
-      foreach ($vendor_vals as $val) {
-        $tmp = explode(':', $val);
+      $vendor_values = [];
+      $values = explode(",", $vendor['vendor_values']);
+      foreach ($values as $value) {
+        $tmp = explode(':', $value);
         $vendor_values[$tmp[0]] = $tmp[1];
       }
       $rtc_config['vendors'][$vendor['vendor']] = $vendor_values;
