@@ -137,7 +137,7 @@ class DFPAmp extends AdViewBase {
       $num_vendors = (int) $form_state->getValue($vendor_num);
     }
     else {
-      if (!isset($settings['amp'])) {
+      if (!isset($settings['amp']['rtc_config'])) {
         $num_vendors = 1;
       }
       else {

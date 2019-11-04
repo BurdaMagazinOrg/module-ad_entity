@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\ad_entity\Unit;
+namespace Drupal\Tests\ad_entity\Kernel;
 
 use Drupal\ad_entity\Plugin\ad_entity\AdContext\TargetingContext;
 use Drupal\ad_entity\TargetingCollection;

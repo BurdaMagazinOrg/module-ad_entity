@@ -4,6 +4,18 @@ Like this module and want to help us making it stable?
 We appreciate any contribution - have a look at the ROADMAP.md
 to see the current blockers for the first release candidate.
 
+8.x-1.0-beta34:
+- Added compatibility to drupal 9
+
+8.x-1.0-beta33:
+- Included rtc-config patch issue 3037401
+
+8.x-1.0-beta32:
+- DFP: Added Amp rtc-config options for the AMP view handler, removed rtc-config tag if empty.
+
+8.x-1.0-beta31:
+- DFP: Added Amp rtc-config options for the AMP view handler.
+
 8.x-1.0-beta30:
 - DFP: Added personalization options by consent for the AMP view handler.
 - DFP: Issue #3020997 by Cecilina, mxh: Add an optional setting to define the

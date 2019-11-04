@@ -129,7 +129,7 @@ class AdDisplayBlock extends BlockBase implements ContainerFactoryPluginInterfac
       ];
     }
     else {
-      drupal_set_message($this->t('Stale reference: Failed to load corresponding Display configuration id @id.', ['@id' => $id]), 'error');
+      ​\​Drupal​\​Core​\​Messenger​\​MessengerInterface::addMessage($this->t('Stale reference: Failed to load corresponding Display configuration id @id.', ['@id' => $id]), 'error');
     }
 
     return $form;

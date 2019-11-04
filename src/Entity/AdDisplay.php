@@ -101,7 +101,8 @@ class AdDisplay extends ConfigEntityBase implements AdDisplayInterface {
         $theme_name = $fallback['use_settings_from'];
       }
       if (!empty($fallback['use_base_theme'])) {
-        foreach ($theme->getBaseThemes() as $base_theme) {
+        foreach (
+          $theme->getBaseThemeExtensions() as $base_theme) {
           if (!empty($variants[$base_theme->getName()])) {
             $theme_name = $base_theme->getName();
             break;

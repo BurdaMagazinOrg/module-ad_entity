@@ -1,10 +1,17 @@
 {
-  "name": "burdamagazinorg/ad_entity",
+  "name": "drupal/ad_entity",
   "type": "drupal-module",
-  "description": "Advertising Entity", 
+  "description": "Advertising Entity",
   "license": "GPL-2.0-or-later",
   "minimum-stability": "dev",
   "require": {
     "drupal/entity": "~1.0"
+  },
+  "extra": {
+   "drush": {
+    "services": {
+     "drush.services.yml": "^9"
+    }
+   }
   }
 }

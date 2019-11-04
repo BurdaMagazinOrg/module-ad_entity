@@ -1,0 +1,5 @@
+services:
+  ad_entity.commands:
+    class: \Drupal\ad_entity\Commands\AdEntityAdIntegrationCommands
+    tags:
+      - { name: drush.command }

@@ -265,13 +265,13 @@ class AdDisplayForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label display configuration.', [
+        ​\​Drupal​\​Core​\​Messenger​\​MessengerInterface::addMessage($this->t('Created the %label display configuration.', [
           '%label' => $ad_display->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label display configuration.', [
+        ​\​Drupal​\​Core​\​Messenger​\​MessengerInterface::addMessage($this->t('Saved the %label display configuration.', [
           '%label' => $ad_display->label(),
         ]));
     }
